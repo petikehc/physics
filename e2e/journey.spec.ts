@@ -100,8 +100,10 @@ test('the player steps between beats with the keyboard', async ({ page }) => {
     () => window.__journey!.beats.find((b) => b.key === 'pythagoras:squares')!.start,
   );
   await page.keyboard.press('ArrowRight');
+  // The step is a ~1.4 s tween, but GSAP slows its clock when frames take too long, and software rendering
+  // on CI is slow: allow it the same headroom as the reduced-motion test.
   await expect
-    .poll(() => page.evaluate(() => window.__journey!.time()), { timeout: 20_000 })
+    .poll(() => page.evaluate(() => window.__journey!.time()), { timeout: 60_000 })
     .toBeGreaterThanOrEqual(start - 0.01);
 });
 
