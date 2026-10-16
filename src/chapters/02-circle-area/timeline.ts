@@ -28,11 +28,17 @@ export function buildCircleArea(j: JourneyBuilder) {
   j.beat(SLUG, { id: 'flight', kind: 'flight', minDuration: 5.6 }, ({ tl, cue }) => {
     const d = 5.4;
     tl.set(rig, { ...CIRCLE_DEFAULTS }, 0);
-    // The flat circle rises off the beach and turns upright to face the camera as it flies.
+    // The flat circle rises off the beach and turns upright to face the camera as it flies. It arcs up first
+    // and shrinks early, so the upright circle (radius 2·scale) never dips into the sand.
     tl.set(dust, { from: 'circleFlat', to: 'circle', morph: 0 }, 0);
     tl.to(dust, { morph: 1, duration: d * 0.6, ease: 'power2.inOut' }, 0.2);
-    tl.to(dust, { x: o.x, y: o.y + 1.8, z: o.z, duration: d, ease: 'power2.inOut' }, 0);
-    tl.to(dust, { spin: 0.35, scale: 0.62, size: 1.05, duration: d }, 0);
+    tl.to(dust, { x: o.x, z: o.z, duration: d, ease: 'power2.inOut' }, 0);
+    tl.to(dust, { y: o.y + 3.6, duration: d / 2, ease: 'sine.out' }, 0);
+    tl.to(dust, { y: o.y + 1.8, duration: d / 2, ease: 'sine.in' }, d / 2);
+    tl.to(dust, { scale: 0.62, duration: d * 0.6, ease: 'power2.out' }, 0);
+    tl.to(dust, { spin: 0.35, size: 1.05, duration: d }, 0);
+    // A gentler swirl while it travels, so it reads as a circle rather than a cloud.
+    tl.to(dust, { swirl: 0.35, duration: 1.2 }, 0);
     shot(
       tl,
       SLUG,
@@ -59,8 +65,10 @@ export function buildCircleArea(j: JourneyBuilder) {
     ({ tl, cue }) => {
       // The circle of dust lies down on the sand at exactly the disc's radius…
       tl.set(dust, { from: 'circle', to: 'circleFlat', morph: 0 }, 0);
-      tl.to(dust, { morph: 1, duration: 2.2, ease: 'power2.inOut' }, 0);
-      tl.to(dust, { y: o.y + 0.04, scale: R / 2, spin: 0, duration: 2.4, ease: 'power2.inOut' }, 0);
+      // It lies down first and only then settles, so no part of it dips into the sand on the way.
+      tl.to(dust, { morph: 1, duration: 2.0, ease: 'power2.inOut' }, 0);
+      tl.to(dust, { scale: R / 2, spin: 0, duration: 2.4, ease: 'power2.inOut' }, 0);
+      tl.to(dust, { y: o.y + 0.04, duration: 2.4, ease: 'power3.in' }, 0.1);
       // …and a bronze disc rises through it, scattering the dust back into glinting sand.
       tl.to(rig, { disc: 1, duration: 1.8, ease: 'power2.out' }, 2.5);
       cue(2.5, 'rise', { gain: 0.7 });

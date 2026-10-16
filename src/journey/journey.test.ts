@@ -128,4 +128,32 @@ describe('the journey timeline', () => {
     master.seek(t, false);
     expect(state()).toBe(snap);
   });
+
+  it('keeps the dust circle above the sand while it stands up, flies to chapter 2 and lies down again', () => {
+    const { master } = journey;
+    const dust = runtime.dust;
+    const from = journey.beats.find((b) => b.key === 'pythagoras:slices')!.start;
+    const to = journey.beats.find((b) => b.key === 'circle-area:title')!.end;
+    // Worst case over the points, as the Dust shader moves them: each point's morph is staggered by up to
+    // STAGGER and smoothstepped, and mid-morph it swirls by up to 0.9·swirl (icon units, before scaling).
+    const STAGGER = 0.35;
+    const smooth = (x: number) => {
+      const m = Math.min(Math.max(x, 0), 1);
+      return m * m * (3 - 2 * m);
+    };
+    let worst = Infinity;
+    for (let t = from; t <= to; t += 0.05) {
+      master.seek(t, false);
+      const k = dust.morph * (1 + STAGGER);
+      // How upright the most upright point is (the circle icon has radius 2; lying flat it has no height).
+      const upright = dust.to === 'circle' ? smooth(k) : dust.from === 'circle' ? 1 - smooth(k - STAGGER) : 0;
+      // Lying flat it rests on its groove; standing at all, its lowest point must clear the sand.
+      if (upright < 0.02) continue;
+      const swirling = dust.morph > 0 && dust.morph < 1 ? 0.9 * dust.swirl : 0;
+      const lowest = dust.y - (upright * 2 + swirling) * dust.scale;
+      worst = Math.min(worst, lowest);
+      expect(lowest, `at ${t.toFixed(2)} s`).toBeGreaterThan(0.02);
+    }
+    expect(worst).toBeLessThan(Infinity);
+  });
 });
