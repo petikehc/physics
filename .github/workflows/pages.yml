@@ -1,0 +1,88 @@
+name: Pages
+
+# Publishes the site to the gh-pages branch (Settings → Pages → Deploy from a branch → gh-pages, / (root)):
+#   main          → https://<owner>.github.io/<repo>/
+#   other branches → https://<owner>.github.io/<repo>/preview/<branch>/   (removed when the branch is deleted)
+on:
+  push:
+    branches-ignore: [gh-pages]
+  delete:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# One deploy at a time, in order, so they never overwrite each other's commits to gh-pages.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event_name != 'delete'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Work out where this branch is published
+        id: where
+        run: |
+          repo="${{ github.event.repository.name }}"
+          if [ "$GITHUB_REF_NAME" = "main" ]; then
+            echo "dir=." >> "$GITHUB_OUTPUT"
+            echo "base=/$repo/" >> "$GITHUB_OUTPUT"
+          else
+            slug=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')
+            echo "dir=preview/$slug" >> "$GITHUB_OUTPUT"
+            echo "base=/$repo/preview/$slug/" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          BASE_PATH: ${{ steps.where.outputs.base }}
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: site
+      - name: Publish
+        env:
+          DIR: ${{ steps.where.outputs.dir }}
+          REPO: ${{ github.event.repository.name }}
+        run: |
+          if [ "$DIR" = "." ]; then
+            # main owns the site root; keep the branch previews.
+            find site -mindepth 1 -maxdepth 1 ! -name preview ! -name .git -exec rm -rf {} +
+          else
+            rm -rf "site/$DIR"
+          fi
+          mkdir -p "site/$DIR"
+          cp -r dist/. "site/$DIR/"
+          sh .github/pages/write-fallback.sh site "$REPO"
+          cd site
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Deploy ${GITHUB_SHA::7} from ${GITHUB_REF_NAME}" || exit 0
+          git push -q origin gh-pages
+
+  remove-preview:
+    if: github.event_name == 'delete' && github.event.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+      - name: Remove the deleted branch's preview
+        env:
+          BRANCH: ${{ github.event.ref }}
+        run: |
+          slug=$(echo "$BRANCH" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')
+          [ -d "preview/$slug" ] || exit 0
+          git rm -rq "preview/$slug"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -q -m "Remove the preview of $BRANCH"
+          git push -q origin gh-pages

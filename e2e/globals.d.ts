@@ -6,6 +6,7 @@ interface JourneyHook {
   time: () => number;
   duration: number;
   beats: Array<{ key: string; start: number; end: number; pauseAt?: number }>;
+  rigs: Record<string, object>;
   renderAudio: (seconds?: number) => Promise<string>;
 }
 

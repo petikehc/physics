@@ -311,6 +311,18 @@ is corrected at beat labels when it exceeds 50 ms.
   - quiet UI hover and click sounds
 - Your turn / Lab: three soft tones follow a, b and c while dragging, and a triple chime plays on Pythagorean triples.
 
+**Chapter 2 cue sheet (built)**
+- Score "Circles": during the flight the drone glides from C + G to A + E and the pad turns to F–G–Em–Am. The
+  arpeggio goes round its chord instead of up and down, doubles its rate and climbs an octave while the slices
+  multiply, and the formula resolves on 3:4:5 again.
+- SFX:
+  - knife scrape for each cut, ending in a faint bronze ring
+  - a riffle of light clicks as the pieces land in the row
+  - one step up the pentatonic for each doubling of the slices
+  - the onion rings uncoil with a long whoosh, and every third ring tinks as it lands, higher as the strips shorten
+  - formula: a run once round the pentatonic, then a wide open chord
+- Your turn / Lab: every slider change re-deals the row with the same doubling step and riffle.
+
 ---
 
 ## 5. Technical architecture
@@ -406,7 +418,7 @@ src/
    - → **Checkpoint with you** to lock the look, camera pacing and sound.
 
 **Later sessions**
-3. Ch.2 and ch.3 (bronze disc, bath house, water).
+3. Ch.2 (built: the slicing and onion proofs, Your turn, Lab and score) and ch.3 (bath house, water).
 4. Ch.4–6 (space, chase cam, the abstract realm).
 5. Ch.7–9 (helix shadows, clockwork Fourier, Doppler street).
 6. Ch.10, the Constellation finale and index, and the full teaser montage.

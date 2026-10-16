@@ -186,7 +186,13 @@ function crownIcon(n: number) {
     [4, band],
     [3, spikes],
     [0.8, jewels],
-    [1, circle(0, -0.6, R)],
+    [
+      1,
+      (rng) => {
+        const t = rng() * TAU;
+        return [Math.cos(t) * R, -0.6, Math.sin(t) * R];
+      },
+    ],
   ]);
 }
 
@@ -348,6 +354,20 @@ function coasterIcon(n: number) {
   ]);
 }
 
+/** Lays an upright icon flat on the ground: (x, y, z) → (x, z, −y). */
+function laidFlat(gen: (n: number) => Float32Array) {
+  return (n: number) => {
+    const src = gen(n);
+    const out = new Float32Array(src.length);
+    for (let i = 0; i < src.length; i += 3) {
+      out[i] = src[i]!;
+      out[i + 1] = src[i + 2]!;
+      out[i + 2] = -src[i + 1]!;
+    }
+    return out;
+  };
+}
+
 function grain(n: number) {
   return mix(n, 21, [[1, ball(0, 0, 0, 0.035)]], 0);
 }
@@ -373,6 +393,7 @@ function stars(n: number) {
 export const SHAPES: Record<string, (n: number) => Float32Array> = {
   pythagoras: pythagorasIcon,
   circle: circleIcon,
+  circleFlat: laidFlat(circleIcon),
   crown: crownIcon,
   orbit: orbitIcon,
   apple: appleIcon,

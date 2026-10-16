@@ -157,7 +157,7 @@ export function Dust() {
     spin.current += rig.spin * Math.min(dt, 0.1);
     pts.position.set(rig.x, rig.y, rig.z);
     pts.scale.setScalar(rig.scale);
-    pts.rotation.y = rig.rotY + spin.current;
+    pts.rotation.set(rig.rotX, rig.rotY + spin.current, 0, 'YXZ');
     pts.visible = rig.opacity > 0.001;
   });
 

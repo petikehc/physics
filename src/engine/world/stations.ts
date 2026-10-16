@@ -3,13 +3,16 @@ export interface StationPlacement {
   x: number;
   y: number;
   z: number;
+  /** Centre of the station's shadow frustum, as an (x, z) offset from the station. */
+  shadow?: [number, number];
 }
 
 /** The landing teaser hangs in the dusk sky above the beach of chapter 1. */
 export const TEASER: StationPlacement = { x: 0, y: 25.4, z: 0 };
 
 export const STATIONS: Record<string, StationPlacement> = {
-  pythagoras: { x: 0, y: 0, z: 0 },
+  // The proofs of chapter 1 sit to the right of the triangle.
+  pythagoras: { x: 0, y: 0, z: 0, shadow: [3, 0] },
   // Archimedes drew his circles in the sand too: chapter 2 sits further along the same beach.
   'circle-area': { x: 46, y: 0, z: -38 },
   archimedes: { x: 90, y: 0, z: -80 },

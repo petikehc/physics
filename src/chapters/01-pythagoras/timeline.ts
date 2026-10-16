@@ -20,6 +20,11 @@ const P1 = at(3, 0);
 const CENTROID = at(1, 4 / 3);
 const C_TANK = at(3.5, 3.5);
 const FRAME_CENTRE = at(13, 2);
+/** Looking almost straight down on the circle the hypotenuse carves (radius 5·S about P1), a little high in frame. */
+const TOP_DOWN = {
+  pos: [P1[0], 11.6, P1[2] + 1.9] as [number, number, number],
+  target: [P1[0], 0, P1[2] + 0.7] as [number, number, number],
+};
 
 /** Story-mode timeline for chapter 1, beat by beat. */
 export function buildPythagoras(j: JourneyBuilder) {
@@ -64,7 +69,7 @@ export function buildPythagoras(j: JourneyBuilder) {
     {
       id: 'draw',
       heading: 'Scratch it in the sand',
-      body: 'Two short sides, [a:a] and [b:b], meet at a right angle. The long side across from it, [c:c], is the hypotenuse.',
+      body: 'Two short sides, [a:a] and [b:b], meet at a right angle, marked with a little square. The long side across from it, [c:c], is the hypotenuse.',
     },
     ({ tl, cue }) => {
       const R = 4.1;
@@ -89,8 +94,10 @@ export function buildPythagoras(j: JourneyBuilder) {
       cue(6.3, 'pop', { pitch: 2 });
       cue(8.8, 'pop', { pitch: 1 });
       tl.to(rig, { stick: 0, duration: 0.5, ease: 'power2.in' }, 8.9);
-      tl.to(rig, { rightMark: 1, duration: 0.7, ease: 'power2.out' }, 9.0);
-      cue(9.6, 'tick');
+      tl.to(rig, { rightMark: 1, duration: 0.9, ease: 'power2.out' }, 9.0);
+      cue(9.8, 'tick');
+      // Rise for a moment so the whole triangle and its square corner read clearly.
+      shot(tl, SLUG, { orbit: { height: 3.6, radius: 4.9 }, dof: 0.3 }, 2.0, 8.8, 'power2.inOut');
     },
   );
 
@@ -272,10 +279,12 @@ export function buildPythagoras(j: JourneyBuilder) {
       tl.to(rig, { tanks: 0, areaLabels: 0, labels: 0, rightMark: 0, duration: 1.4, ease: 'power2.in' }, 0);
       tl.set(rig, { cFull: 0, proofSink: 0 }, 1.5);
       cue(0.1, 'sink');
+      // Face-on, from almost straight above: at an angle, perspective squashes the circle into an ellipse,
+      // the swinging radius seems to change length, and the legs stop looking square.
       shot(
         tl,
         SLUG,
-        { pos: [P1[0] + 0.6, 7.0, P1[2] + 7.4], target: [P1[0], 0, P1[2] - 0.3], fov: 40, shake: 0.4 },
+        { pos: TOP_DOWN.pos, target: TOP_DOWN.target, fov: 40, shake: 0.3, dof: 0 },
         2.6,
         0,
         'power3.inOut',
@@ -285,33 +294,50 @@ export function buildPythagoras(j: JourneyBuilder) {
       tl.to(rig, { groove: 0.35, duration: 3 }, 3);
       cue(6.0, 'tick');
       tl.to(rig, { radius: 0, duration: 0.6 }, 6.2);
-      // The beach's dust lifts off the sand and gathers into the disc of the next chapter.
-      tl.set(dust, { from: 'sand', to: 'circle', morph: 0 }, 6.1);
-      tl.to(dust, { morph: 1, duration: 2.6, ease: 'power2.inOut' }, 6.1);
+    },
+  );
+
+  j.beat(
+    SLUG,
+    {
+      id: 'slices',
+      heading: 'Sliced like a pie',
+      body: 'Archimedes measured circles by cutting them into slices like these. That is the next chapter.',
+    },
+    ({ tl, cue }) => {
+      // The beach's dust gathers onto the carved circle and lies flat on it, exactly over the groove. (It rises
+      // and stands up to face the camera during the flight to chapter II: from straight above, a lift here
+      // would only read as the circle growing.)
+      const R = 5 * S; // radius of the carved circle: the hypotenuse
+      tl.set(dust, { from: 'sand', to: 'circleFlat', morph: 0, rotX: 0, spin: 0 }, 0);
+      tl.to(dust, { morph: 1, duration: 2.8, ease: 'power2.inOut' }, 0);
       tl.to(
         dust,
         {
           x: P1[0],
-          y: 1.6,
+          y: 0.04,
           z: P1[2],
-          scale: 1.1,
+          // The icon's circle has radius 2, so this lands it exactly on the groove.
+          scale: R / 2,
           size: 1.05,
           swirl: 1.1,
           drift: 0.8,
           colorA: '#f6e6cc',
           colorB: '#c98b4a',
-          duration: 2.6,
+          duration: 2.8,
           ease: 'power2.inOut',
         },
-        6.1,
+        0,
       );
-      cue(6.1, 'gather');
+      cue(0, 'gather');
+      tl.to(dust, { size: 1.2, duration: 1.8, ease: 'sine.inOut' }, 2.8);
+      // Still face-on, so the dust reads as a sliced disc lying on the carved circle.
       shot(
         tl,
         SLUG,
-        { pos: [P1[0], 2.4, P1[2] + 7.2], target: [P1[0], 1.4, P1[2]], focus: [P1[0], 1.6, P1[2]] },
-        3.2,
-        6.0,
+        { pos: [P1[0], 11.4, P1[2] + 2.2], target: [P1[0], 0.3, P1[2] + 0.9], focus: [P1[0], 0.3, P1[2]] },
+        4.2,
+        0,
         'power2.inOut',
       );
     },

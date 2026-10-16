@@ -66,6 +66,8 @@ export interface DustRig {
   z: number;
   scale: number;
   rotY: number;
+  /** Tilt about the x-axis (applied before the y rotation and spin). */
+  rotX: number;
   /** Continuous spin speed (radians per second) added on top of rotY. */
   spin: number;
   size: number;
@@ -88,6 +90,7 @@ export function createDustRig(): DustRig {
     z: 0,
     scale: 0.85,
     rotY: 0,
+    rotX: 0,
     spin: 0.08,
     size: 1,
     opacity: 1,

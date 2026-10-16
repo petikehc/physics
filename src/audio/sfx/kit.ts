@@ -2,6 +2,22 @@ import * as Tone from 'tone';
 import { pyth, sideToFrequency, triangleChord } from '../tuning';
 import type { Triangle } from '../../chapters/01-pythagoras/math';
 
+/** C pentatonic upwards from C5: the pitches pieces and rings land on. */
+const PENTA_UP = [
+  pyth('C', 5),
+  pyth('D', 5),
+  pyth('E', 5),
+  pyth('G', 5),
+  pyth('A', 5),
+  pyth('C', 6),
+  pyth('D', 6),
+  pyth('E', 6),
+  pyth('G', 6),
+  pyth('A', 6),
+];
+/** Up the pentatonic and back to where it started: a circle. */
+const CIRCLE_RUN = [...PENTA_UP.slice(0, 6), ...PENTA_UP.slice(0, 5).reverse()];
+
 /**
  * Procedural sound effects. Everything is synthesised (no samples), built once and re-triggered.
  * Every trigger takes an optional AudioContext time so the same kit can be scheduled offline.
@@ -17,6 +33,11 @@ export class SfxKit {
   private clackBody: Tone.MembraneSynth;
   private clackNoise: Tone.NoiseSynth;
   private click: Tone.NoiseSynth;
+  /** Bronze: a bright, inharmonic FM clink. */
+  private metal: Tone.PolySynth<Tone.FMSynth>;
+  /** Knife scrape: white noise through a sweeping band-pass. */
+  private scrapeFilter: Tone.Filter;
+  private scrapeGain: Tone.Gain;
 
   // Whoosh: a running noise whose gain and filter are automated per trigger.
   private whooshFilter: Tone.Filter;
@@ -85,6 +106,22 @@ export class SfxKit {
       volume: -18,
     }).connect(clickFilter);
 
+    this.metal = new Tone.PolySynth(Tone.FMSynth, {
+      harmonicity: 5.07,
+      modulationIndex: 12,
+      oscillator: { type: 'sine' },
+      envelope: { attack: 0.001, decay: 0.9, sustain: 0, release: 0.9 },
+      modulation: { type: 'sine' },
+      modulationEnvelope: { attack: 0.001, decay: 0.12, sustain: 0, release: 0.1 },
+      volume: -24,
+    }).connect(this.verb);
+
+    this.scrapeGain = new Tone.Gain(0).connect(this.verb);
+    this.scrapeFilter = new Tone.Filter({ type: 'bandpass', frequency: 3000, Q: 2.5 }).connect(
+      this.scrapeGain,
+    );
+    const scrapeNoise = new Tone.Noise('white').connect(this.scrapeFilter);
+
     // Whoosh chain.
     this.whooshPan = new Tone.Panner(0).connect(this.out);
     this.whooshGain = new Tone.Gain(0).connect(this.whooshPan);
@@ -136,6 +173,7 @@ export class SfxKit {
     );
 
     this.sources = [
+      scrapeNoise,
       whooshNoise,
       rumbleNoise,
       chalkNoise,
@@ -233,6 +271,14 @@ export class SfxKit {
         return;
       }
       case 'formula':
+        if (params.chapter === 2) {
+          // Once round the pentatonic circle, then a wide, open C chord.
+          CIRCLE_RUN.forEach((f, i) => this.bell.triggerAttackRelease(f, 1.6, t + i * 0.09, 0.22));
+          [pyth('C', 4), pyth('G', 4), pyth('E', 5)].forEach((f, i) =>
+            this.bell.triggerAttackRelease(f, 3.5, t + 0.75 + i * 0.1, 0.42),
+          );
+          return;
+        }
         // The triangle's own chord: frequencies in the ratio 3 : 4 : 5.
         triangleChord(pyth('C', 4)).forEach((f, i) =>
           this.bell.triggerAttackRelease(f, 3.5, t + i * 0.12, 0.45),
@@ -260,6 +306,50 @@ export class SfxKit {
         triangleChord(pyth('C', 5)).forEach((f, i) =>
           this.bell.triggerAttackRelease(f, 1.8, t + i * 0.09, 0.4),
         );
+        return;
+      case 'cut': {
+        // A knife drawn across bronze: a rising hiss and a faint ring.
+        const f = this.scrapeFilter.frequency;
+        f.cancelScheduledValues(t);
+        f.setValueAtTime(2200, t);
+        f.exponentialRampToValueAtTime(6200, t + 0.55);
+        const g = this.scrapeGain.gain;
+        g.cancelScheduledValues(t);
+        g.setValueAtTime(0, t);
+        g.linearRampToValueAtTime(0.16, t + 0.08);
+        g.linearRampToValueAtTime(0.1, t + 0.45);
+        g.linearRampToValueAtTime(0, t + 0.7);
+        const ring = [pyth('A', 6), pyth('E', 6), pyth('G', 6), pyth('D', 6)][(params.i ?? 0) % 4]!;
+        this.metal.triggerAttackRelease(ring, 0.6, t + 0.62, 0.35);
+        return;
+      }
+      case 'tink': {
+        const f = PENTA_UP[Math.min(params.i ?? 0, PENTA_UP.length - 1)]!;
+        this.metal.triggerAttackRelease(f, 0.5, t, 0.55);
+        return;
+      }
+      case 'riffle': {
+        // Pieces landing one after another, like a deck of cards being riffled.
+        const n = Math.max(4, Math.min(params.n ?? 8, 24));
+        const dur = params.dur ?? 1.2;
+        const t0 = t + (params.delay ?? 0);
+        for (let i = 0; i < n; i++) {
+          const jitter = (((i * 7919) % 13) / 13 - 0.5) * (dur / n) * 0.5;
+          const at = t0 + (dur * i) / n + jitter;
+          this.clackNoise.triggerAttackRelease(0.03, Math.max(t0, at), 0.18 + ((i * 31) % 7) / 30);
+        }
+        return;
+      }
+      case 'double': {
+        // Each doubling of the slices climbs one step.
+        const k = Math.max(0, Math.min(params.k ?? 0, PENTA_UP.length - 3));
+        this.bell.triggerAttackRelease(PENTA_UP[k + 2]!, 1.2, t, 0.22);
+        this.blip.triggerAttackRelease(PENTA_UP[k + 2]! * 2, 0.06, t, 0.35);
+        return;
+      }
+      case 'uncoil':
+        this.whoosh(t, 0.55, 3.2);
+        this.rumble(t + 0.2, 2.4, 0.35, 300, 700);
         return;
       case 'uiHover':
         return this.blip.triggerAttackRelease(1800, 0.02, t, 0.12);
@@ -296,7 +386,7 @@ export class SfxKit {
     const g = this.rumbleGain.gain;
     g.cancelScheduledValues(t);
     g.setValueAtTime(0, t);
-    g.linearRampToValueAtTime(0.7 * gain, t + dur * 0.4);
+    g.linearRampToValueAtTime(0.38 * gain, t + dur * 0.4);
     g.linearRampToValueAtTime(0, t + dur);
   }
 

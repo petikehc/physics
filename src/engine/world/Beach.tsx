@@ -5,6 +5,12 @@ import * as THREE from 'three';
 import { createSandMaterial } from '../materials/sand';
 import { DUSK, SUN_DIR } from './Sky';
 import { useApp } from '../../state/store';
+import { station } from './stations';
+
+/** Half-size of the shadow frustum around the active station (centred by its `shadow` offset). */
+const SHADOW_HALF = 11;
+/** Elevation of the shadow-casting sun (the visible sun sits much lower, on the horizon). */
+const SHADOW_ELEVATION = (50 * Math.PI) / 180;
 
 const sand = createSandMaterial();
 sand.uniforms.uZenith.value.set(DUSK.zenith);
@@ -31,35 +37,50 @@ export function Beach() {
     };
   }, [scene]);
 
+  const chapterSlug = useApp((s) => s.chapterSlug);
+
   const sun = useMemo(() => {
-    const light = new THREE.DirectionalLight('#ffb27a', 3.0);
+    // Dim enough that the high shadow-casting angle doesn't flatten the dusk light.
+    const light = new THREE.DirectionalLight('#ffb27a', 1.7);
     light.castShadow = quality !== 'low';
-    const size = quality === 'high' ? 2048 : 1024;
-    light.shadow.mapSize.set(size, size);
+    light.shadow.mapSize.set(2048, 2048);
     const cam = light.shadow.camera;
-    cam.left = -12;
-    cam.right = 12;
-    cam.top = 12;
-    cam.bottom = -12;
-    cam.near = 1;
-    cam.far = 80;
-    light.shadow.bias = -0.0004;
-    light.shadow.normalBias = 0.03;
+    cam.left = -SHADOW_HALF;
+    cam.right = SHADOW_HALF;
+    cam.top = SHADOW_HALF;
+    cam.bottom = -SHADOW_HALF;
+    cam.near = 5;
+    cam.far = 90;
+    light.shadow.bias = -0.0003;
+    light.shadow.normalBias = 0.02;
+    // Soft PCF edges instead of stair-stepped ones, and lighter shadows that don't read as holes.
+    light.shadow.radius = 2.5;
+    light.shadow.intensity = 0.72;
     return light;
   }, [quality]);
 
   useEffect(() => () => sun.dispose(), [sun]);
 
+  // The shadow frustum is fixed around the active station. Following the camera made shadows swim and jump.
+  useEffect(() => {
+    const o = station(chapterSlug);
+    const cx = o.x + (o.shadow?.[0] ?? 0);
+    const cz = o.z + (o.shadow?.[1] ?? 0);
+    sun.target.position.set(cx, o.y, cz);
+    sun.target.updateMatrixWorld();
+    // A higher virtual sun than the visible one keeps shadows short and readable at dusk.
+    const h = Math.hypot(SUN_DIR.x, SUN_DIR.z);
+    const el = SHADOW_ELEVATION;
+    sun.position.set(
+      cx + (SUN_DIR.x / h) * Math.cos(el) * 40,
+      o.y + Math.sin(el) * 40,
+      cz + (SUN_DIR.z / h) * Math.cos(el) * 40,
+    );
+    sun.shadow.needsUpdate = true;
+  }, [sun, chapterSlug]);
+
   useFrame((state) => {
     beachSand.uTime.value = state.clock.elapsedTime;
-    // Keep the shadow frustum centred under the camera's target area.
-    const cam = state.camera;
-    const fx = Math.round(cam.position.x / 4) * 4;
-    const fz = Math.round(cam.position.z / 4) * 4;
-    sun.target.position.set(fx, 0, fz - 3);
-    // A higher virtual sun than the visible one keeps shadows readable at dusk.
-    sun.position.set(fx + SUN_DIR.x * 40, 14, fz - 3 + SUN_DIR.z * 40);
-    sun.target.updateMatrixWorld();
   });
 
   return (

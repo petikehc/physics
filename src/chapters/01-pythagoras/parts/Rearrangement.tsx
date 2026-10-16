@@ -63,12 +63,13 @@ const stone = new THREE.MeshStandardMaterial({ color: '#efe4d0', roughness: 0.78
 const stoneEdges = new THREE.LineBasicMaterial({ color: '#f4efe6', transparent: true, opacity: 0.55 });
 const frameMat = new THREE.MeshStandardMaterial({ color: '#3b2f28', roughness: 0.7 });
 
+// An opaque-ish fill rather than an additive glow: additive brightened the fine sand grain and the
+// twinkling Dust underneath, which shimmered as the camera breathed.
 function glowMaterial(color: string) {
   return new THREE.MeshBasicMaterial({
     color,
     transparent: true,
     opacity: 0,
-    blending: THREE.AdditiveBlending,
     depthWrite: false,
     toneMapped: false,
   });
@@ -92,9 +93,10 @@ export function Rearrangement() {
       L,
       tile,
       edges: new THREE.EdgesGeometry(tile, 25),
-      glowA1: flatShape(L.holesA[0]!, 0.02),
-      glowA2: flatShape(L.holesA[1]!, 0.02),
-      glowB: flatShape(L.holeB, 0.025),
+      // Lifted above the Dust's sand sparkles so none twinkle through.
+      glowA1: flatShape(L.holesA[0]!, 0.06),
+      glowA2: flatShape(L.holesA[1]!, 0.06),
+      glowB: flatShape(L.holeB, 0.065),
     };
   }, [a, b]);
 
@@ -155,11 +157,12 @@ export function Rearrangement() {
     }
 
     // Glowing holes: a² and b² in layout A, c² in layout B.
-    const gA = rig.glowA * (1 - rig.layout);
+    // a² and b² clear away early in the slide so they never muddy the c² square.
+    const gA = rig.glowA * (1 - Math.min(1, rig.layout * 2.5));
     const gB = rig.glowB * rig.layout;
-    glowMats[0]!.opacity = gA * 0.55;
-    glowMats[1]!.opacity = gA * 0.55;
-    glowMats[2]!.opacity = gB * 0.55;
+    glowMats[0]!.opacity = gA * 0.85;
+    glowMats[1]!.opacity = gA * 0.85;
+    glowMats[2]!.opacity = gB * 0.85;
     glows.current.forEach((m, i) => {
       if (m) m.visible = (i < 2 ? gA : gB) > 0.002;
     });

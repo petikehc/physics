@@ -45,9 +45,11 @@ export function PostFX() {
         luminanceSmoothing={0.2}
         radius={0.7}
       />
+      {/* Tone map before grading: grain and vignette must work on display values, not raw HDR, or bright
+          highlights split into colour fringes. */}
+      <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
       <Vignette offset={0.28} darkness={0.72} />
       <Noise premultiply blendFunction={BlendFunction.SOFT_LIGHT} opacity={0.35} />
-      <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
     </EffectComposer>
   );
 }

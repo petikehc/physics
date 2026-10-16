@@ -1,6 +1,7 @@
 import { audio } from '../../audio';
 import { clamp01 } from '../../engine/ease';
-import { pourLevels, triangle } from './math';
+import type { Levels, Meter } from '../sound';
+import { triangle } from './math';
 import { pythagorasRig, type PythagorasRig } from './rig';
 
 /** The rig fields the soundtrack listens to. */
@@ -22,7 +23,7 @@ export function sample(rig: PythagorasRig): SoundSample {
  * Continuous sound levels from how fast the rig changes: the chalk scratch follows the stick and the
  * swinging radius, the pour follows the drain rate. Pure, so offline renders use it too.
  */
-export function continuousLevels(prev: SoundSample, cur: SoundSample, dt: number) {
+export function continuousLevels(prev: SoundSample, cur: SoundSample, dt: number): Levels {
   const step = Math.max(dt, 1 / 240);
   const drawRate = Math.abs(cur.draw - prev.draw) / step;
   const circleRate = Math.abs(cur.circle - prev.circle) / step;
@@ -36,23 +37,26 @@ export function continuousLevels(prev: SoundSample, cur: SoundSample, dt: number
   return { chalk, pour };
 }
 
-let prev: SoundSample = { draw: 0, circle: 0, pourA: 0, pourB: 0, stick: 0 };
+/** Tracks chapter 1's rig between frames and returns its continuous levels. */
+export function pythagorasMeter(): Meter {
+  const rig = pythagorasRig();
+  let prev = sample(rig);
+  return (dt) => {
+    const cur = sample(rig);
+    const levels = continuousLevels(prev, cur, dt);
+    prev = cur;
+    return levels;
+  };
+}
+
 const prevShape = { a: 3, b: 4, gamma: 90 };
 
-/** Called every frame by the journey and the Lab. */
-export function pythagorasSoundFrame(dt: number, interactive: boolean) {
+/** The three side tones while the viewer reshapes the triangle (silent when `interactive` is false). */
+export function pythagorasSides(interactive: boolean) {
   const rig = pythagorasRig();
-  const cur = sample(rig);
-  const { chalk, pour } = continuousLevels(prev, cur, dt);
-  audio.continuous('chalk', chalk);
   const t = triangle(rig.a, rig.b, rig.gamma);
-  audio.continuous('pour', pour, {
-    level: pourLevels(t.a, t.b, t.c, drainOf(rig.pourA), drainOf(rig.pourB)).total,
-  });
-
   const moved = rig.a !== prevShape.a || rig.b !== prevShape.b || rig.gamma !== prevShape.gamma;
   audio.sides(interactive ? t : null, moved);
-  prev = cur;
   prevShape.a = rig.a;
   prevShape.b = rig.b;
   prevShape.gamma = rig.gamma;
