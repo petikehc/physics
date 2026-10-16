@@ -6,6 +6,7 @@ import { controller } from './controller';
 import { renderCaption } from '../ui/caption';
 import { Formula } from '../engine/labels/Formula';
 import { chapterBySlug } from '../chapters/registry';
+import { VIEWS } from '../chapters/views';
 
 function useBeat() {
   const key = useApp((s) => s.beatKey);
@@ -130,14 +131,16 @@ export function TitleCard() {
   );
 }
 
-const PYTHAGORAS_TEX = '\\textcolor{#f2b04a}{a}^2 + \\textcolor{#45c4b8}{b}^2 = \\textcolor{#e2704f}{c}^2';
-
 /** The chapter formula, assembled during the formula beat. */
 export function FormulaOverlay() {
   const beat = useBeat();
   const reduced = useApp((s) => s.reducedMotion);
   const visible = beat?.kind === 'formula';
+  // Keep the last formula while it dissolves after its beat.
+  const last = useRef(VIEWS.pythagoras!.formula);
+  const f = beat ? VIEWS[beat.chapter]?.formula : undefined;
+  if (visible && f) last.current = f;
   return (
-    <Formula source={PYTHAGORAS_TEX} visible={visible} caption="The Pythagorean theorem" reduced={reduced} />
+    <Formula source={last.current.tex} visible={visible} caption={last.current.caption} reduced={reduced} />
   );
 }

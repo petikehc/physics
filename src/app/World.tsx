@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { PerformanceMonitor } from '@react-three/drei';
 import { useApp, type QualityTier } from '../state/store';
@@ -7,18 +7,27 @@ import { Dust } from '../engine/dust/Dust';
 import { Sky } from '../engine/world/Sky';
 import { Beach } from '../engine/world/Beach';
 import { PostFX } from '../engine/world/PostFX';
-
-const PythagorasStation = lazy(() => import('../chapters/01-pythagoras/Station'));
+import { CHAPTERS, chapterBySlug } from '../chapters/registry';
+import { STATION_VIEWS } from '../chapters/stations';
 
 const DPR: Record<QualityTier, [number, number]> = { low: [1, 1.25], medium: [1, 1.5], high: [1, 2] };
 const DOWN: Record<QualityTier, QualityTier> = { high: 'medium', medium: 'low', low: 'low' };
+
+/** The stations to keep mounted: the current chapter and its neighbours, so a flight never lands on nothing. */
+function stationWindow(slug: string): string[] {
+  const i = chapterBySlug(slug)?.index ?? 0;
+  return CHAPTERS.slice(Math.max(0, i - 1), i + 2)
+    .map((c) => c.slug)
+    .filter((s) => STATION_VIEWS[s]);
+}
 
 /** The single persistent 3D world behind every route. */
 export function World() {
   const quality = useApp((s) => s.quality);
   const mode = useApp((s) => s.mode);
+  const chapterSlug = useApp((s) => s.chapterSlug);
   const set = useApp((s) => s.set);
-  const showStation = mode === 'journey' || mode === 'lab';
+  const showStations = mode === 'journey' || mode === 'lab';
 
   return (
     <Canvas
@@ -34,11 +43,16 @@ export function World() {
       <Sky />
       <Beach />
       <Dust />
-      {showStation ? (
-        <Suspense fallback={null}>
-          <PythagorasStation />
-        </Suspense>
-      ) : null}
+      {showStations
+        ? stationWindow(chapterSlug).map((slug) => {
+            const Station = STATION_VIEWS[slug]!;
+            return (
+              <Suspense key={slug} fallback={null}>
+                <Station />
+              </Suspense>
+            );
+          })
+        : null}
       <PostFX />
     </Canvas>
   );

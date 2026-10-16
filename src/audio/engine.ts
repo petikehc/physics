@@ -81,7 +81,7 @@ export class AudioEngine {
       this.scene === 'teaser'
         ? 'teaser'
         : this.scene === 'lab'
-          ? 'lab'
+          ? (this.beat ?? 'lab')
           : this.scene === 'journey'
             ? this.beat
             : null;

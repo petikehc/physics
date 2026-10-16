@@ -1,6 +1,8 @@
 import * as Tone from 'tone';
 import { C3, pyth, triangleChord, type Note } from '../tuning';
 
+export type Theme = 'pythagoras' | 'circle';
+
 /** How the score sounds during one beat. Values are targets the score glides to. */
 export interface Layers {
   drone: number;
@@ -8,13 +10,24 @@ export interface Layers {
   cutoff: number;
   plucks: number;
   arp: number;
-  /** 'prog' cycles C–Am–F–G; 'resolve' holds the 3:4:5 triangle chord. */
+  /** 'prog' cycles the theme's chords; 'resolve' holds the 3:4:5 triangle chord. */
   harmony: 'prog' | 'resolve';
+  /** Chapter theme: its drone and chord progression. Defaults to chapter 1's. */
+  theme?: Theme;
+  /** Arpeggio in sixteenths instead of eighths. */
+  arpFast?: boolean;
+  /** Extra octaves on the arpeggio. */
+  arpOctave?: number;
 }
 
 const QUIET: Layers = { drone: 0, pad: 0, cutoff: 500, plucks: 0, arp: 0, harmony: 'prog' };
+const CIRCLE: Theme = 'circle';
 
-/** Per-beat arrangement of chapter 1 ("Pythagorean Drone"). */
+/**
+ * Per-beat arrangement. Chapter 1 is "Pythagorean Drone" (C–Am–F–G over a C–G drone); chapter 2 turns to
+ * "Circles" (F–G–Em–Am over an A–E drone, the arpeggio going round its chord rather than up and down, and
+ * climbing as the slices multiply). The drone glides between the two during the flight.
+ */
 export const ARRANGEMENT: Record<string, Layers> = {
   teaser: { drone: 0.55, pad: 0.6, cutoff: 700, plucks: 0.14, arp: 0, harmony: 'prog' },
   'pythagoras:title': { drone: 0.8, pad: 0.75, cutoff: 650, plucks: 0.1, arp: 0, harmony: 'prog' },
@@ -28,13 +41,134 @@ export const ARRANGEMENT: Record<string, Layers> = {
   'pythagoras:yourTurn': { drone: 0.5, pad: 0.45, cutoff: 700, plucks: 0.12, arp: 0, harmony: 'prog' },
   'pythagoras:handoff': { drone: 0.8, pad: 0.75, cutoff: 1800, plucks: 0.1, arp: 0.7, harmony: 'prog' },
   'pythagoras:slices': { drone: 0.8, pad: 0.75, cutoff: 1800, plucks: 0.1, arp: 0.85, harmony: 'prog' },
-  'circle-area:flight': { drone: 0.9, pad: 0.9, cutoff: 2600, plucks: 0.2, arp: 0.5, harmony: 'prog' },
-  'circle-area:soon': { drone: 0.5, pad: 0.5, cutoff: 900, plucks: 0.1, arp: 0, harmony: 'prog' },
+  'pythagoras:lab': { drone: 0.45, pad: 0.4, cutoff: 800, plucks: 0.1, arp: 0, harmony: 'prog' },
+  'circle-area:flight': {
+    drone: 0.9,
+    pad: 0.9,
+    cutoff: 2600,
+    plucks: 0.2,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: CIRCLE,
+  },
+  'circle-area:title': {
+    drone: 0.8,
+    pad: 0.75,
+    cutoff: 700,
+    plucks: 0.12,
+    arp: 0,
+    harmony: 'prog',
+    theme: CIRCLE,
+  },
+  'circle-area:slice': {
+    drone: 0.8,
+    pad: 0.7,
+    cutoff: 900,
+    plucks: 0.22,
+    arp: 0,
+    harmony: 'prog',
+    theme: CIRCLE,
+  },
+  'circle-area:deal': {
+    drone: 0.85,
+    pad: 0.8,
+    cutoff: 1300,
+    plucks: 0.14,
+    arp: 0.55,
+    harmony: 'prog',
+    theme: CIRCLE,
+  },
+  'circle-area:refine': {
+    drone: 0.9,
+    pad: 0.85,
+    cutoff: 2400,
+    plucks: 0.08,
+    arp: 0.7,
+    harmony: 'prog',
+    theme: CIRCLE,
+    arpFast: true,
+    arpOctave: 1,
+  },
+  'circle-area:rectangle': {
+    drone: 0.8,
+    pad: 0.8,
+    cutoff: 1600,
+    plucks: 0.28,
+    arp: 0.3,
+    harmony: 'prog',
+    theme: CIRCLE,
+  },
+  'circle-area:formula': {
+    drone: 0.9,
+    pad: 1,
+    cutoff: 3000,
+    plucks: 0,
+    arp: 0,
+    harmony: 'resolve',
+    theme: CIRCLE,
+  },
+  'circle-area:onion': {
+    drone: 0.85,
+    pad: 0.8,
+    cutoff: 2000,
+    plucks: 0.1,
+    arp: 0.6,
+    harmony: 'prog',
+    theme: CIRCLE,
+    arpFast: true,
+  },
+  'circle-area:yourTurn': {
+    drone: 0.5,
+    pad: 0.45,
+    cutoff: 700,
+    plucks: 0.12,
+    arp: 0,
+    harmony: 'prog',
+    theme: CIRCLE,
+  },
+  'circle-area:handoff': {
+    drone: 0.8,
+    pad: 0.75,
+    cutoff: 1800,
+    plucks: 0.1,
+    arp: 0.6,
+    harmony: 'prog',
+    theme: CIRCLE,
+  },
+  'circle-area:lab': {
+    drone: 0.45,
+    pad: 0.4,
+    cutoff: 800,
+    plucks: 0.1,
+    arp: 0,
+    harmony: 'prog',
+    theme: CIRCLE,
+  },
+  'archimedes:flight': {
+    drone: 0.9,
+    pad: 0.9,
+    cutoff: 2600,
+    plucks: 0.2,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: CIRCLE,
+  },
+  'archimedes:soon': {
+    drone: 0.5,
+    pad: 0.5,
+    cutoff: 900,
+    plucks: 0.1,
+    arp: 0,
+    harmony: 'prog',
+    theme: CIRCLE,
+  },
   lab: { drone: 0.45, pad: 0.4, cutoff: 800, plucks: 0.1, arp: 0, harmony: 'prog' },
 };
 
+type Chord = Array<[Note, number]>;
+
 // Chords as Pythagorean pitches: C – Am – F – G.
-const PROGRESSION: Array<Array<[Note, number]>> = [
+const PYTHAGORAS_CHORDS: Chord[] = [
   [
     ['C', 3],
     ['G', 3],
@@ -61,6 +195,39 @@ const PROGRESSION: Array<Array<[Note, number]>> = [
   ],
 ];
 
+// F – G – Em – Am.
+const CIRCLE_CHORDS: Chord[] = [
+  [
+    ['F', 2],
+    ['C', 3],
+    ['F', 3],
+    ['A', 3],
+  ],
+  [
+    ['G', 2],
+    ['D', 3],
+    ['G', 3],
+    ['B', 3],
+  ],
+  [
+    ['E', 2],
+    ['B', 2],
+    ['E', 3],
+    ['G', 3],
+  ],
+  [
+    ['A', 2],
+    ['E', 3],
+    ['A', 3],
+    ['C', 4],
+  ],
+];
+
+const THEMES: Record<Theme, { chords: Chord[]; drone: [number, number, number] }> = {
+  pythagoras: { chords: PYTHAGORAS_CHORDS, drone: [pyth('C', 2), pyth('G', 2), pyth('C', 3)] },
+  circle: { chords: CIRCLE_CHORDS, drone: [pyth('A', 1), pyth('E', 2), pyth('A', 2)] },
+};
+
 const PENTATONIC: Array<[Note, number]> = [
   ['C', 5],
   ['D', 5],
@@ -72,9 +239,15 @@ const PENTATONIC: Array<[Note, number]> = [
   ['E', 6],
 ];
 
+function fallback(key: string | null): Layers {
+  if (key?.startsWith('pythagoras')) return ARRANGEMENT['pythagoras:draw']!;
+  if (key?.startsWith('circle-area')) return ARRANGEMENT['circle-area:slice']!;
+  return QUIET;
+}
+
 /**
- * Chapter 1's generative score. A drone of pure fifths, a slow pad, sparse pentatonic plucks and an arpeggio
- * that enters as the tanks rise; it resolves on the 3:4:5 chord when the formula appears.
+ * The generative score, in Pythagorean tuning throughout. A drone of pure fifths, a slow pad, sparse
+ * pentatonic plucks and an arpeggio, layered per beat by ARRANGEMENT; each formula resolves on the 3:4:5 chord.
  */
 export class PythagoreanScore {
   private out: Tone.Gain;
@@ -88,6 +261,8 @@ export class PythagoreanScore {
   private layers: Layers = QUIET;
   private chord = 0;
   private bar = 0;
+  private theme: Theme = 'pythagoras';
+  private drones: Tone.Oscillator[] = [];
   private sources: Array<{ start: (t?: number) => unknown; dispose: () => unknown }> = [];
   private loops: Tone.Loop[] = [];
   private rng = 1;
@@ -137,6 +312,7 @@ export class PythagoreanScore {
     }).connect(this.arpGain);
 
     this.sources = [d1, d2, d3, breath];
+    this.drones = [d1, d2, d3];
 
     // Harmony: one chord per bar (4 beats at 72 bpm ≈ 3.3 s), two bars per chord.
     transport.bpm.value = 72;
@@ -147,7 +323,8 @@ export class PythagoreanScore {
         if (l.harmony === 'resolve') {
           if (this.bar % 2 === 0) this.pad.triggerAttackRelease(triangleChord(pyth('C', 4)), '1m', time, 0.7);
         } else if (this.bar % 2 === 0) {
-          const notes = PROGRESSION[this.chord % PROGRESSION.length]!.map(([n, o]) => pyth(n, o));
+          const chords = THEMES[this.theme].chords;
+          const notes = chords[this.chord % chords.length]!.map(([n, o]) => pyth(n, o));
           this.pad.triggerAttackRelease(notes, '2m', time, 0.6);
           this.chord++;
         }
@@ -163,20 +340,26 @@ export class PythagoreanScore {
         }
       }, '8n').start(0),
     );
-    // Arpeggio of the current chord in sixteenths.
+    // Arpeggio of the current chord: up and down in eighths (chapter 1), or round and round (chapter 2).
     let step = 0;
+    let tick = 0;
     this.loops.push(
       new Tone.Loop((time) => {
-        if (this.layers.arp <= 0.01) return;
+        const l = this.layers;
+        const on = l.arpFast || tick % 2 === 0;
+        tick++;
+        if (l.arp <= 0.01 || !on) return;
+        const chords = THEMES[this.theme].chords;
+        const up = 2 + (l.arpOctave ?? 0);
         const chord =
-          this.layers.harmony === 'resolve'
+          l.harmony === 'resolve'
             ? triangleChord(pyth('C', 5))
-            : PROGRESSION[Math.max(this.chord - 1, 0) % PROGRESSION.length]!.map(([n, o]) => pyth(n, o + 2));
-        const order = [0, 1, 2, 3, 2, 1];
+            : chords[Math.max(this.chord - 1, 0) % chords.length]!.map(([n, o]) => pyth(n, o + up));
+        const order = this.theme === 'circle' ? [0, 1, 2, 3] : [0, 1, 2, 3, 2, 1];
         const f = chord[order[step % order.length]! % chord.length]!;
-        this.arpSynth.triggerAttackRelease(f, '16n', time, 0.5);
+        this.arpSynth.triggerAttackRelease(f, '16n', time, l.arpFast ? 0.38 : 0.5);
         step++;
-      }, '8n').start(0),
+      }, '16n').start(0),
     );
   }
 
@@ -192,11 +375,17 @@ export class PythagoreanScore {
   }
 
   apply(key: string | null, time = Tone.now()) {
-    const l =
-      (key && ARRANGEMENT[key]) || (key?.startsWith('pythagoras') ? ARRANGEMENT['pythagoras:draw']! : QUIET);
+    const l = (key && ARRANGEMENT[key]) || fallback(key);
     const prev = this.layers;
     this.layers = l;
     const glide = 1.6;
+    const theme = l.theme ?? 'pythagoras';
+    if (theme !== this.theme && l !== QUIET) {
+      // Glide the drone into the new chapter's key and start its progression from the top.
+      this.theme = theme;
+      this.chord = 0;
+      THEMES[theme].drone.forEach((f, i) => this.drones[i]!.frequency.setTargetAtTime(f, time, 1.2));
+    }
     this.droneGain.gain.setTargetAtTime(l.drone * 0.32, time, glide / 3);
     this.padGain.gain.setTargetAtTime(l.pad, time, glide / 3);
     this.padFilter.frequency.setTargetAtTime(l.cutoff, time, key === 'pythagoras:pour' ? 3 : glide / 2);

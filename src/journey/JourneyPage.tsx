@@ -10,7 +10,7 @@ import { ChaptersMenu } from '../ui/ChaptersMenu';
 import { PlayerBar } from './PlayerBar';
 import { Captions, FormulaOverlay, TitleCard } from './Overlays';
 import { EndCard } from './EndCard';
-import { YourTurnPanel } from '../chapters/01-pythagoras/ui/YourTurnPanel';
+import { VIEWS } from '../chapters/views';
 
 /** The cinematic journey: one master timeline, a player, and overlays driven by the current beat. */
 export default function JourneyPage() {
@@ -32,7 +32,7 @@ export default function JourneyPage() {
   }, [slug, meta, navigate]);
 
   useEffect(() => {
-    set({ mode: 'journey', chapterSlug: 'pythagoras' });
+    set({ mode: 'journey', chapterSlug: slug && meta?.status === 'ready' ? slug : 'pythagoras' });
     audio.setScene('journey');
     controller.start(slug && meta?.status === 'ready' ? slug : undefined);
     controller.play();
@@ -109,6 +109,7 @@ export default function JourneyPage() {
 
   const onContinue = useCallback(() => controller.continueFromYourTurn(), []);
   const chapter = chapterBySlug(beatKey?.split(':')[0]);
+  const YourTurn = chapter ? VIEWS[chapter.slug]?.YourTurn : undefined;
 
   return (
     <div className="overlay">
@@ -118,7 +119,7 @@ export default function JourneyPage() {
           <TitleCard />
           <FormulaOverlay />
           <Captions />
-          {yourTurn ? <YourTurnPanel onContinue={onContinue} /> : null}
+          {yourTurn && YourTurn ? <YourTurn onContinue={onContinue} /> : null}
           {ended ? <EndCard /> : null}
           <PlayerBar />
         </>

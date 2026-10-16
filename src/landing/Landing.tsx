@@ -182,7 +182,7 @@ export default function Landing() {
           </div>
         </div>
         <p className="landing__foot">
-          Chapter I is ready (about 2 minutes) · best with headphones · space to pause, arrows to step
+          Chapters I–II are ready (about 4 minutes) · best with headphones · space to pause, arrows to step
         </p>
       </div>
       {menu ? <ChaptersMenu onClose={() => setMenu(false)} /> : null}

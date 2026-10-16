@@ -7,9 +7,8 @@ import { DUSK, SUN_DIR } from './Sky';
 import { useApp } from '../../state/store';
 import { station } from './stations';
 
-/** Half-size of the shadow frustum, and its centre relative to the station (covers the tanks and the proof frame). */
+/** Half-size of the shadow frustum around the active station (centred by its `shadow` offset). */
 const SHADOW_HALF = 11;
-const SHADOW_CENTRE: [number, number] = [3, 0];
 /** Elevation of the shadow-casting sun (the visible sun sits much lower, on the horizon). */
 const SHADOW_ELEVATION = (50 * Math.PI) / 180;
 
@@ -65,8 +64,8 @@ export function Beach() {
   // The shadow frustum is fixed around the active station. Following the camera made shadows swim and jump.
   useEffect(() => {
     const o = station(chapterSlug);
-    const cx = o.x + SHADOW_CENTRE[0];
-    const cz = o.z + SHADOW_CENTRE[1];
+    const cx = o.x + (o.shadow?.[0] ?? 0);
+    const cz = o.z + (o.shadow?.[1] ?? 0);
     sun.target.position.set(cx, o.y, cz);
     sun.target.updateMatrixWorld();
     // A higher virtual sun than the visible one keeps shadows short and readable at dusk.

@@ -3,11 +3,12 @@ import { beatAt, cuesBetween, readingTime } from './builder';
 import { buildJourney } from './journey';
 import { runtime } from '../engine/runtime';
 import { pythagorasRig } from '../chapters/01-pythagoras/rig';
+import { circleRig } from '../chapters/02-circle-area/rig';
 
 describe('the journey timeline', () => {
   const journey = buildJourney();
 
-  it('labels every beat of chapter 1 in story order', () => {
+  it('labels every beat in story order', () => {
     const keys = journey.beats.map((b) => b.key);
     expect(keys).toEqual([
       'pythagoras:title',
@@ -22,7 +23,17 @@ describe('the journey timeline', () => {
       'pythagoras:handoff',
       'pythagoras:slices',
       'circle-area:flight',
-      'circle-area:soon',
+      'circle-area:title',
+      'circle-area:slice',
+      'circle-area:deal',
+      'circle-area:refine',
+      'circle-area:rectangle',
+      'circle-area:formula',
+      'circle-area:onion',
+      'circle-area:yourTurn',
+      'circle-area:handoff',
+      'archimedes:flight',
+      'archimedes:soon',
     ]);
     for (const b of journey.beats) expect(journey.master.labels[b.key]).toBeCloseTo(b.start, 6);
   });
@@ -41,12 +52,20 @@ describe('the journey timeline', () => {
     expect(len).toBeLessThan(110);
   });
 
-  it('pauses once, inside the Your-turn beat', () => {
+  it('runs chapter 2 for roughly 70–110 seconds', () => {
+    const ch2 = journey.chapters.find((c) => c.slug === 'circle-area')!;
+    const len = ch2.end - ch2.start;
+    expect(len).toBeGreaterThan(70);
+    expect(len).toBeLessThan(110);
+  });
+
+  it('pauses once per chapter, inside its Your-turn beat', () => {
     const paused = journey.beats.filter((b) => b.pauseAt !== undefined);
-    expect(paused.map((b) => b.id)).toEqual(['yourTurn']);
-    const b = paused[0]!;
-    expect(b.pauseAt!).toBeGreaterThan(b.start);
-    expect(b.pauseAt!).toBeLessThan(b.end);
+    expect(paused.map((b) => b.key)).toEqual(['pythagoras:yourTurn', 'circle-area:yourTurn']);
+    for (const b of paused) {
+      expect(b.pauseAt!).toBeGreaterThan(b.start);
+      expect(b.pauseAt!).toBeLessThan(b.end);
+    }
   });
 
   it('keeps cues sorted and inside the timeline', () => {
@@ -55,6 +74,8 @@ describe('the journey timeline', () => {
     expect(times[0]).toBeGreaterThanOrEqual(0);
     expect(times[times.length - 1]).toBeLessThanOrEqual(journey.duration);
     expect(journey.cues.filter((c) => c.id === 'clack')).toHaveLength(7);
+    expect(journey.cues.filter((c) => c.id === 'cut')).toHaveLength(4);
+    expect(journey.cues.filter((c) => c.id === 'double')).toHaveLength(5);
   });
 
   it('finds the beat at a time and the cues crossed between two times', () => {
@@ -82,5 +103,29 @@ describe('the journey timeline', () => {
     expect(rig.draw).toBe(3);
     expect(rig.pourA).toBe(1);
     expect(rig.pourB).toBe(1);
+  });
+
+  it('re-slices chapter 2 deterministically, ending on 256 pieces in a row', () => {
+    const { master } = journey;
+    const rig = circleRig();
+    const state = () => JSON.stringify(rig, (k, v) => (k === '_gsap' ? undefined : v));
+    const at = (id: string, dt: number) =>
+      journey.beats.find((b) => b.key === `circle-area:${id}`)!.start + dt;
+
+    master.seek(at('deal', 0.1), false);
+    expect(rig.n).toBe(8);
+    expect(rig.whole).toBe(0);
+
+    const t = at('rectangle', 1);
+    master.seek(t, false);
+    const snap = state();
+    expect(rig.n).toBe(256);
+    expect(rig.fromN).toBe(128);
+    expect(rig.deal).toBe(1);
+    expect(rig.ghost).toBe(1);
+    master.seek(journey.duration - 0.1, false);
+    master.seek(0, false);
+    master.seek(t, false);
+    expect(state()).toBe(snap);
   });
 });

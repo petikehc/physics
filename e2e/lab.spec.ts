@@ -34,6 +34,30 @@ test('the Pythagoras lab updates live and explains a broken right angle', async 
   expect(errors).toEqual([]);
 });
 
+test('the circle lab re-slices the disc and follows the radius', async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.goto('/lab/circle-area?quality=low');
+  const panel = page.getByRole('complementary', { name: 'Circle area lab' });
+  await expect(panel).toBeVisible();
+  await expect(panel).toContainText('= 4.40 × 1.40 = 6.16');
+
+  const slices = panel.getByLabel('Slices');
+  await slices.focus();
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('ArrowRight');
+  await expect(panel).toContainText('64 straight-edged triangles cover 6.15: 0.2% short');
+
+  const radius = panel.getByLabel('Radius r');
+  await radius.focus();
+  for (let i = 0; i < 4; i++) await page.keyboard.press('ArrowRight');
+  await expect(panel).toContainText('= 5.03 × 1.60 = 8.04');
+
+  await page.waitForTimeout(1500);
+  await expectCanvasRendered(page);
+  await page.screenshot({ path: test.info().outputPath('lab-circle.png') });
+  expect(errors).toEqual([]);
+});
+
 test('labs that are not built yet say so', async ({ page }) => {
   await page.goto('/lab/kepler?quality=low');
   await expect(page.getByText('This Lab is in production.')).toBeVisible();

@@ -4,8 +4,8 @@ import { audio } from '../audio';
 import { runtime } from '../engine/runtime';
 import { beatAt, cuesBetween, type BeatMarker, type Journey } from './builder';
 import { buildJourney } from './journey';
-import { continuousLevels, pythagorasSoundFrame, sample } from '../chapters/01-pythagoras/sound';
-import { pythagorasRig, PYTHAGORAS_DEFAULTS } from '../chapters/01-pythagoras/rig';
+import { HOOKS } from '../chapters/hooks';
+import { continuousMeter, createSoundFrame } from '../chapters/sound';
 
 const EPS = 0.05;
 
@@ -20,6 +20,7 @@ class JourneyController {
   private lastReal = 0;
   private lastBeat: BeatMarker | undefined;
   private wantPlay = false;
+  private soundFrame = createSoundFrame();
 
   start(slug?: string) {
     this.dispose();
@@ -28,6 +29,7 @@ class JourneyController {
     this.lastTime = 0;
     this.lastReal = performance.now();
     this.lastBeat = undefined;
+    this.soundFrame = createSoundFrame();
     gsap.ticker.add(this.tick);
     const s = useApp.getState();
     journey.master.timeScale(s.speed);
@@ -152,17 +154,8 @@ class JourneyController {
   private leaveYourTurn(restore: boolean) {
     const s = useApp.getState();
     if (!s.yourTurn && s.cameraMode === 'directed') return;
-    const rig = pythagorasRig();
-    rig.interactive = 0;
-    if (restore) {
-      gsap.to(rig, {
-        a: PYTHAGORAS_DEFAULTS.a,
-        b: PYTHAGORAS_DEFAULTS.b,
-        gamma: 90,
-        duration: 0.8,
-        ease: 'power2.inOut',
-      });
-    }
+    const chapter = beatAt(this.journey?.beats ?? [], this.time)?.chapter;
+    if (chapter) HOOKS[chapter]?.leaveYourTurn?.(restore);
     s.set({ yourTurn: false, cameraMode: 'directed', dragging: false });
   }
 
@@ -201,6 +194,8 @@ class JourneyController {
       }
       this.lastBeat = beat;
       audio.setBeat(beat?.key ?? null);
+      // The world (shadows, the station window) follows the chapter the playhead is in.
+      if (beat && beat.chapter !== s.chapterSlug) s.set({ chapterSlug: beat.chapter });
     }
 
     const atPause =
@@ -216,7 +211,7 @@ class JourneyController {
     }
     audio.setPlaying(isPlaying || s.yourTurn);
 
-    pythagorasSoundFrame(realDt, s.yourTurn);
+    this.soundFrame(realDt, s.yourTurn ? (beat?.chapter ?? null) : null);
     this.lastTime = t;
   };
 }
@@ -231,6 +226,8 @@ interface TestHook {
   duration: number;
   beats: Array<{ key: string; start: number; end: number; pauseAt?: number }>;
   camera: typeof runtime.camera;
+  /** Every chapter's live rig, by slug (read-only use in tests). */
+  rigs: typeof runtime.chapters;
   /** Renders the soundtrack of the first `seconds` offline and returns a base64 WAV. */
   renderAudio: (seconds?: number) => Promise<string>;
 }
@@ -257,23 +254,21 @@ function exposeTestHook(c: JourneyController) {
     duration: j.duration,
     beats: j.beats.map((b) => ({ key: b.key, start: b.start, end: b.end, pauseAt: b.pauseAt })),
     camera: runtime.camera,
+    rigs: runtime.chapters,
     renderAudio: async (seconds) => {
       const { renderPlan, encodeWav, toBase64 } = await import('../audio/offline');
       const duration = Math.min(seconds ?? j.duration, j.duration);
       const saved = j.master.time();
       c.pause();
       // Sample the continuous layers by stepping the timeline, exactly as playback would.
-      const rig = pythagorasRig();
       const step = 1 / 30;
       const continuous: Array<[number, number, number]> = [];
       j.master.seek(0, false);
-      let prev = sample(rig);
+      const meter = continuousMeter();
       for (let t = step; t <= duration; t += step) {
         j.master.seek(t, false);
-        const cur = sample(rig);
-        const l = continuousLevels(prev, cur, step);
+        const l = meter(step);
         continuous.push([t, l.chalk, l.pour]);
-        prev = cur;
       }
       j.master.seek(saved, false);
       const buffer = await renderPlan({

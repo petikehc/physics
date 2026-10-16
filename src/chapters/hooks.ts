@@ -1,0 +1,33 @@
+import gsap from 'gsap';
+import { resetRig } from '../engine/rigs';
+import { pythagorasRig, PYTHAGORAS_DEFAULTS } from './01-pythagoras/rig';
+import { circleRig, CIRCLE_DEFAULTS } from './02-circle-area/rig';
+import { leaveCircleYourTurn } from './02-circle-area/interaction';
+
+/** What the journey controller needs from a chapter, outside React. */
+export interface ChapterHooks {
+  /** Puts the chapter's rig back to its defaults before the journey timeline is built. */
+  reset: () => void;
+  /** Leaves the Your-turn moment. `restore` is true when the story continues from it. */
+  leaveYourTurn?: (restore: boolean) => void;
+}
+
+export const HOOKS: Record<string, ChapterHooks> = {
+  pythagoras: {
+    reset: () => resetRig(pythagorasRig(), { ...PYTHAGORAS_DEFAULTS }),
+    leaveYourTurn: (restore) => {
+      const rig = pythagorasRig();
+      rig.interactive = 0;
+      // The story's triangle is 3-4-5 again before the handoff swings it.
+      if (restore) gsap.to(rig, { a: 3, b: 4, gamma: 90, duration: 0.8, ease: 'power2.inOut' });
+    },
+  },
+  'circle-area': {
+    reset: () => resetRig(circleRig(), { ...CIRCLE_DEFAULTS }),
+    leaveYourTurn: leaveCircleYourTurn,
+  },
+};
+
+export function resetChapterRigs() {
+  for (const h of Object.values(HOOKS)) h.reset();
+}

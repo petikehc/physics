@@ -2,27 +2,29 @@ import { runtime } from '../engine/runtime';
 import { createCameraRig, createDustRig, resetRig } from '../engine/rigs';
 import { shot } from '../engine/camera/shots';
 import { station } from '../engine/world/stations';
+import { chapterBySlug } from '../chapters/registry';
+import { resetChapterRigs } from '../chapters/hooks';
 import { buildPythagoras } from '../chapters/01-pythagoras/timeline';
-import { pythagorasRig, PYTHAGORAS_DEFAULTS } from '../chapters/01-pythagoras/rig';
+import { buildCircleArea } from '../chapters/02-circle-area/timeline';
 import { JourneyBuilder, type Journey } from './builder';
 
-/** Flight from the end of chapter 1 to the (stub) station of chapter 2, then its "coming soon" beat. */
-function buildCircleAreaStub(j: JourneyBuilder) {
-  const slug = 'circle-area';
+/**
+ * The flight to a chapter that is not built yet, then its "coming soon" beat. The Dust (already shaped as
+ * that chapter's icon by the previous handoff) flies ahead of the camera to the new station.
+ */
+function buildComingSoon(j: JourneyBuilder, slug: string, body: string) {
   const dust = runtime.dust;
   const to = station(slug);
+  const meta = chapterBySlug(slug);
 
   j.beat(slug, { id: 'flight', kind: 'flight', minDuration: 5.6 }, ({ tl, cue }) => {
     const d = 5.4;
-    // The flat circle rises off the beach and turns upright to face the camera as it flies.
-    tl.set(dust, { from: 'circleFlat', to: 'circle', morph: 0 }, 0);
-    tl.to(dust, { morph: 1, duration: d * 0.6, ease: 'power2.inOut' }, 0.2);
     tl.to(dust, { x: to.x, y: to.y + 1.8, z: to.z, duration: d, ease: 'power2.inOut' }, 0);
-    tl.to(dust, { spin: 0.35, scale: 0.62, size: 1.05, duration: d }, 0);
+    tl.to(dust, { spin: 0.35, scale: 0.8, size: 1.05, duration: d }, 0);
     shot(
       tl,
       slug,
-      { pos: [0, 2.4, 9.2], target: [0, 2.0, 0], focus: [0, 1.8, 0], shake: 0.5 },
+      { pos: [0, 2.4, 9.2], target: [0, 2.0, 0], focus: [0, 1.8, 0], dof: 0, shake: 0.5 },
       d,
       0,
       'power2.inOut',
@@ -39,8 +41,8 @@ function buildCircleAreaStub(j: JourneyBuilder) {
     {
       id: 'soon',
       kind: 'end',
-      heading: 'II · The Area of a Circle',
-      body: 'Archimedes is still drawing his circles in the sand. This chapter is in production.',
+      heading: meta ? `${meta.numeral} · ${meta.title}` : undefined,
+      body,
       minDuration: 3,
     },
     ({ tl }) => {
@@ -53,11 +55,16 @@ function buildCircleAreaStub(j: JourneyBuilder) {
 export function buildJourney(): Journey {
   resetRig(runtime.camera, createCameraRig());
   resetRig(runtime.dust, createDustRig());
-  resetRig(pythagorasRig(), { ...PYTHAGORAS_DEFAULTS });
+  resetChapterRigs();
 
   const j = new JourneyBuilder();
   buildPythagoras(j);
-  buildCircleAreaStub(j);
+  buildCircleArea(j);
+  buildComingSoon(
+    j,
+    'archimedes',
+    'Archimedes is about to step into his bath. This chapter is in production.',
+  );
   const journey = j.finish();
   journey.master.progress(0);
   return journey;

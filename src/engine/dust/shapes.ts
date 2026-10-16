@@ -186,7 +186,13 @@ function crownIcon(n: number) {
     [4, band],
     [3, spikes],
     [0.8, jewels],
-    [1, circle(0, -0.6, R)],
+    [
+      1,
+      (rng) => {
+        const t = rng() * TAU;
+        return [Math.cos(t) * R, -0.6, Math.sin(t) * R];
+      },
+    ],
   ]);
 }
 

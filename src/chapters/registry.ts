@@ -47,7 +47,7 @@ export const CHAPTERS: ChapterMeta[] = [
     kind: 'math',
     accent: '#c98b4a',
     dustIcon: 'circle',
-    status: 'soon',
+    status: 'ready',
   },
   {
     slug: 'archimedes',

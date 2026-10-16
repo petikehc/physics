@@ -7,10 +7,11 @@ The full research, storyboards and architecture are in [`docs/PLAN.md`](docs/PLA
 
 ## Status
 
-| #    | Chapter                                                                            | Status                                                         |
-| ---- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| I    | The Pythagorean Theorem                                                            | **Playable**: journey, Your turn, Lab, score and sound effects |
-| II–X | Circle area, Archimedes, Kepler, Newton, Calculus, Euler, Fourier, Doppler, Energy | In production                                                  |
+| #     | Chapter                                                               | Status                                                         |
+| ----- | --------------------------------------------------------------------- | -------------------------------------------------------------- |
+| I     | The Pythagorean Theorem                                               | **Playable**: journey, Your turn, Lab, score and sound effects |
+| II    | The Area of a Circle                                                  | **Playable**: journey, Your turn, Lab, score and sound effects |
+| III–X | Archimedes, Kepler, Newton, Calculus, Euler, Fourier, Doppler, Energy | In production                                                  |
 
 ## Running it
 
@@ -52,12 +53,16 @@ to render a slice.
   hands the camera to the viewer in "Your turn" and the Labs.
 - **The Dust** (`src/engine/dust`) is one GPU particle system that morphs between procedural point clouds. It carries
   every transition and the landing teaser.
-- **Sound** (`src/audio`) is procedural Tone.js, lazy-loaded when the viewer chooses sound. Chapter 1 is scored in
-  Pythagorean tuning and resolves on a 3:4:5 chord. The same engine renders offline previews.
+- **Sound** (`src/audio`) is procedural Tone.js, lazy-loaded when the viewer chooses sound. The score is in
+  Pythagorean tuning throughout: chapter 1 resolves on a 3:4:5 chord, and chapter 2 glides into its own key, its
+  arpeggio circling and climbing as the slices multiply. The same engine renders offline previews.
 
 ## Adding a chapter
 
 1. Create `src/chapters/NN-slug/` with `rig.ts` (animated numbers), `math.ts` (+ tests), `Station.tsx` (reads the rig),
-   `timeline.ts` (beats added through `JourneyBuilder`) and UI for Your turn and the Lab.
-2. Register it in `src/chapters/registry.ts`, give it a station in `stations.ts`, and add its timeline in
-   `src/journey/journey.ts`.
+   `timeline.ts` (beats added through `JourneyBuilder`, starting with the flight in), `sound.ts` (continuous levels)
+   and UI for Your turn and the Lab.
+2. Register it in `src/chapters/registry.ts` and give it a place in `src/engine/world/stations.ts`.
+3. Wire it in: its station in `src/chapters/stations.ts`, its Your turn, Lab and formula in `src/chapters/views.ts`,
+   its rig reset and Your-turn exit in `src/chapters/hooks.ts`, its meter in `src/chapters/sound.ts`, its timeline in
+   `src/journey/journey.ts`, and its beats in the score's `ARRANGEMENT`.

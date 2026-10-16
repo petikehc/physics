@@ -13,8 +13,8 @@ test('the landing teaser renders and offers the journey', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('every beat of chapter 1 renders (desktop and phone)', async ({ page }) => {
-  test.setTimeout(400_000);
+test('every beat of the journey renders (desktop and phone)', async ({ page }) => {
+  test.setTimeout(600_000);
   const errors = collectErrors(page);
   for (const viewport of [
     { width: 1440, height: 900, name: 'desktop' },
@@ -24,7 +24,7 @@ test('every beat of chapter 1 renders (desktop and phone)', async ({ page }) => 
     await page.goto(`/play${Q}`);
     await waitForJourney(page);
     const beats = await page.evaluate(() => window.__journey!.beats);
-    expect(beats.length).toBeGreaterThan(10);
+    expect(beats.length).toBeGreaterThan(20);
     for (const b of beats) {
       await seek(page, b.start + Math.min((b.end - b.start) * 0.7, 6));
       await page.waitForTimeout(1500);
@@ -50,6 +50,40 @@ test('Your turn pauses the journey, and Continue resumes it', async ({ page }) =
   await expect(panel).toBeVisible({ timeout: 30_000 });
   await expect(panel).toContainText('9 + 16 = 25');
   await expect(panel.getByText(/Pythagorean triple: 3–4–5/)).toBeVisible();
+  await panel.getByRole('button', { name: /Continue/ }).click();
+  await expect(panel).toBeHidden();
+  await expect
+    .poll(() => page.evaluate(() => window.__journey!.time()), { timeout: 20_000 })
+    .toBeGreaterThan(pauseAt + 0.2);
+  expect(errors).toEqual([]);
+});
+
+test('chapter 2: Your turn re-slices the disc, and Continue hands it back to the story', async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.goto(`/play/circle-area${Q}`);
+  await waitForJourney(page);
+  // The chapter link starts the journey at chapter 2.
+  const start = await page.evaluate(
+    () => window.__journey!.beats.find((b) => b.key === 'circle-area:flight')!.start,
+  );
+  expect(await page.evaluate(() => window.__journey!.time())).toBeGreaterThanOrEqual(start - 0.01);
+
+  const pauseAt = await page.evaluate(
+    () => window.__journey!.beats.find((b) => b.key === 'circle-area:yourTurn')!.pauseAt!,
+  );
+  await seek(page, pauseAt - 0.4);
+  await page.evaluate(() => window.__journey!.play());
+  const panel = page.getByRole('complementary', { name: 'Your turn' });
+  await expect(panel).toBeVisible({ timeout: 30_000 });
+  await expect(panel).toContainText('= 4.40 × 1.40 = 6.16');
+  await expect(panel).toContainText('16 straight-edged triangles cover 6.00');
+
+  await panel.getByLabel('Slices').focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(panel).toContainText('32 straight-edged triangles');
+  const n = () => page.evaluate(() => (window.__journey!.rigs['circle-area'] as { n: number }).n);
+  expect(await n()).toBe(32);
+
   await panel.getByRole('button', { name: /Continue/ }).click();
   await expect(panel).toBeHidden();
   await expect
