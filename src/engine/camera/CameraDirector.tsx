@@ -29,6 +29,19 @@ export function directedPose(rig: CameraRig, outPos: THREE.Vector3, outTarget: T
   outTarget.set(rig.tx, rig.ty, rig.tz);
 }
 
+/** Shots are composed for a landscape screen of about this aspect ratio. */
+const DESIGN_ASPECT = 1.6;
+
+/**
+ * On a narrower screen (a phone held upright), step back from the target and widen the lens a little, so a shot
+ * keeps most of its composed width instead of cropping the sides of wide scenes.
+ */
+function portraitFit(aspect: number) {
+  const r = DESIGN_ASPECT / Math.max(aspect, 0.3);
+  if (r <= 1) return { dolly: 1, fov: 1 };
+  return { dolly: Math.min(Math.pow(r, 0.8), 2.4), fov: Math.min(Math.pow(r, 0.2), 1.25) };
+}
+
 function handheld(t: number, seed: number) {
   return (
     Math.sin(t * 0.63 + seed) * 0.55 +
@@ -82,6 +95,8 @@ export function CameraDirector() {
     }
     const rig = runtime.camera;
     directedPose(rig, pos.current, target.current);
+    const fit = portraitFit(state.size.width / Math.max(state.size.height, 1));
+    if (fit.dolly !== 1) pos.current.sub(target.current).multiplyScalar(fit.dolly).add(target.current);
 
     const amp = reduced ? 0 : rig.shake;
     if (amp > 0) {
@@ -105,8 +120,9 @@ export function CameraDirector() {
     if (rig.roll !== 0) camera.rotateZ(rig.roll);
     lastTarget.current.copy(target.current);
 
-    if (Math.abs(camera.fov - rig.fov) > 0.01) {
-      camera.fov = rig.fov;
+    const fov = rig.fov * fit.fov;
+    if (Math.abs(camera.fov - fov) > 0.01) {
+      camera.fov = fov;
       camera.updateProjectionMatrix();
     }
   });
