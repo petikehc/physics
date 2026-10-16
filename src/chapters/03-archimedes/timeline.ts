@@ -81,7 +81,7 @@ export function buildArchimedes(j: JourneyBuilder) {
       shot(
         tl,
         SLUG,
-        { pos: [-3.0, 2.9, 6.4], target: [0, 2.0, -1.0], focus: [0, 1.0, 0], fov: 38, dof: 0.4, shake: 0.5 },
+        { pos: [-3.8, 3.5, 8.4], target: [0, 3.0, -1.0], focus: [0, 1.0, 0], fov: 38, dof: 0.4, shake: 0.5 },
         6,
         0.2,
         'power3.inOut',
