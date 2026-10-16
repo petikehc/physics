@@ -194,8 +194,13 @@ function LineupLabels() {
       if (!el) return;
       const q = staggered(rig.lineup, i, LINEUP.length, 0.22);
       el.style.opacity = String(clamp01((q - 0.55) * 4) * (1 - clamp01(rig.play * 2)));
-      const t = `${s.name} ${s.density} · ${floats ? `${Math.round(fraction * 100)} % under` : 'sinks'}`;
-      if (el.textContent !== t) el.textContent = t;
+      // Two short lines, so the three labels fit side by side on a phone.
+      const t = `${s.name} ${s.density}\n${floats ? `${Math.round(fraction * 100)} % under` : 'sinks'}`;
+      if (el.textContent !== t) {
+        el.textContent = t;
+        el.style.whiteSpace = 'pre-line';
+        el.style.textAlign = 'center';
+      }
     });
   });
   return (

@@ -140,10 +140,20 @@ export function Beakers() {
 
     const n = (x: number) => x.toFixed(2);
     const spots: Array<[[number, number, number], number, string]> = [
-      [uv(posA[0], posA[1], rise + BEAKER.h + 0.12), show && mlA > 0.5 ? 1 : 0, `${Math.round(mlA)} mL`],
-      [uv(posB[0], posB[1], rise + BEAKER.h + 0.12), show && mlB > 0.5 ? 1 : 0, `${Math.round(mlB)} mL`],
+      // The two beaker labels lean apart (the beakers stand close), and the weight label sits low beside the
+      // first beaker, so none of them collide on a narrow screen.
+      [
+        uv(posA[0] + OUT * 0.1, posA[1], rise + BEAKER.h + 0.12),
+        show && mlA > 0.5 ? 1 : 0,
+        `${Math.round(mlA)} mL`,
+      ],
+      [
+        uv(posB[0] - OUT * 0.1, posB[1], rise + BEAKER.h + 0.22),
+        show && mlB > 0.5 ? 1 : 0,
+        `${Math.round(mlB)} mL`,
+      ],
       [uv(0.48, 0, h.bottom + h.height / 2 + 0.3), k, `push ${n(NUMBERS.crownPush)} N`],
-      [uv(posA[0] + OUT * 0.55, posA[1], rise + columnHeight(mlA) + 0.4), k, `weighs ${n(buoyancy(mlA))} N`],
+      [uv(posA[0] + OUT * 0.5, posA[1], rise + 0.12), k, `weighs ${n(buoyancy(mlA))} N`],
     ];
     spots.forEach(([pos, o, t], i) => {
       labels.current[i]?.position.set(...pos);
