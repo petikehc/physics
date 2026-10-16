@@ -1,0 +1,43 @@
+name: Pages
+
+# Builds the site for https://<owner>.github.io/<repo>/ and publishes it to the gh-pages branch.
+# One-time setup: Settings → Pages → Build and deployment → Deploy from a branch → gh-pages, / (root).
+on:
+  push:
+    branches: [main, claude/nifty-gauss-ttjbaf]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}/
+      - name: Add the single-page-app fallback
+        # Pages serves 404.html for unknown paths, so deep links like /play/circle-area still boot the app.
+        run: |
+          cp dist/index.html dist/404.html
+          touch dist/.nojekyll
+      - name: Publish to the gh-pages branch
+        working-directory: dist
+        run: |
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Deploy ${GITHUB_SHA::7} from ${GITHUB_REF_NAME}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" gh-pages
