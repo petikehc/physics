@@ -193,10 +193,12 @@ class JourneyController {
         this.wantPlay = false;
       }
       this.lastBeat = beat;
-      audio.setBeat(beat?.key ?? null);
-      // The world (shadows, the station window) follows the chapter the playhead is in.
-      if (beat && beat.chapter !== s.chapterSlug) s.set({ chapterSlug: beat.chapter });
     }
+    // Every frame, not only when playback crosses a beat: a seek (scrubber, chapters menu) jumps straight
+    // into a beat. The score follows the beat, and the world (shadows, which stations are mounted) follows
+    // the chapter the playhead is in. Both calls are no-ops when nothing changed.
+    audio.setBeat(beat?.key ?? null);
+    if (beat && beat.chapter !== s.chapterSlug) s.set({ chapterSlug: beat.chapter });
 
     const atPause =
       beat?.pauseAt !== undefined && Math.abs(t - beat.pauseAt) < EPS && j.master.paused() && !this.stepTween;
