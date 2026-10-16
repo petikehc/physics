@@ -265,7 +265,7 @@ export function buildPythagoras(j: JourneyBuilder) {
     {
       id: 'handoff',
       heading: 'One more secret',
-      body: 'Hold the long side by one end and swing it round. Its tip carves a circle, and at every point of that circle a right triangle is hiding.',
+      body: 'Hold the long side by one end and swing it round. Its tip carves a circle, and at every point of that circle a right triangle is hiding. The circle is where the next idea begins.',
     },
     ({ tl, cue }) => {
       tl.to(rig, { a: 3, b: 4, gamma: 90, scale: S, duration: 1.0, ease: 'power2.inOut' }, 0);
@@ -285,32 +285,36 @@ export function buildPythagoras(j: JourneyBuilder) {
       tl.to(rig, { groove: 0.35, duration: 3 }, 3);
       cue(6.0, 'tick');
       tl.to(rig, { radius: 0, duration: 0.6 }, 6.2);
-      // The beach's dust lifts off the sand and gathers into the disc of the next chapter.
-      tl.set(dust, { from: 'sand', to: 'circle', morph: 0 }, 6.1);
-      tl.to(dust, { morph: 1, duration: 2.6, ease: 'power2.inOut' }, 6.1);
+      // The beach's dust gathers onto the carved circle, lying flat on it, then lifts it off the sand.
+      // (It stands up to face the camera during the flight to chapter II.)
+      const R = 5 * S; // radius of the carved circle: the hypotenuse
+      tl.set(dust, { from: 'sand', to: 'circleFlat', morph: 0, rotX: 0, spin: 0 }, 6.1);
+      tl.to(dust, { morph: 1, duration: 2.8, ease: 'power2.inOut' }, 6.1);
       tl.to(
         dust,
         {
           x: P1[0],
-          y: 1.6,
+          y: 0.04,
           z: P1[2],
-          scale: 1.1,
+          // The icon's circle has radius 2, so this lands it exactly on the groove.
+          scale: R / 2,
           size: 1.05,
           swirl: 1.1,
           drift: 0.8,
           colorA: '#f6e6cc',
           colorB: '#c98b4a',
-          duration: 2.6,
+          duration: 2.8,
           ease: 'power2.inOut',
         },
         6.1,
       );
       cue(6.1, 'gather');
+      tl.to(dust, { y: 0.5, size: 1.2, duration: 1.8, ease: 'sine.inOut' }, 8.9);
       shot(
         tl,
         SLUG,
-        { pos: [P1[0], 2.4, P1[2] + 7.2], target: [P1[0], 1.4, P1[2]], focus: [P1[0], 1.6, P1[2]] },
-        3.2,
+        { pos: [P1[0], 6.3, P1[2] + 7.6], target: [P1[0], 0.1, P1[2] + 0.5], focus: [P1[0], 0.3, P1[2]] },
+        4.2,
         6.0,
         'power2.inOut',
       );

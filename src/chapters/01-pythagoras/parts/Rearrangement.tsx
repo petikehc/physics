@@ -155,7 +155,8 @@ export function Rearrangement() {
     }
 
     // Glowing holes: a² and b² in layout A, c² in layout B.
-    const gA = rig.glowA * (1 - rig.layout);
+    // a² and b² clear away early in the slide so they never muddy the c² square.
+    const gA = rig.glowA * (1 - Math.min(1, rig.layout * 2.5));
     const gB = rig.glowB * rig.layout;
     glowMats[0]!.opacity = gA * 0.55;
     glowMats[1]!.opacity = gA * 0.55;

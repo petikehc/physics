@@ -14,8 +14,11 @@ function buildCircleAreaStub(j: JourneyBuilder) {
 
   j.beat(slug, { id: 'flight', kind: 'flight', minDuration: 5.6 }, ({ tl, cue }) => {
     const d = 5.4;
+    // The flat circle rises off the beach and turns upright to face the camera as it flies.
+    tl.set(dust, { from: 'circleFlat', to: 'circle', morph: 0 }, 0);
+    tl.to(dust, { morph: 1, duration: d * 0.6, ease: 'power2.inOut' }, 0.2);
     tl.to(dust, { x: to.x, y: to.y + 1.8, z: to.z, duration: d, ease: 'power2.inOut' }, 0);
-    tl.to(dust, { spin: 0.35, scale: 0.62, duration: d }, 0);
+    tl.to(dust, { spin: 0.35, scale: 0.62, size: 1.05, duration: d }, 0);
     shot(
       tl,
       slug,

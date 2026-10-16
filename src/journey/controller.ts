@@ -35,14 +35,12 @@ class JourneyController {
       const first = journey.beats.find((b) => b.chapter === slug);
       if (first && first.start > 0) journey.master.seek(first.start, false);
     }
-    useApp
-      .getState()
-      .set({
-        ended: false,
-        yourTurn: false,
-        cameraMode: 'directed',
-        journeyId: useApp.getState().journeyId + 1,
-      });
+    useApp.getState().set({
+      ended: false,
+      yourTurn: false,
+      cameraMode: 'directed',
+      journeyId: useApp.getState().journeyId + 1,
+    });
     exposeTestHook(this);
     return journey;
   }

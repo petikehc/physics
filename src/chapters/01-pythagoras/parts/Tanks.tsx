@@ -10,27 +10,31 @@ const unitBox = new THREE.BoxGeometry(1, 1, 1);
 const unitEdges = new THREE.EdgesGeometry(unitBox);
 const streamGeo = new THREE.CylinderGeometry(1, 1, 1, 16, 1, true);
 
-const glassMaterial = new THREE.MeshStandardMaterial({
+const glassMaterial = new THREE.MeshPhysicalMaterial({
   color: '#cfe6ee',
   transparent: true,
   opacity: 0.13,
-  roughness: 0.04,
+  // Not too glossy: a mirror-sharp sun highlight overflows the HDR buffer and blooms into rainbow rings.
+  roughness: 0.16,
   metalness: 0.1,
-  envMapIntensity: 2.2,
+  envMapIntensity: 1.6,
+  specularIntensity: 0.6,
   side: THREE.DoubleSide,
   depthWrite: false,
 });
 
 function waterMaterial(color: string) {
-  return new THREE.MeshStandardMaterial({
+  // Physical only for specularIntensity: the low virtual sun would otherwise glare off every water surface.
+  return new THREE.MeshPhysicalMaterial({
     color,
     transparent: true,
     opacity: 0.86,
-    roughness: 0.1,
+    roughness: 0.34,
     metalness: 0.05,
     emissive: new THREE.Color(color),
     emissiveIntensity: 0.22,
-    envMapIntensity: 1.4,
+    envMapIntensity: 1.0,
+    specularIntensity: 0.3,
   });
 }
 
@@ -108,7 +112,8 @@ function Tank({ which }: { which: Which }) {
     const rise = easeOutCubic(rig.tanks);
     let x = hx;
     let z = hz;
-    let y = -D * 1.02 * (1 - rise);
+    // Sit a hair above the sand: a glass floor exactly at y = 0 z-fights with it and flickers.
+    let y = -D * 1.02 * (1 - rise) + 0.008;
     let rot = sq.angle;
     let level = 1;
 
@@ -216,7 +221,7 @@ function Tank({ which }: { which: Which }) {
         <mesh ref={glass} geometry={unitBox} material={glassMaterial} renderOrder={2} />
         <lineSegments ref={edges} geometry={unitEdges} material={mats.edges} renderOrder={3} />
         <group ref={labelGroup}>
-          <MathLabel ref={label} color={color} />
+          <MathLabel ref={label} className="math-label math-label--chip" color={color} />
           {which === 'c' ? (
             <group position={[0, -0.36, 0]}>
               <MathLabel ref={sumLabel} className="math-label math-label--small" />
