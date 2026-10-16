@@ -10,6 +10,7 @@ import { perimeterPoint, triangle } from '../math';
 import { pythagorasRig, SYM, uvToLocal } from '../rig';
 
 const ORIGIN = station('pythagoras');
+const flatUnitSquare = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
 
 /** Angle of P2 seen from P1 in the story triangle: where the swing starts. */
 function swingStart(a: number, b: number, gammaDeg: number) {
@@ -25,6 +26,7 @@ export function Drawing() {
   const rig = pythagorasRig();
   const stick = useRef<THREE.Group>(null);
   const mark = useRef<ChalkLineHandle | null>(null);
+  const markFill = useRef<THREE.Mesh>(null);
   const radiusLine = useRef<ChalkLineHandle | null>(null);
   const legA = useRef<ChalkLineHandle | null>(null);
   const legB = useRef<ChalkLineHandle | null>(null);
@@ -63,15 +65,21 @@ export function Drawing() {
       g.scale.setScalar(Math.max(rig.stick, 0.001));
     }
 
-    // Right-angle mark at P0.
-    const m = 0.45;
+    // Right-angle mark at P0: the textbook little square, outlined and then filled so it still reads as a
+    // square when the camera sees it at a low angle.
+    const m = 0.6;
     const markPts: Pts = [w(m, 0, 0.012), w(m, m, 0.012), w(0, m, 0.012)];
     // Like the side labels, the mark steps aside while the tanks stand over the corner.
-    mark.current?.set(
-      markPts,
-      rig.rightMark,
-      rig.rightMark * rig.groove * (rig.gamma === 90 ? 1 : 0.25) * (1 - rig.tanks),
-    );
+    const markVis = rig.groove * (1 - rig.tanks);
+    mark.current?.set(markPts, rig.rightMark, rig.rightMark * markVis * (rig.gamma === 90 ? 1 : 0.25));
+    const f = markFill.current;
+    if (f) {
+      const o = smooth((rig.rightMark - 0.5) / 0.5) * markVis * (rig.gamma === 90 ? 0.38 : 0);
+      f.visible = o > 0.002;
+      (f.material as THREE.MeshBasicMaterial).opacity = o;
+      f.position.set(...w(m / 2, m / 2, 0.011));
+      f.scale.set(m * S, 1, m * S);
+    }
 
     // Side labels appear as each side is finished.
     const centroid: [number, number] = [(t.P0[0] + t.P1[0] + t.P2[0]) / 3, (t.P0[1] + t.P1[1] + t.P2[1]) / 3];
@@ -120,7 +128,10 @@ export function Drawing() {
           <meshStandardMaterial color="#9a7454" roughness={0.85} />
         </mesh>
       </group>
-      <ChalkLine handle={mark} color="#f4efe6" width={2} />
+      <ChalkLine handle={mark} color="#f4efe6" width={2.6} />
+      <mesh ref={markFill} geometry={flatUnitSquare} visible={false} renderOrder={4}>
+        <meshBasicMaterial color="#f4efe6" transparent opacity={0} depthWrite={false} toneMapped={false} />
+      </mesh>
       <ChalkLine handle={radiusLine} color={SYM.c} width={3.5} />
       <ChalkLine handle={legA} color={SYM.a} width={2.2} />
       <ChalkLine handle={legB} color={SYM.b} width={2.2} />

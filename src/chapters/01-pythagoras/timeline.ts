@@ -64,7 +64,7 @@ export function buildPythagoras(j: JourneyBuilder) {
     {
       id: 'draw',
       heading: 'Scratch it in the sand',
-      body: 'Two short sides, [a:a] and [b:b], meet at a right angle. The long side across from it, [c:c], is the hypotenuse.',
+      body: 'Two short sides, [a:a] and [b:b], meet at a right angle, marked with a little square. The long side across from it, [c:c], is the hypotenuse.',
     },
     ({ tl, cue }) => {
       const R = 4.1;
@@ -89,8 +89,10 @@ export function buildPythagoras(j: JourneyBuilder) {
       cue(6.3, 'pop', { pitch: 2 });
       cue(8.8, 'pop', { pitch: 1 });
       tl.to(rig, { stick: 0, duration: 0.5, ease: 'power2.in' }, 8.9);
-      tl.to(rig, { rightMark: 1, duration: 0.7, ease: 'power2.out' }, 9.0);
-      cue(9.6, 'tick');
+      tl.to(rig, { rightMark: 1, duration: 0.9, ease: 'power2.out' }, 9.0);
+      cue(9.8, 'tick');
+      // Rise for a moment so the whole triangle and its square corner read clearly.
+      shot(tl, SLUG, { orbit: { height: 3.6, radius: 4.9 }, dof: 0.3 }, 2.0, 8.8, 'power2.inOut');
     },
   );
 
