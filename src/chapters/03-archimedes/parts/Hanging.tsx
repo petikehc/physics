@@ -19,40 +19,91 @@ const wood = new THREE.MeshStandardMaterial({ color: '#6b4a2f', roughness: 0.8 }
 const brass = new THREE.MeshStandardMaterial({ color: '#b98b45', metalness: 0.6, roughness: 0.35 });
 const rope = new THREE.MeshStandardMaterial({ color: '#e7dcc5', roughness: 0.9 });
 
-/** A crown about 0.6 wide and 0.34 tall, its base at y = 0: a band with seven jewelled points. */
+/** The crown's shape: a band BAND tall whose top edge rises into POINTS points, SPIKE taller. */
+const POINTS = 7;
+const BAND = 0.12;
+const SPIKE = 0.16;
+const WALL = 0.022;
+/** Outer radius at height y: the crown flares slightly towards the top. */
+const radiusAt = (y: number) => CROWN_SIZE.r * (1 + (0.07 * y) / (BAND + SPIKE));
+/** Height of the top edge at angle a: a valley between points, a sharp tip at each point. */
+function edgeAt(a: number) {
+  const phase = ((a / (Math.PI * 2)) * POINTS) % 1;
+  return BAND + SPIKE * Math.pow(1 - Math.abs(2 * phase - 1), 1.8);
+}
+/** Angles of the points' tips, and of the valleys between them. */
+const tipAngle = (k: number) => ((k + 0.5) / POINTS) * Math.PI * 2;
+const valleyAngle = (k: number) => (k / POINTS) * Math.PI * 2;
+
+/**
+ * A crown about 0.6 wide and 0.34 tall, its base at y = 0, cast as one piece: a band whose top edge rises into
+ * seven points (so the points grow out of the band instead of sitting on it), a jewel on each tip and a rolled
+ * lip round the base.
+ */
 function crownGeometry() {
-  const { r, h } = CROWN_SIZE;
-  const band = new THREE.LatheGeometry(
-    [
-      new THREE.Vector2(r - 0.03, 0),
-      new THREE.Vector2(r, 0),
-      new THREE.Vector2(r, 0.16),
-      new THREE.Vector2(r - 0.03, 0.16),
-      new THREE.Vector2(r - 0.03, 0),
-    ],
-    72,
-  );
-  const parts: THREE.BufferGeometry[] = [band.toNonIndexed()];
-  for (let k = 0; k < 7; k++) {
-    const a = (k / 7) * Math.PI * 2;
-    const spike = new THREE.ConeGeometry(0.05, h - 0.16 - 0.02, 4).toNonIndexed();
-    spike.translate(Math.cos(a) * (r - 0.015), 0.16 + (h - 0.18) / 2, Math.sin(a) * (r - 0.015));
-    const jewel = new THREE.IcosahedronGeometry(0.028, 1).toNonIndexed();
-    jewel.translate(Math.cos(a) * (r - 0.015), h - 0.02, Math.sin(a) * (r - 0.015));
-    parts.push(spike, jewel);
+  const M = POINTS * 24; // a vertex exactly on every tip and valley
+  const ring = (y: (a: number) => number, inset: number) =>
+    Array.from({ length: M }, (_, i) => {
+      const a = (i / M) * Math.PI * 2;
+      const h = y(a);
+      const r = radiusAt(h) - inset;
+      return new THREE.Vector3(Math.cos(a) * r, h, Math.sin(a) * r);
+    });
+  const outerBottom = ring(() => 0, 0);
+  const outerTop = ring(edgeAt, 0);
+  const innerBottom = ring(() => 0, WALL);
+  const innerTop = ring(edgeAt, WALL);
+
+  const pos: number[] = [];
+  const index: number[] = [];
+  // A closed strip between two rings; each strip has its own vertices, so edges between strips stay crisp.
+  const strip = (a: THREE.Vector3[], b: THREE.Vector3[], flip: boolean) => {
+    const base = pos.length / 3;
+    for (const p of [...a, ...b]) pos.push(p.x, p.y, p.z);
+    for (let i = 0; i < M; i++) {
+      const j = (i + 1) % M;
+      const tris = [
+        [base + i, base + M + i, base + j],
+        [base + M + i, base + M + j, base + j],
+      ];
+      for (const [x, y, z] of tris) index.push(...(flip ? [x!, z!, y!] : [x!, y!, z!]));
+    }
+  };
+  strip(outerBottom, outerTop, false); // outside, facing out
+  strip(innerBottom, innerTop, true); // inside, facing in
+  strip(outerTop, innerTop, false); // the top edge, facing up
+  strip(outerBottom, innerBottom, true); // the base, facing down
+  const shell = new THREE.BufferGeometry();
+  shell.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  shell.setIndex(index);
+  shell.computeVertexNormals();
+
+  const parts: THREE.BufferGeometry[] = [shell.toNonIndexed()];
+  const lip = new THREE.TorusGeometry(CROWN_SIZE.r + 0.004, 0.013, 12, 96)
+    .rotateX(Math.PI / 2)
+    .translate(0, 0.012, 0);
+  parts.push(lip.toNonIndexed());
+  for (let k = 0; k < POINTS; k++) {
+    const a = tipAngle(k);
+    const r = radiusAt(BAND + SPIKE) - WALL / 2;
+    // Faceted, like a cut stone.
+    const jewel = new THREE.IcosahedronGeometry(0.024, 0);
+    jewel.translate(Math.cos(a) * r, BAND + SPIKE + 0.016, Math.sin(a) * r);
+    parts.push(jewel);
   }
-  // Merge by hand (positions and normals only) to keep this module free of three/examples imports.
+  // Merge by hand (positions and normals), keeping each part's own shading.
   const count = parts.reduce((n, g) => n + g.getAttribute('position').count, 0);
-  const pos = new Float32Array(count * 3);
+  const position = new Float32Array(count * 3);
+  const normal = new Float32Array(count * 3);
   let o = 0;
   for (const g of parts) {
-    const p = g.getAttribute('position').array as Float32Array;
-    pos.set(p, o);
-    o += p.length;
+    position.set(g.getAttribute('position').array as Float32Array, o);
+    normal.set(g.getAttribute('normal').array as Float32Array, o);
+    o += g.getAttribute('position').count * 3;
   }
   const merged = new THREE.BufferGeometry();
-  merged.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  merged.computeVertexNormals();
+  merged.setAttribute('position', new THREE.BufferAttribute(position, 3));
+  merged.setAttribute('normal', new THREE.BufferAttribute(normal, 3));
   return merged;
 }
 
@@ -60,6 +111,36 @@ const crownGeo = crownGeometry();
 const barGeo = new THREE.BoxGeometry(BAR_SIZE.u, BAR_SIZE.h, BAR_SIZE.v).translate(0, BAR_SIZE.h / 2, 0);
 const unitBox = new THREE.BoxGeometry(1, 1, 1);
 const unitCyl = new THREE.CylinderGeometry(1, 1, 1, 16);
+
+type V3 = [number, number, number];
+const _a = new THREE.Vector3();
+const _b = new THREE.Vector3();
+const _up = new THREE.Vector3(0, 1, 0);
+/** Stretches a unit cylinder of radius r from a to b. */
+function span(m: THREE.Mesh, a: V3, b: V3, r: number) {
+  _a.set(...a);
+  _b.set(...b).sub(_a);
+  const len = _b.length();
+  m.position.copy(_a).addScaledVector(_b, 0.5);
+  m.quaternion.setFromUnitVectors(_up, _b.normalize());
+  m.scale.set(r, Math.max(len, 0.001), r);
+}
+
+/** Where the cradle's cords hold the crown (on the band, in three valleys) and the bar (near its ends). */
+const CROWN_HOLDS = [0, 2, 5].map((k) => {
+  const a = valleyAngle(k);
+  const r = radiusAt(BAND) - WALL / 2;
+  return [Math.cos(a) * r, BAND - 0.01, Math.sin(a) * r] as V3;
+});
+const BAR_HOLDS: V3[] = [
+  [-BAR_SIZE.u * 0.36, BAR_SIZE.h, 0],
+  [BAR_SIZE.u * 0.36, BAR_SIZE.h, 0],
+];
+/** How far above the object's top the cords meet. */
+const KNOT = 0.14;
+
+/** A weight in grams as the scale shows it: whole grams, with a thousands separator. */
+const grams = (x: number) => Math.round(x).toLocaleString('en-US');
 
 /** Where the scale's hook hangs: it rises a little as the reading drops (exaggerated so it shows). */
 function hookY(reading: number, weight: number) {
@@ -72,6 +153,7 @@ export function Hanging() {
   const gantry = useRef<THREE.Group>(null);
   const plunger = useRef<THREE.Mesh>(null);
   const cord = useRef<THREE.Mesh>(null);
+  const cradle = useRef<Array<THREE.Mesh | null>>([]);
   const crown = useRef<THREE.Mesh>(null);
   const bar = useRef<THREE.Mesh>(null);
   const label = useRef<THREE.Group>(null);
@@ -102,12 +184,20 @@ export function Hanging() {
     const show = rig.crown > 0.001 && rig.gantry > 0.5;
     const objTop = s.top;
     const fade = clamp01(rig.crown) * (1 - clamp01(rig.hookOut * 1.6));
+    const roped = show && rig.hookOut < 0.6;
+    const knot: V3 = uv(0, 0, objTop + KNOT);
     const c = cord.current;
     if (c) {
-      c.visible = show && rig.hookOut < 0.6;
-      c.position.set(...uv(0, 0, (hook + objTop) / 2));
-      c.scale.set(0.008, Math.max(hook - objTop, 0.001), 0.008);
+      c.visible = roped;
+      span(c, uv(0, 0, hook), knot, 0.008);
     }
+    const holds = s.isBar ? BAR_HOLDS : CROWN_HOLDS;
+    cradle.current.forEach((m, i) => {
+      if (!m) return;
+      const hold = holds[i];
+      m.visible = roped && hold !== undefined;
+      if (hold) span(m, knot, [hold[0], s.bottom + hold[1], hold[2]], 0.005);
+    });
     goldMaterial.opacity = fade;
     goldMaterial.transparent = fade < 0.999;
     goldMaterial.depthWrite = fade > 0.5;
@@ -124,7 +214,7 @@ export function Hanging() {
     const el = text.current;
     if (el) {
       el.style.opacity = String(clamp01(rig.readout) * grow);
-      const t = `${s.reading.toFixed(2)} N`;
+      const t = `${grams(s.reading)} g`;
       if (t !== last.current) {
         el.textContent = t;
         last.current = t;
@@ -162,11 +252,20 @@ export function Hanging() {
         <mesh ref={plunger} geometry={unitCyl} material={brass} />
       </group>
       <mesh ref={cord} geometry={unitCyl} material={rope} visible={false} />
+      {[0, 1, 2].map((i) => (
+        <mesh
+          key={i}
+          ref={(m) => void (cradle.current[i] = m)}
+          geometry={unitCyl}
+          material={rope}
+          visible={false}
+        />
+      ))}
       <mesh ref={crown} geometry={crownGeo} material={goldMaterial} castShadow visible={false} />
       <mesh ref={bar} geometry={barGeo} material={goldMaterial} castShadow visible={false} />
       <group ref={label}>
         <MathLabel ref={text} className="math-label math-label--chip" color={SYM3.weight}>
-          9.80 N
+          1,000 g
         </MathLabel>
       </group>
     </group>
