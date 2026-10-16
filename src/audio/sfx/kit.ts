@@ -296,7 +296,7 @@ export class SfxKit {
     const g = this.rumbleGain.gain;
     g.cancelScheduledValues(t);
     g.setValueAtTime(0, t);
-    g.linearRampToValueAtTime(0.7 * gain, t + dur * 0.4);
+    g.linearRampToValueAtTime(0.38 * gain, t + dur * 0.4);
     g.linearRampToValueAtTime(0, t + dur);
   }
 
