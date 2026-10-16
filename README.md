@@ -19,16 +19,24 @@ npm install
 npm run dev        # http://localhost:5173
 ```
 
-| Script                               | What it does                                                 |
-| ------------------------------------ | ------------------------------------------------------------ |
-| `npm run dev`                        | Vite dev server                                              |
-| `npm run build`                      | Typecheck and production build to `dist/`                    |
-| `npm run preview`                    | Serve the production build                                   |
-| `npm test`                           | Unit tests (Vitest): the maths, the journey timeline, tuning |
-| `npm run e2e`                        | End-to-end tests (Playwright, software WebGL)                |
-| `npm run typecheck` / `npm run lint` | TypeScript and ESLint                                        |
+| Script                               | What it does                                                  |
+| ------------------------------------ | ------------------------------------------------------------- |
+| `npm run dev`                        | Vite dev server                                               |
+| `npm run build`                      | Typecheck and production build to `dist/`                     |
+| `npm run preview`                    | Serve the production build                                    |
+| `npm test`                           | Unit tests (Vitest): the maths, the journey timeline, tuning  |
+| `npm run e2e`                        | End-to-end tests (Playwright, software WebGL)                 |
+| `npm run typecheck` / `npm run lint` | TypeScript and ESLint                                         |
+| `npm run render:preview`             | Render the journey to `previews/` (WAV soundtrack + MP4 film) |
 
 Useful URL parameters: `?quality=low|medium|high` (otherwise detected) and `?motion=reduced`.
+
+### Rendering a preview film
+
+With the production build served (`npm run build && npm run preview`), `npm run render:preview -- --quality low`
+renders the soundtrack offline and the picture frame by frame (by seeking the timeline), then muxes both with ffmpeg
+into `previews/journey.mp4`. It needs no GPU. Add `--resume` to continue an interrupted render and `--from`/`--seconds`
+to render a slice.
 
 ## How it fits together
 
