@@ -7,11 +7,12 @@ The full research, storyboards and architecture are in [`docs/PLAN.md`](docs/PLA
 
 ## Status
 
-| #     | Chapter                                                               | Status                                                         |
-| ----- | --------------------------------------------------------------------- | -------------------------------------------------------------- |
-| I     | The Pythagorean Theorem                                               | **Playable**: journey, Your turn, Lab, score and sound effects |
-| II    | The Area of a Circle                                                  | **Playable**: journey, Your turn, Lab, score and sound effects |
-| III–X | Archimedes, Kepler, Newton, Calculus, Euler, Fourier, Doppler, Energy | In production                                                  |
+| #    | Chapter                                                   | Status                                                         |
+| ---- | --------------------------------------------------------- | -------------------------------------------------------------- |
+| I    | The Pythagorean Theorem                                   | **Playable**: journey, Your turn, Lab, score and sound effects |
+| II   | The Area of a Circle                                      | **Playable**: journey, Your turn, Lab, score and sound effects |
+| III  | Archimedes' Principle                                     | **Playable**: journey, Your turn, Lab, score and sound effects |
+| IV–X | Kepler, Newton, Calculus, Euler, Fourier, Doppler, Energy | In production                                                  |
 
 ## Running it
 
@@ -65,8 +66,8 @@ pull request.
 - **The Dust** (`src/engine/dust`) is one GPU particle system that morphs between procedural point clouds. It carries
   every transition and the landing teaser.
 - **Sound** (`src/audio`) is procedural Tone.js, lazy-loaded when the viewer chooses sound. The score is in
-  Pythagorean tuning throughout: chapter 1 resolves on a 3:4:5 chord, and chapter 2 glides into its own key, its
-  arpeggio circling and climbing as the slices multiply. The same engine renders offline previews.
+  Pythagorean tuning throughout: chapter 1 resolves on a 3:4:5 chord, chapter 2 glides into its own key, its
+  arpeggio circling and climbing as the slices multiply, and chapter 3's bath ripples in D. The same engine renders offline previews.
 
 ## Adding a chapter
 

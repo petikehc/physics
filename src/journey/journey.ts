@@ -6,6 +6,7 @@ import { chapterBySlug } from '../chapters/registry';
 import { resetChapterRigs } from '../chapters/hooks';
 import { buildPythagoras } from '../chapters/01-pythagoras/timeline';
 import { buildCircleArea } from '../chapters/02-circle-area/timeline';
+import { buildArchimedes } from '../chapters/03-archimedes/timeline';
 import { JourneyBuilder, type Journey } from './builder';
 
 /**
@@ -60,11 +61,8 @@ export function buildJourney(): Journey {
   const j = new JourneyBuilder();
   buildPythagoras(j);
   buildCircleArea(j);
-  buildComingSoon(
-    j,
-    'archimedes',
-    'Archimedes is about to step into his bath. This chapter is in production.',
-  );
+  buildArchimedes(j);
+  buildComingSoon(j, 'kepler', 'Kepler is charting the planets. This chapter is in production.');
   const journey = j.finish();
   journey.master.progress(0);
   return journey;

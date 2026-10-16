@@ -271,6 +271,14 @@ export class SfxKit {
         return;
       }
       case 'formula':
+        if (params.chapter === 3) {
+          // Three drops falling into still water, then the open chord.
+          [pyth('G', 5), pyth('E', 5), pyth('C', 5)].forEach((f, i) => this.drop(t + i * 0.22, f));
+          [pyth('C', 4), pyth('G', 4), pyth('E', 5)].forEach((f, i) =>
+            this.bell.triggerAttackRelease(f, 3.5, t + 0.8 + i * 0.1, 0.42),
+          );
+          return;
+        }
         if (params.chapter === 2) {
           // Once round the pentatonic circle, then a wide, open C chord.
           CIRCLE_RUN.forEach((f, i) => this.bell.triggerAttackRelease(f, 1.6, t + i * 0.09, 0.22));
@@ -351,6 +359,29 @@ export class SfxKit {
         this.whoosh(t, 0.55, 3.2);
         this.rumble(t + 0.2, 2.4, 0.35, 300, 700);
         return;
+      case 'plunk': {
+        // Something heavy slipping under the surface: a soft low thump and a burst of bubbles.
+        const k = params.small ? 0.6 : 1;
+        this.thump.triggerAttackRelease(pyth('D', 2), 0.25, t, 0.45 * k);
+        this.rumble(t, 0.6, 0.35 * k, 700, 250);
+        for (let i = 0; i < 6; i++)
+          this.drop(t + 0.06 + i * 0.07 + ((i * 37) % 5) * 0.01, 420 + ((i * 173) % 7) * 90, 0.5);
+        return;
+      }
+      case 'bloop':
+        // The bubble breaking the surface.
+        this.drop(t, 260, 0.8, 0.22, 4.5);
+        this.bell.triggerAttackRelease(pyth('A', 5), 1.4, t + 0.12, 0.16);
+        return;
+      case 'eureka': {
+        const run = [pyth('C', 5), pyth('E', 5), pyth('G', 5), pyth('C', 6), pyth('E', 6)];
+        run.forEach((f, i) => this.bell.triggerAttackRelease(f, 1.6, t + i * 0.07, 0.3));
+        [pyth('C', 4), pyth('G', 4), pyth('E', 5)].forEach((f, i) =>
+          this.bell.triggerAttackRelease(f, 3, t + 0.4 + i * 0.05, 0.36),
+        );
+        this.whoosh(t, 0.35, 1.4);
+        return;
+      }
       case 'uiHover':
         return this.blip.triggerAttackRelease(1800, 0.02, t, 0.12);
       case 'uiClick':
@@ -359,6 +390,13 @@ export class SfxKit {
       default:
         return;
     }
+  }
+
+  /** One water drop or bubble: a sine blip that slides up in pitch. */
+  private drop(t: number, f: number, velocity = 0.6, dur = 0.05, rise = 1.8) {
+    this.bubble.frequency.setValueAtTime(f, t);
+    this.bubble.frequency.exponentialRampToValueAtTime(f * rise, t + dur);
+    this.bubble.triggerAttackRelease(f, dur * 0.8, t, velocity);
   }
 
   private whoosh(t: number, gain: number, dur: number) {

@@ -323,6 +323,18 @@ is corrected at beat labels when it exceeds 50 ms.
   - formula: a run once round the pentatonic, then a wide open chord
 - Your turn / Lab: every slider change re-deals the row with the same doubling step and riffle.
 
+**Chapter 3 (built)**
+- Story: the crown (70 % gold, 30 % silver: 1 kg, 64.8 mL) on a hanging scale (the captions never say "spring":
+  spring scales are some 2,000 years too late) over a brim-full stone tank with a glass front; lowered, it spills
+  65 mL into a beaker and the scale falls from 1,000 g to 935 g; arrows show the 65 g push and the 65 g weight of
+  the spilled water side by side (weights in grams throughout: Archimedes thought in weights, and newtons are
+  1,900 years too late); the formula; Eureka: a pure gold bar of the same weight spills only 52 mL; then, at the
+  waterline, pine floats half under, ice 92 % under and gold sinks, the submerged part of each block glowing.
+  Handoff: a bubble rises and the dust blooms into chapter 4's orbit.
+- Your turn / Lab: six materials (cork to gold) in four fluids (olive oil, water, Dead Sea, mercury).
+- Score "Water": Dm–F–C–G over a D–A drone, the arpeggio rippling. SFX: plunk (immersion), splash, the pour, a
+  bubble's bloop, a eureka run and three drops before the formula chord.
+
 ---
 
 ## 5. Technical architecture
@@ -418,7 +430,7 @@ src/
    - → **Checkpoint with you** to lock the look, camera pacing and sound.
 
 **Later sessions**
-3. Ch.2 (built: the slicing and onion proofs, Your turn, Lab and score) and ch.3 (bath house, water).
+3. Ch.2 (built: the slicing and onion proofs, Your turn, Lab and score) and ch.3 (built: the crown, the overflow, the line-up).
 4. Ch.4–6 (space, chase cam, the abstract realm).
 5. Ch.7–9 (helix shadows, clockwork Fourier, Doppler street).
 6. Ch.10, the Constellation finale and index, and the full teaser montage.
