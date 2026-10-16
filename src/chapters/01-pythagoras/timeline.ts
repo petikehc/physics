@@ -20,6 +20,11 @@ const P1 = at(3, 0);
 const CENTROID = at(1, 4 / 3);
 const C_TANK = at(3.5, 3.5);
 const FRAME_CENTRE = at(13, 2);
+/** Looking almost straight down on the circle the hypotenuse carves (radius 5·S about P1), a little high in frame. */
+const TOP_DOWN = {
+  pos: [P1[0], 11.6, P1[2] + 1.9] as [number, number, number],
+  target: [P1[0], 0, P1[2] + 0.7] as [number, number, number],
+};
 
 /** Story-mode timeline for chapter 1, beat by beat. */
 export function buildPythagoras(j: JourneyBuilder) {
@@ -274,10 +279,12 @@ export function buildPythagoras(j: JourneyBuilder) {
       tl.to(rig, { tanks: 0, areaLabels: 0, labels: 0, rightMark: 0, duration: 1.4, ease: 'power2.in' }, 0);
       tl.set(rig, { cFull: 0, proofSink: 0 }, 1.5);
       cue(0.1, 'sink');
+      // Face-on, from almost straight above: at an angle, perspective squashes the circle into an ellipse,
+      // the swinging radius seems to change length, and the legs stop looking square.
       shot(
         tl,
         SLUG,
-        { pos: [P1[0] + 0.6, 7.0, P1[2] + 7.4], target: [P1[0], 0, P1[2] - 0.3], fov: 40, shake: 0.4 },
+        { pos: TOP_DOWN.pos, target: TOP_DOWN.target, fov: 40, shake: 0.3, dof: 0 },
         2.6,
         0,
         'power3.inOut',
@@ -323,10 +330,11 @@ export function buildPythagoras(j: JourneyBuilder) {
       );
       cue(0, 'gather');
       tl.to(dust, { y: 0.5, size: 1.2, duration: 1.8, ease: 'sine.inOut' }, 2.8);
+      // Still face-on, so the dust reads as a sliced disc as it lifts off the sand.
       shot(
         tl,
         SLUG,
-        { pos: [P1[0], 6.3, P1[2] + 7.6], target: [P1[0], 0.1, P1[2] + 0.5], focus: [P1[0], 0.3, P1[2]] },
+        { pos: [P1[0], 11.4, P1[2] + 2.2], target: [P1[0], 0.3, P1[2] + 0.9], focus: [P1[0], 0.3, P1[2]] },
         4.2,
         0,
         'power2.inOut',
