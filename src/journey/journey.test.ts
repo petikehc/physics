@@ -192,7 +192,7 @@ describe('the journey timeline', () => {
     expect(crown.isBar).toBe(false);
     expect(crown.submerged).toBe(1);
     expect(rig.spillA).toBe(1);
-    expect(crown.reading.toFixed(2)).toBe('9.16');
+    expect(Math.round(crown.reading)).toBe(935);
 
     // After the eureka beat: the bar is under too, and the tank is back to the brim.
     const t = beat('float').start;

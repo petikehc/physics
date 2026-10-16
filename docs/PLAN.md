@@ -325,8 +325,9 @@ is corrected at beat labels when it exceeds 50 ms.
 
 **Chapter 3 (built)**
 - Story: the crown (70 % gold, 30 % silver: 1 kg, 64.8 mL) on a spring scale over a brim-full stone tank with a
-  glass front; lowered, it spills 65 mL into a beaker and the scale falls from 9.80 N to 9.16 N; arrows show the
-  0.64 N push and the 0.64 N weight of the spilled water side by side; the formula; Eureka: a pure gold bar of the
+  glass front; lowered, it spills 65 mL into a beaker and the scale falls from 1,000 g to 935 g; arrows show the
+  65 g push and the 65 g weight of the spilled water side by side (weights in grams throughout: Archimedes
+  thought in weights, and newtons are 1,900 years too late); the formula; Eureka: a pure gold bar of the
   same weight spills only 52 mL; then, at the waterline, pine floats half under, ice 92 % under and gold sinks, the
   submerged part of each block glowing. Handoff: a bubble rises and the dust blooms into chapter 4's orbit.
 - Your turn / Lab: six materials (cork to gold) in four fluids (olive oil, water, Dead Sea, mercury).

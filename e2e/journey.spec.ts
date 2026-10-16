@@ -128,7 +128,7 @@ test('jumping ahead loads the chapter the playhead lands in', async ({ page }) =
   );
   await seek(page, t);
   // The overflow beaker's label only exists once chapter 3's station is mounted.
-  await expect(page.getByText('65 mL', { exact: true })).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByText(/^65 mL/)).toBeVisible({ timeout: 60_000 });
   expect(errors).toEqual([]);
 });
 

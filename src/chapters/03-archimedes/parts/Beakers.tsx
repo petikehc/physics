@@ -138,22 +138,21 @@ export function Beakers() {
       w.scale.setScalar(Math.max(k, 0.001));
     }
 
-    const n = (x: number) => x.toFixed(2);
+    // The two beaker labels lean apart (the beakers stand close). While the arrows are up, the first beaker's
+    // label also gives the spilled water's weight, rather than a separate label that would crowd it.
+    const spilledA = Math.round(mlA);
     const spots: Array<[[number, number, number], number, string]> = [
-      // The two beaker labels lean apart (the beakers stand close), and the weight label sits low beside the
-      // first beaker, so none of them collide on a narrow screen.
       [
         uv(posA[0] + OUT * 0.1, posA[1], rise + BEAKER.h + 0.12),
         show && mlA > 0.5 ? 1 : 0,
-        `${Math.round(mlA)} mL`,
+        k > 0.5 ? `${spilledA} mL = ${Math.round(buoyancy(mlA))} g` : `${spilledA} mL`,
       ],
       [
         uv(posB[0] - OUT * 0.1, posB[1], rise + BEAKER.h + 0.22),
         show && mlB > 0.5 ? 1 : 0,
         `${Math.round(mlB)} mL`,
       ],
-      [uv(0.48, 0, h.bottom + h.height / 2 + 0.3), k, `push ${n(NUMBERS.crownPush)} N`],
-      [uv(posA[0] + OUT * 0.5, posA[1], rise + 0.12), k, `weighs ${n(buoyancy(mlA))} N`],
+      [uv(0.48, 0, h.bottom + h.height / 2 + 0.3), k, `${Math.round(NUMBERS.crownPush)} g lighter`],
     ];
     spots.forEach(([pos, o, t], i) => {
       labels.current[i]?.position.set(...pos);
@@ -180,7 +179,7 @@ export function Beakers() {
       <mesh ref={stream} geometry={streamGeo} material={streamMat} visible={false} />
       <Arrow arrow={push} />
       <Arrow arrow={spilled} />
-      {[SYM3.push, SYM3.push, SYM3.push, SYM3.push].map((color, i) => (
+      {[SYM3.push, SYM3.push, SYM3.push].map((color, i) => (
         <group key={i} ref={(el) => void (labels.current[i] = el)}>
           <MathLabel
             ref={(el) => void (texts.current[i] = el)}

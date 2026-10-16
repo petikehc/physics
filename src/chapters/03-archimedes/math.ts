@@ -1,9 +1,7 @@
 /**
- * Pure physics for chapter 3 (Archimedes' principle). Masses in grams, volumes in cm³ (= mL), densities in
- * g/cm³, forces in newtons.
+ * Pure physics for chapter 3 (Archimedes' principle). Volumes in cm³ (= mL), densities in g/cm³, and weights in
+ * grams, as a scale shows them (Archimedes thought in weights; forces and newtons came 1,900 years later).
  */
-
-export const G = 9.8;
 
 export interface Substance {
   id: string;
@@ -35,24 +33,22 @@ export const GOLD = 19.3;
 export const SILVER = 10.5;
 export const WATER = 1.0;
 
-/** Weight in newtons of `grams`. */
-export function weight(grams: number): number {
-  return (grams / 1000) * G;
-}
-
 /** Volume of `grams` of gold–silver alloy that is `goldShare` gold by mass (densities add as volumes). */
 export function alloyVolume(grams: number, goldShare: number): number {
   return (grams * goldShare) / GOLD + (grams * (1 - goldShare)) / SILVER;
 }
 
-/** Upward push on `volume` cm³ submerged in a fluid: the weight of the fluid it displaces. */
+/**
+ * The push on `volume` cm³ submerged in a fluid, in grams: the weight of the fluid it displaces. (100 mL of
+ * water weighs 100 g, so it pushes up as hard as a 100 g weight pulls down.)
+ */
 export function buoyancy(volume: number, fluidDensity = WATER): number {
-  return weight(volume * fluidDensity);
+  return volume * fluidDensity;
 }
 
-/** What a spring scale reads for an object hanging with `submerged` (0..1) of its volume under water. */
+/** What a spring scale reads, in grams, for an object hanging with `submerged` (0..1) of its volume under. */
 export function scaleReading(grams: number, volume: number, submerged: number, fluidDensity = WATER): number {
-  return weight(grams) - buoyancy(volume * submerged, fluidDensity);
+  return grams - buoyancy(volume * submerged, fluidDensity);
 }
 
 /**
@@ -74,7 +70,7 @@ export function storyNumbers() {
   const crownVolume = alloyVolume(CROWN.grams, CROWN.goldShare);
   const barVolume = alloyVolume(BAR.grams, BAR.goldShare);
   return {
-    weight: weight(CROWN.grams),
+    weight: CROWN.grams,
     crownVolume,
     barVolume,
     crownPush: buoyancy(crownVolume),

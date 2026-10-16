@@ -94,7 +94,7 @@ export function buildArchimedes(j: JourneyBuilder) {
     {
       id: 'weigh',
       heading: 'Weigh it',
-      body: 'Hung from a spring scale, the crown weighs [w:9.80 N]. Under it, a stone tank is filled with water right up to the brim.',
+      body: 'Hung from a spring scale, the crown weighs [w:1,000 g]. Under it, a stone tank is filled with water right up to the brim.',
     },
     ({ tl, cue }) => {
       shot(
@@ -123,7 +123,7 @@ export function buildArchimedes(j: JourneyBuilder) {
     {
       id: 'lower',
       heading: 'Lower it into the water',
-      body: 'As the crown goes under it pushes water aside, and the overflow runs from the spout into a beaker. Watch the scale: [w:9.80 N] falls to [w:9.16 N].',
+      body: 'As the crown goes under it pushes water aside, and the overflow runs from the spout into a beaker. Watch the scale: [w:1,000 g] falls to [w:935 g].',
     },
     ({ tl, cue }) => {
       shot(
@@ -159,7 +159,7 @@ export function buildArchimedes(j: JourneyBuilder) {
     {
       id: 'push',
       heading: 'The water pushes up',
-      body: 'The crown lost [p:0.64 N] of weight: the water is pushing it up. And the water it spilled weighs exactly [p:0.64 N]. The push always equals the weight of the water pushed aside.',
+      body: 'In the water the crown weighs [p:65 g] less: the water is pushing it up. And the water it spilled weighs exactly [p:65 g]. The push always equals the weight of the water pushed aside.',
     },
     ({ tl, cue }) => {
       shot(
@@ -180,7 +180,7 @@ export function buildArchimedes(j: JourneyBuilder) {
     {
       id: 'formula',
       kind: 'formula',
-      body: "Archimedes' principle: the push is the fluid's density, times the volume pushed aside, times g.",
+      body: "As physicists write it today: the push is the fluid's density, times the volume pushed aside, times gravity.",
       minDuration: 6.5,
     },
     ({ tl, cue }) => {

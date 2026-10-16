@@ -1,5 +1,5 @@
 import { clamp01, lerp } from '../../engine/ease';
-import { BAR, CROWN, scaleReading, storyNumbers, weight } from './math';
+import { BAR, CROWN, scaleReading, storyNumbers } from './math';
 import { BAR_SIZE, BRIM, CROWN_SIZE, HANG_BOTTOM, TANK, type ArchimedesRig } from './rig';
 
 const NUMBERS = storyNumbers();
@@ -9,7 +9,7 @@ export function waterY(level: number): number {
   return TANK.floor + (BRIM - TANK.floor) * level;
 }
 
-/** Where the object on the hook is and what the scale reads, derived from the rig. */
+/** Where the object on the hook is and what the scale reads (grams), derived from the rig. */
 export function hangState(rig: Pick<ArchimedesRig, 'bar' | 'lower' | 'hookOut' | 'level'>) {
   const isBar = rig.bar >= 0.5;
   const height = isBar ? BAR_SIZE.h : CROWN_SIZE.h;
@@ -24,7 +24,7 @@ export function hangState(rig: Pick<ArchimedesRig, 'bar' | 'lower' | 'hookOut' |
     top: bottom + height,
     submerged,
     volume,
-    weight: weight(grams),
+    weight: grams,
     reading: scaleReading(grams, volume, submerged),
   };
 }
