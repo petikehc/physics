@@ -27,6 +27,7 @@ export const ARRANGEMENT: Record<string, Layers> = {
   'pythagoras:formula': { drone: 0.9, pad: 1, cutoff: 3000, plucks: 0, arp: 0, harmony: 'resolve' },
   'pythagoras:yourTurn': { drone: 0.5, pad: 0.45, cutoff: 700, plucks: 0.12, arp: 0, harmony: 'prog' },
   'pythagoras:handoff': { drone: 0.8, pad: 0.75, cutoff: 1800, plucks: 0.1, arp: 0.7, harmony: 'prog' },
+  'pythagoras:slices': { drone: 0.8, pad: 0.75, cutoff: 1800, plucks: 0.1, arp: 0.85, harmony: 'prog' },
   'circle-area:flight': { drone: 0.9, pad: 0.9, cutoff: 2600, plucks: 0.2, arp: 0.5, harmony: 'prog' },
   'circle-area:soon': { drone: 0.5, pad: 0.5, cutoff: 900, plucks: 0.1, arp: 0, harmony: 'prog' },
   lab: { drone: 0.45, pad: 0.4, cutoff: 800, plucks: 0.1, arp: 0, harmony: 'prog' },

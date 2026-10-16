@@ -66,7 +66,12 @@ export function Drawing() {
     // Right-angle mark at P0.
     const m = 0.45;
     const markPts: Pts = [w(m, 0, 0.012), w(m, m, 0.012), w(0, m, 0.012)];
-    mark.current?.set(markPts, rig.rightMark, rig.rightMark * rig.groove * (rig.gamma === 90 ? 1 : 0.25));
+    // Like the side labels, the mark steps aside while the tanks stand over the corner.
+    mark.current?.set(
+      markPts,
+      rig.rightMark,
+      rig.rightMark * rig.groove * (rig.gamma === 90 ? 1 : 0.25) * (1 - rig.tanks),
+    );
 
     // Side labels appear as each side is finished.
     const centroid: [number, number] = [(t.P0[0] + t.P1[0] + t.P2[0]) / 3, (t.P0[1] + t.P1[1] + t.P2[1]) / 3];

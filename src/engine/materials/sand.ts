@@ -152,7 +152,8 @@ export function createSandMaterial(): { material: THREE.MeshStandardMaterial; un
           float dune = sandNoise(p * 0.08) * 0.35 + sandNoise(p * 0.22) * 0.12;
           // Fine grain fades out with distance to avoid shimmering.
           float fw = fwidth(p.x * 60.0);
-          float grainFade = 1.0 - smoothstep(0.3, 1.0, fw);
+          // Fade grain out well before it reaches pixel size, where it would shimmer as the camera moves.
+          float grainFade = 1.0 - smoothstep(0.12, 0.4, fw);
           float grainN = sandHash(floor(p * 60.0)) * grainFade;
           // Ripples also fade with distance, before they alias.
           float rippleFade = 1.0 - smoothstep(0.25, 0.8, fwidth(p.x * 1.5));
@@ -191,7 +192,7 @@ export function createSandMaterial(): { material: THREE.MeshStandardMaterial; un
       );
   };
   // Distinct cache key so three does not reuse a plain MeshStandardMaterial program.
-  material.customProgramCacheKey = () => 'sand-v2';
+  material.customProgramCacheKey = () => 'sand-v3';
 
   return { material, uniforms };
 }

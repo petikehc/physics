@@ -265,7 +265,7 @@ export function buildPythagoras(j: JourneyBuilder) {
     {
       id: 'handoff',
       heading: 'One more secret',
-      body: 'Hold the long side by one end and swing it round. Its tip carves a circle, and at every point of that circle a right triangle is hiding. The circle is where the next idea begins.',
+      body: 'Hold the long side by one end and swing it round. Its tip carves a circle, and at every point of that circle a right triangle is hiding.',
     },
     ({ tl, cue }) => {
       tl.to(rig, { a: 3, b: 4, gamma: 90, scale: S, duration: 1.0, ease: 'power2.inOut' }, 0);
@@ -285,11 +285,22 @@ export function buildPythagoras(j: JourneyBuilder) {
       tl.to(rig, { groove: 0.35, duration: 3 }, 3);
       cue(6.0, 'tick');
       tl.to(rig, { radius: 0, duration: 0.6 }, 6.2);
+    },
+  );
+
+  j.beat(
+    SLUG,
+    {
+      id: 'slices',
+      heading: 'Sliced like a pie',
+      body: 'Archimedes measured circles by cutting them into slices like these. That is the next chapter.',
+    },
+    ({ tl, cue }) => {
       // The beach's dust gathers onto the carved circle, lying flat on it, then lifts it off the sand.
       // (It stands up to face the camera during the flight to chapter II.)
       const R = 5 * S; // radius of the carved circle: the hypotenuse
-      tl.set(dust, { from: 'sand', to: 'circleFlat', morph: 0, rotX: 0, spin: 0 }, 6.1);
-      tl.to(dust, { morph: 1, duration: 2.8, ease: 'power2.inOut' }, 6.1);
+      tl.set(dust, { from: 'sand', to: 'circleFlat', morph: 0, rotX: 0, spin: 0 }, 0);
+      tl.to(dust, { morph: 1, duration: 2.8, ease: 'power2.inOut' }, 0);
       tl.to(
         dust,
         {
@@ -306,16 +317,16 @@ export function buildPythagoras(j: JourneyBuilder) {
           duration: 2.8,
           ease: 'power2.inOut',
         },
-        6.1,
+        0,
       );
-      cue(6.1, 'gather');
-      tl.to(dust, { y: 0.5, size: 1.2, duration: 1.8, ease: 'sine.inOut' }, 8.9);
+      cue(0, 'gather');
+      tl.to(dust, { y: 0.5, size: 1.2, duration: 1.8, ease: 'sine.inOut' }, 2.8);
       shot(
         tl,
         SLUG,
         { pos: [P1[0], 6.3, P1[2] + 7.6], target: [P1[0], 0.1, P1[2] + 0.5], focus: [P1[0], 0.3, P1[2]] },
         4.2,
-        6.0,
+        0,
         'power2.inOut',
       );
     },

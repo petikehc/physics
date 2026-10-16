@@ -20,6 +20,7 @@ describe('the journey timeline', () => {
       'pythagoras:formula',
       'pythagoras:yourTurn',
       'pythagoras:handoff',
+      'pythagoras:slices',
       'circle-area:flight',
       'circle-area:soon',
     ]);
