@@ -305,8 +305,9 @@ export function buildPythagoras(j: JourneyBuilder) {
       body: 'Archimedes measured circles by cutting them into slices like these. That is the next chapter.',
     },
     ({ tl, cue }) => {
-      // The beach's dust gathers onto the carved circle, lying flat on it, then lifts it off the sand.
-      // (It stands up to face the camera during the flight to chapter II.)
+      // The beach's dust gathers onto the carved circle and lies flat on it, exactly over the groove. (It rises
+      // and stands up to face the camera during the flight to chapter II: from straight above, a lift here
+      // would only read as the circle growing.)
       const R = 5 * S; // radius of the carved circle: the hypotenuse
       tl.set(dust, { from: 'sand', to: 'circleFlat', morph: 0, rotX: 0, spin: 0 }, 0);
       tl.to(dust, { morph: 1, duration: 2.8, ease: 'power2.inOut' }, 0);
@@ -329,8 +330,8 @@ export function buildPythagoras(j: JourneyBuilder) {
         0,
       );
       cue(0, 'gather');
-      tl.to(dust, { y: 0.5, size: 1.2, duration: 1.8, ease: 'sine.inOut' }, 2.8);
-      // Still face-on, so the dust reads as a sliced disc as it lifts off the sand.
+      tl.to(dust, { size: 1.2, duration: 1.8, ease: 'sine.inOut' }, 2.8);
+      // Still face-on, so the dust reads as a sliced disc lying on the carved circle.
       shot(
         tl,
         SLUG,
