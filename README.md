@@ -39,6 +39,17 @@ renders the soundtrack offline and the picture frame by frame (by seeking the ti
 into `previews/journey.mp4`. It needs no GPU. Add `--resume` to continue an interrupted render and `--from`/`--seconds`
 to render a slice.
 
+### Deploys and previews
+
+Every push publishes the site to GitHub Pages (the `gh-pages` branch, built by `.github/workflows/pages.yml`):
+
+- `main` is the live site: https://petikehc.github.io/physics/
+- any other branch gets its own preview: `https://petikehc.github.io/physics/preview/<branch>/` (lower-case, with
+  `/` turned into `-`), removed again when the branch is deleted.
+
+Work on a chapter or a fix in its own branch, check its preview (on a phone too), then merge it into `main` with a
+pull request.
+
 ## How it fits together
 
 - **One world, one canvas.** `src/app/World.tsx` renders a single persistent R3F `<Canvas>` behind every route. Each
