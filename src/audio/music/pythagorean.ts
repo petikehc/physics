@@ -1,0 +1,222 @@
+import * as Tone from 'tone';
+import { C3, pyth, triangleChord, type Note } from '../tuning';
+
+/** How the score sounds during one beat. Values are targets the score glides to. */
+export interface Layers {
+  drone: number;
+  pad: number;
+  cutoff: number;
+  plucks: number;
+  arp: number;
+  /** 'prog' cycles C–Am–F–G; 'resolve' holds the 3:4:5 triangle chord. */
+  harmony: 'prog' | 'resolve';
+}
+
+const QUIET: Layers = { drone: 0, pad: 0, cutoff: 500, plucks: 0, arp: 0, harmony: 'prog' };
+
+/** Per-beat arrangement of chapter 1 ("Pythagorean Drone"). */
+export const ARRANGEMENT: Record<string, Layers> = {
+  teaser: { drone: 0.55, pad: 0.6, cutoff: 700, plucks: 0.14, arp: 0, harmony: 'prog' },
+  'pythagoras:title': { drone: 0.8, pad: 0.75, cutoff: 650, plucks: 0.1, arp: 0, harmony: 'prog' },
+  'pythagoras:draw': { drone: 0.8, pad: 0.7, cutoff: 800, plucks: 0.24, arp: 0, harmony: 'prog' },
+  'pythagoras:squares': { drone: 0.85, pad: 0.8, cutoff: 1100, plucks: 0.2, arp: 0.55, harmony: 'prog' },
+  'pythagoras:pour': { drone: 0.9, pad: 0.85, cutoff: 2300, plucks: 0.12, arp: 0.8, harmony: 'prog' },
+  'pythagoras:brim': { drone: 0.9, pad: 0.9, cutoff: 2700, plucks: 0.3, arp: 0.6, harmony: 'prog' },
+  'pythagoras:rearrangeA': { drone: 0.7, pad: 0.6, cutoff: 1400, plucks: 0.3, arp: 0, harmony: 'prog' },
+  'pythagoras:rearrangeB': { drone: 0.75, pad: 0.65, cutoff: 1600, plucks: 0.32, arp: 0.3, harmony: 'prog' },
+  'pythagoras:formula': { drone: 0.9, pad: 1, cutoff: 3000, plucks: 0, arp: 0, harmony: 'resolve' },
+  'pythagoras:yourTurn': { drone: 0.5, pad: 0.45, cutoff: 700, plucks: 0.12, arp: 0, harmony: 'prog' },
+  'pythagoras:handoff': { drone: 0.8, pad: 0.75, cutoff: 1800, plucks: 0.1, arp: 0.7, harmony: 'prog' },
+  'circle-area:flight': { drone: 0.9, pad: 0.9, cutoff: 2600, plucks: 0.2, arp: 0.5, harmony: 'prog' },
+  'circle-area:soon': { drone: 0.5, pad: 0.5, cutoff: 900, plucks: 0.1, arp: 0, harmony: 'prog' },
+  lab: { drone: 0.45, pad: 0.4, cutoff: 800, plucks: 0.1, arp: 0, harmony: 'prog' },
+};
+
+// Chords as Pythagorean pitches: C – Am – F – G.
+const PROGRESSION: Array<Array<[Note, number]>> = [
+  [
+    ['C', 3],
+    ['G', 3],
+    ['C', 4],
+    ['E', 4],
+  ],
+  [
+    ['A', 2],
+    ['E', 3],
+    ['A', 3],
+    ['C', 4],
+  ],
+  [
+    ['F', 2],
+    ['C', 3],
+    ['F', 3],
+    ['A', 3],
+  ],
+  [
+    ['G', 2],
+    ['D', 3],
+    ['G', 3],
+    ['B', 3],
+  ],
+];
+
+const PENTATONIC: Array<[Note, number]> = [
+  ['C', 5],
+  ['D', 5],
+  ['E', 5],
+  ['G', 5],
+  ['A', 5],
+  ['C', 6],
+  ['D', 6],
+  ['E', 6],
+];
+
+/**
+ * Chapter 1's generative score. A drone of pure fifths, a slow pad, sparse pentatonic plucks and an arpeggio
+ * that enters as the tanks rise; it resolves on the 3:4:5 chord when the formula appears.
+ */
+export class PythagoreanScore {
+  private out: Tone.Gain;
+  private droneGain: Tone.Gain;
+  private padFilter: Tone.Filter;
+  private padGain: Tone.Gain;
+  private pad: Tone.PolySynth<Tone.Synth>;
+  private pluck: Tone.Synth;
+  private arpSynth: Tone.FMSynth;
+  private arpGain: Tone.Gain;
+  private layers: Layers = QUIET;
+  private chord = 0;
+  private bar = 0;
+  private sources: Array<{ start: (t?: number) => unknown; dispose: () => unknown }> = [];
+  private loops: Tone.Loop[] = [];
+  private rng = 1;
+
+  constructor(destination: Tone.InputNode, transport: ReturnType<typeof Tone.getTransport>) {
+    this.out = new Tone.Gain(1).connect(destination);
+    const verb = new Tone.Reverb({ decay: 7, wet: 0.5 }).connect(this.out);
+    const delay = new Tone.FeedbackDelay({ delayTime: 0.62, feedback: 0.38, wet: 0.35 }).connect(verb);
+
+    // Drone: C2 + G2, a pure fifth, breathing slowly.
+    this.droneGain = new Tone.Gain(0).connect(verb);
+    const droneFilter = new Tone.Filter({ type: 'lowpass', frequency: 420 }).connect(this.droneGain);
+    const trem = new Tone.Gain(0.8).connect(droneFilter);
+    const breath = new Tone.LFO({ frequency: 0.07, min: 0.55, max: 1 }).connect(trem.gain);
+    const d1 = new Tone.Oscillator({ type: 'triangle', frequency: C3 / 2, volume: -15 }).connect(trem);
+    const d2 = new Tone.Oscillator({ type: 'sine', frequency: (C3 / 2) * 1.5, volume: -15 }).connect(trem);
+    // A quiet octave above keeps the drone audible on small speakers.
+    const d3 = new Tone.Oscillator({ type: 'sine', frequency: C3, volume: -24 }).connect(trem);
+
+    // Pad.
+    this.padGain = new Tone.Gain(0).connect(verb);
+    this.padFilter = new Tone.Filter({ type: 'lowpass', frequency: 600, Q: 0.6 }).connect(this.padGain);
+    const chorus = new Tone.Chorus({ frequency: 0.3, delayTime: 4, depth: 0.5, wet: 0.5 }).connect(
+      this.padFilter,
+    );
+    this.pad = new Tone.PolySynth(Tone.Synth, {
+      oscillator: { type: 'fattriangle', count: 3, spread: 22 },
+      envelope: { attack: 2.6, decay: 1.5, sustain: 0.75, release: 5 },
+      volume: -15,
+    }).connect(chorus);
+
+    // Plucks.
+    this.pluck = new Tone.Synth({
+      oscillator: { type: 'triangle' },
+      envelope: { attack: 0.004, decay: 0.7, sustain: 0, release: 0.9 },
+      volume: -15,
+    }).connect(delay);
+
+    // Arpeggio.
+    this.arpGain = new Tone.Gain(0).connect(delay);
+    this.arpSynth = new Tone.FMSynth({
+      harmonicity: 2,
+      modulationIndex: 2.5,
+      envelope: { attack: 0.01, decay: 0.35, sustain: 0, release: 0.4 },
+      modulationEnvelope: { attack: 0.01, decay: 0.2, sustain: 0, release: 0.2 },
+      volume: -14,
+    }).connect(this.arpGain);
+
+    this.sources = [d1, d2, d3, breath];
+
+    // Harmony: one chord per bar (4 beats at 72 bpm ≈ 3.3 s), two bars per chord.
+    transport.bpm.value = 72;
+    this.loops.push(
+      new Tone.Loop((time) => {
+        const l = this.layers;
+        if (l.pad <= 0.01) return;
+        if (l.harmony === 'resolve') {
+          if (this.bar % 2 === 0) this.pad.triggerAttackRelease(triangleChord(pyth('C', 4)), '1m', time, 0.7);
+        } else if (this.bar % 2 === 0) {
+          const notes = PROGRESSION[this.chord % PROGRESSION.length]!.map(([n, o]) => pyth(n, o));
+          this.pad.triggerAttackRelease(notes, '2m', time, 0.6);
+          this.chord++;
+        }
+        this.bar++;
+      }, '1m').start(0),
+    );
+    // Plucks on eighth notes, sparse and random.
+    this.loops.push(
+      new Tone.Loop((time) => {
+        if (this.random() < this.layers.plucks) {
+          const [n, o] = PENTATONIC[Math.floor(this.random() * PENTATONIC.length)]!;
+          this.pluck.triggerAttackRelease(pyth(n, o), '8n', time, 0.35 + this.random() * 0.4);
+        }
+      }, '8n').start(0),
+    );
+    // Arpeggio of the current chord in sixteenths.
+    let step = 0;
+    this.loops.push(
+      new Tone.Loop((time) => {
+        if (this.layers.arp <= 0.01) return;
+        const chord =
+          this.layers.harmony === 'resolve'
+            ? triangleChord(pyth('C', 5))
+            : PROGRESSION[Math.max(this.chord - 1, 0) % PROGRESSION.length]!.map(([n, o]) => pyth(n, o + 2));
+        const order = [0, 1, 2, 3, 2, 1];
+        const f = chord[order[step % order.length]! % chord.length]!;
+        this.arpSynth.triggerAttackRelease(f, '16n', time, 0.5);
+        step++;
+      }, '8n').start(0),
+    );
+  }
+
+  async ready() {
+    const t = Tone.now();
+    for (const s of this.sources) s.start(t);
+  }
+
+  /** Deterministic pseudo-random numbers so offline renders match. */
+  private random() {
+    this.rng = (this.rng * 16807) % 2147483647;
+    return (this.rng - 1) / 2147483646;
+  }
+
+  apply(key: string | null, time = Tone.now()) {
+    const l =
+      (key && ARRANGEMENT[key]) || (key?.startsWith('pythagoras') ? ARRANGEMENT['pythagoras:draw']! : QUIET);
+    const prev = this.layers;
+    this.layers = l;
+    const glide = 1.6;
+    this.droneGain.gain.setTargetAtTime(l.drone * 0.32, time, glide / 3);
+    this.padGain.gain.setTargetAtTime(l.pad, time, glide / 3);
+    this.padFilter.frequency.setTargetAtTime(l.cutoff, time, key === 'pythagoras:pour' ? 3 : glide / 2);
+    this.arpGain.gain.setTargetAtTime(l.arp, time, glide / 3);
+    if (l.harmony === 'resolve' && prev.harmony !== 'resolve') {
+      // Swell straight into the triangle chord instead of waiting for the next bar.
+      this.pad.releaseAll(time);
+      this.pad.triggerAttackRelease(triangleChord(pyth('C', 4)), 6, time + 0.3, 0.8);
+      this.bar = 1;
+    }
+  }
+
+  /** Fade everything out (pause) or back in (resume). */
+  setActive(active: boolean, time = Tone.now()) {
+    this.out.gain.setTargetAtTime(active ? 1 : 0, time, active ? 0.4 : 0.6);
+  }
+
+  dispose() {
+    for (const l of this.loops) l.dispose();
+    for (const s of this.sources) s.dispose();
+    this.pad.dispose();
+    this.out.dispose();
+  }
+}
