@@ -50,7 +50,7 @@ export function buildArchimedes(j: JourneyBuilder) {
     {
       id: 'title',
       kind: 'title',
-      body: 'Syracuse, about 250 BC. King Hiero thinks his goldsmith mixed cheap silver into his new crown. Archimedes must find out without harming it.',
+      body: "Syracuse, about 250 BC. King Hiero's new gold crown is a gift for the gods, but rumour says the goldsmith swapped some of the gold for silver. Archimedes must find out without harming it.",
       minDuration: 8,
     },
     ({ tl, cue }) => {
@@ -94,7 +94,7 @@ export function buildArchimedes(j: JourneyBuilder) {
     {
       id: 'weigh',
       heading: 'Weigh it',
-      body: 'Hung from a spring scale, the crown weighs [w:1,000 g]. Under it, a stone tank is filled with water right up to the brim.',
+      body: "Hung from a scale, the crown weighs [w:1,000 g], just as much as the gold Hiero handed over, so weighing alone can't catch a cheat. Under it, a stone tank brims with water.",
     },
     ({ tl, cue }) => {
       shot(
@@ -123,7 +123,7 @@ export function buildArchimedes(j: JourneyBuilder) {
     {
       id: 'lower',
       heading: 'Lower it into the water',
-      body: 'As the crown goes under it pushes water aside, and the overflow runs from the spout into a beaker. Watch the scale: [w:1,000 g] falls to [w:935 g].',
+      body: 'Like Archimedes easing into his bath, the crown pushes water aside as it goes under, and the overflow runs from the spout into a beaker. Watch the scale: [w:1,000 g] falls to [w:935 g].',
     },
     ({ tl, cue }) => {
       shot(
@@ -180,7 +180,7 @@ export function buildArchimedes(j: JourneyBuilder) {
     {
       id: 'formula',
       kind: 'formula',
-      body: "As physicists write it today: the push is the fluid's density, times the volume pushed aside, times gravity.",
+      body: "As physicists write it today: the fluid's density times the volume pushed aside is the [p:65 g] of water, and times gravity it becomes a force.",
       minDuration: 6.5,
     },
     ({ tl, cue }) => {
