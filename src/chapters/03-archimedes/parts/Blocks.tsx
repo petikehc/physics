@@ -189,16 +189,17 @@ function LineupLabels() {
     LINEUP.forEach(({ material, u }, i) => {
       const s = substance(material);
       const { floats, fraction } = settle(s.density, FLUIDS[1]!.density);
-      groups.current[i]?.position.set(...uv(u, 0, TANK.h + 0.42));
+      // Staggered heights, so neighbouring labels never meet on a narrow screen.
+      groups.current[i]?.position.set(...uv(u, 0, TANK.h + 0.42 + (i % 2) * 0.26));
       const el = els.current[i];
       if (!el) return;
       const q = staggered(rig.lineup, i, LINEUP.length, 0.22);
       el.style.opacity = String(clamp01((q - 0.55) * 4) * (1 - clamp01(rig.play * 2)));
       // Two short lines, so the three labels fit side by side on a phone.
-      const t = `${s.name} ${s.density}\n${floats ? `${Math.round(fraction * 100)} % under` : 'sinks'}`;
+      const t = `${s.name}\n${floats ? `${Math.round(fraction * 100)} % under` : 'sinks'}`;
       if (el.textContent !== t) {
         el.textContent = t;
-        el.style.whiteSpace = 'pre-line';
+        el.style.whiteSpace = 'pre';
         el.style.textAlign = 'center';
       }
     });
