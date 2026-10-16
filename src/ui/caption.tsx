@@ -1,8 +1,8 @@
 import { Fragment, type ReactNode } from 'react';
 
-const TOKEN = /\[(a|b|c|r|pi):([^\]]+)\]/g;
+const TOKEN = /\[(a|b|c|r|pi|w|p):([^\]]+)\]/g;
 
-/** Turns `[a:text]` markup into spans coloured with a symbol's colour (a, b, c, r or pi). */
+/** Turns `[a:text]` markup into spans coloured with a symbol's colour (a, b, c, r, pi, w for weight, p for the water's push). */
 export function renderCaption(text: string | undefined): ReactNode {
   if (!text) return null;
   const out: ReactNode[] = [];

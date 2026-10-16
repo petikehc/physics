@@ -14,6 +14,8 @@
   --sym-c: #e2704f;
   --sym-r: #f2b04a;
   --sym-pi: #8fd3ff;
+  --sym-w: #f2b04a;
+  --sym-p: #5fd3e8;
 
   --accent: #e2704f;
 
@@ -549,6 +551,14 @@ a {
   color: var(--sym-pi);
 }
 
+.captions__body .sym-w {
+  color: var(--sym-w);
+}
+
+.captions__body .sym-p {
+  color: var(--sym-p);
+}
+
 .bottom-shade {
   position: absolute;
   left: 0;
@@ -966,6 +976,44 @@ a {
 .field__value {
   font-family: var(--font-mono);
   font-size: 13px;
+}
+
+/* A row of choices where one is selected (aria-pressed). */
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.choice {
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(14, 15, 19, 0.5);
+  color: var(--chalk-dim);
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.choice:hover:not(:disabled) {
+  color: var(--chalk);
+  border-color: rgba(244, 239, 230, 0.4);
+}
+
+.choice[aria-pressed='true'] {
+  background: rgba(95, 211, 232, 0.18);
+  border-color: var(--sym-p);
+  color: var(--chalk);
+}
+
+.choice:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .lab-actions {

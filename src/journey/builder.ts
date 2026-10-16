@@ -5,7 +5,7 @@ export type BeatKind = 'title' | 'normal' | 'formula' | 'yourTurn' | 'flight' | 
 export interface BeatDef {
   id: string;
   heading?: string;
-  /** Caption text. `[a:text]` colours text with a symbol's colour (a, b, c, r or pi). */
+  /** Caption text. `[a:text]` colours text with a symbol's colour (see ui/caption). */
   body?: string;
   kind?: BeatKind;
   /** Minimum duration in seconds (the beat is padded with a hold if its animation is shorter). */
@@ -48,7 +48,7 @@ const WORDS_PER_SECOND = 3.1;
 /** Seconds a viewer needs to read a caption, plus a breath. */
 export function readingTime(def: Pick<BeatDef, 'heading' | 'body'>): number {
   const text =
-    `${def.heading ?? ''} ${(def.body ?? '').replace(/\[(?:a|b|c|r|pi):([^\]]+)\]/g, '$1')}`.trim();
+    `${def.heading ?? ''} ${(def.body ?? '').replace(/\[(?:a|b|c|r|pi|w|p):([^\]]+)\]/g, '$1')}`.trim();
   if (!text) return 0;
   return text.split(/\s+/).length / WORDS_PER_SECOND + 1.4;
 }

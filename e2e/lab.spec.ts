@@ -58,6 +58,22 @@ test('the circle lab re-slices the disc and follows the radius', async ({ page }
   expect(errors).toEqual([]);
 });
 
+test('the Archimedes lab drops materials into fluids', async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.goto('/lab/archimedes?quality=low');
+  const panel = page.getByRole('complementary', { name: 'Archimedes lab' });
+  await expect(panel).toBeVisible();
+  await expect(panel).toContainText('Ice 0.92 g/cm³');
+  await panel.getByRole('button', { name: 'Cork' }).click();
+  await panel.getByRole('button', { name: 'Dead Sea water' }).click();
+  await expect(panel).toContainText('It floats, 19 % under the surface');
+  await expect(panel.getByRole('button', { name: 'Replay the crown on the scale' })).toBeEnabled();
+  await page.waitForTimeout(1500);
+  await expectCanvasRendered(page);
+  await page.screenshot({ path: test.info().outputPath('lab-archimedes.png') });
+  expect(errors).toEqual([]);
+});
+
 test('labs that are not built yet say so', async ({ page }) => {
   await page.goto('/lab/kepler?quality=low');
   await expect(page.getByText('This Lab is in production.')).toBeVisible();

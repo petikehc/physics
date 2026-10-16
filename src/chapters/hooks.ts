@@ -3,6 +3,8 @@ import { resetRig } from '../engine/rigs';
 import { pythagorasRig, PYTHAGORAS_DEFAULTS } from './01-pythagoras/rig';
 import { circleRig, CIRCLE_DEFAULTS } from './02-circle-area/rig';
 import { leaveCircleYourTurn } from './02-circle-area/interaction';
+import { archimedesRig, ARCHIMEDES_DEFAULTS } from './03-archimedes/rig';
+import { leaveArchimedesYourTurn } from './03-archimedes/interaction';
 
 /** What the journey controller needs from a chapter, outside React. */
 export interface ChapterHooks {
@@ -25,6 +27,10 @@ export const HOOKS: Record<string, ChapterHooks> = {
   'circle-area': {
     reset: () => resetRig(circleRig(), { ...CIRCLE_DEFAULTS }),
     leaveYourTurn: leaveCircleYourTurn,
+  },
+  archimedes: {
+    reset: () => resetRig(archimedesRig(), { ...ARCHIMEDES_DEFAULTS }),
+    leaveYourTurn: leaveArchimedesYourTurn,
   },
 };
 

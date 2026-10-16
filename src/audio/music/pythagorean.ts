@@ -1,7 +1,7 @@
 import * as Tone from 'tone';
 import { C3, pyth, triangleChord, type Note } from '../tuning';
 
-export type Theme = 'pythagoras' | 'circle';
+export type Theme = 'pythagoras' | 'circle' | 'water';
 
 /** How the score sounds during one beat. Values are targets the score glides to. */
 export interface Layers {
@@ -22,11 +22,13 @@ export interface Layers {
 
 const QUIET: Layers = { drone: 0, pad: 0, cutoff: 500, plucks: 0, arp: 0, harmony: 'prog' };
 const CIRCLE: Theme = 'circle';
+const WATER: Theme = 'water';
 
 /**
  * Per-beat arrangement. Chapter 1 is "Pythagorean Drone" (C–Am–F–G over a C–G drone); chapter 2 turns to
  * "Circles" (F–G–Em–Am over an A–E drone, the arpeggio going round its chord rather than up and down, and
- * climbing as the slices multiply). The drone glides between the two during the flight.
+ * climbing as the slices multiply); chapter 3, the bath, is "Water" (Dm–F–C–G over a D–A drone, the arpeggio
+ * rippling). The drone glides into each new key during the flight.
  */
 export const ARRANGEMENT: Record<string, Layers> = {
   teaser: { drone: 0.55, pad: 0.6, cutoff: 700, plucks: 0.14, arp: 0, harmony: 'prog' },
@@ -151,17 +153,110 @@ export const ARRANGEMENT: Record<string, Layers> = {
     plucks: 0.2,
     arp: 0.5,
     harmony: 'prog',
-    theme: CIRCLE,
+    theme: WATER,
   },
-  'archimedes:soon': {
-    drone: 0.5,
-    pad: 0.5,
+  'archimedes:title': {
+    drone: 0.8,
+    pad: 0.75,
+    cutoff: 700,
+    plucks: 0.14,
+    arp: 0,
+    harmony: 'prog',
+    theme: WATER,
+  },
+  'archimedes:weigh': {
+    drone: 0.8,
+    pad: 0.7,
     cutoff: 900,
+    plucks: 0.24,
+    arp: 0,
+    harmony: 'prog',
+    theme: WATER,
+  },
+  'archimedes:lower': {
+    drone: 0.85,
+    pad: 0.8,
+    cutoff: 1300,
+    plucks: 0.12,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: WATER,
+  },
+  'archimedes:push': {
+    drone: 0.85,
+    pad: 0.85,
+    cutoff: 1800,
+    plucks: 0.2,
+    arp: 0.4,
+    harmony: 'prog',
+    theme: WATER,
+  },
+  'archimedes:formula': {
+    drone: 0.9,
+    pad: 1,
+    cutoff: 3000,
+    plucks: 0,
+    arp: 0,
+    harmony: 'resolve',
+    theme: WATER,
+  },
+  'archimedes:eureka': {
+    drone: 0.9,
+    pad: 0.9,
+    cutoff: 2400,
+    plucks: 0.16,
+    arp: 0.7,
+    harmony: 'prog',
+    theme: WATER,
+    arpFast: true,
+  },
+  'archimedes:float': {
+    drone: 0.75,
+    pad: 0.7,
+    cutoff: 600,
+    plucks: 0.1,
+    arp: 0.3,
+    harmony: 'prog',
+    theme: WATER,
+  },
+  'archimedes:yourTurn': {
+    drone: 0.5,
+    pad: 0.45,
+    cutoff: 700,
+    plucks: 0.12,
+    arp: 0,
+    harmony: 'prog',
+    theme: WATER,
+  },
+  'archimedes:handoff': {
+    drone: 0.8,
+    pad: 0.8,
+    cutoff: 1900,
+    plucks: 0.1,
+    arp: 0.6,
+    harmony: 'prog',
+    theme: WATER,
+    arpOctave: 1,
+  },
+  'archimedes:lab': {
+    drone: 0.45,
+    pad: 0.4,
+    cutoff: 800,
     plucks: 0.1,
     arp: 0,
     harmony: 'prog',
-    theme: CIRCLE,
+    theme: WATER,
   },
+  'kepler:flight': {
+    drone: 0.9,
+    pad: 0.9,
+    cutoff: 2600,
+    plucks: 0.2,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: WATER,
+  },
+  'kepler:soon': { drone: 0.5, pad: 0.5, cutoff: 900, plucks: 0.1, arp: 0, harmony: 'prog', theme: WATER },
   lab: { drone: 0.45, pad: 0.4, cutoff: 800, plucks: 0.1, arp: 0, harmony: 'prog' },
 };
 
@@ -223,9 +318,38 @@ const CIRCLE_CHORDS: Chord[] = [
   ],
 ];
 
+// Dm – F – C – G, over a D–A drone: chapter 3, the bath.
+const WATER_CHORDS: Chord[] = [
+  [
+    ['D', 2],
+    ['A', 2],
+    ['D', 3],
+    ['F', 3],
+  ],
+  [
+    ['F', 2],
+    ['C', 3],
+    ['F', 3],
+    ['A', 3],
+  ],
+  [
+    ['C', 2],
+    ['G', 2],
+    ['C', 3],
+    ['E', 3],
+  ],
+  [
+    ['G', 2],
+    ['D', 3],
+    ['G', 3],
+    ['B', 3],
+  ],
+];
+
 const THEMES: Record<Theme, { chords: Chord[]; drone: [number, number, number] }> = {
   pythagoras: { chords: PYTHAGORAS_CHORDS, drone: [pyth('C', 2), pyth('G', 2), pyth('C', 3)] },
   circle: { chords: CIRCLE_CHORDS, drone: [pyth('A', 1), pyth('E', 2), pyth('A', 2)] },
+  water: { chords: WATER_CHORDS, drone: [pyth('D', 2), pyth('A', 2), pyth('D', 3)] },
 };
 
 const PENTATONIC: Array<[Note, number]> = [
@@ -242,6 +366,7 @@ const PENTATONIC: Array<[Note, number]> = [
 function fallback(key: string | null): Layers {
   if (key?.startsWith('pythagoras')) return ARRANGEMENT['pythagoras:draw']!;
   if (key?.startsWith('circle-area')) return ARRANGEMENT['circle-area:slice']!;
+  if (key?.startsWith('archimedes')) return ARRANGEMENT['archimedes:weigh']!;
   return QUIET;
 }
 
@@ -355,7 +480,9 @@ export class PythagoreanScore {
           l.harmony === 'resolve'
             ? triangleChord(pyth('C', 5))
             : chords[Math.max(this.chord - 1, 0) % chords.length]!.map(([n, o]) => pyth(n, o + up));
-        const order = this.theme === 'circle' ? [0, 1, 2, 3] : [0, 1, 2, 3, 2, 1];
+        // Up and down (chapter 1), round and round (chapter 2), rippling (chapter 3).
+        const order =
+          this.theme === 'circle' ? [0, 1, 2, 3] : this.theme === 'water' ? [0, 2, 1, 3] : [0, 1, 2, 3, 2, 1];
         const f = chord[order[step % order.length]! % chord.length]!;
         this.arpSynth.triggerAttackRelease(f, '16n', time, l.arpFast ? 0.38 : 0.5);
         step++;

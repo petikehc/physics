@@ -14,7 +14,7 @@ test('the landing teaser renders and offers the journey', async ({ page }) => {
 });
 
 test('every beat of the journey renders (desktop and phone)', async ({ page }) => {
-  test.setTimeout(600_000);
+  test.setTimeout(900_000);
   const errors = collectErrors(page);
   for (const viewport of [
     { width: 1440, height: 900, name: 'desktop' },
@@ -89,6 +89,46 @@ test('chapter 2: Your turn re-slices the disc, and Continue hands it back to the
   await expect
     .poll(() => page.evaluate(() => window.__journey!.time()), { timeout: 20_000 })
     .toBeGreaterThan(pauseAt + 0.2);
+  expect(errors).toEqual([]);
+});
+
+test('chapter 3: Your turn floats and sinks things in different fluids', async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.goto(`/play/archimedes${Q}`);
+  await waitForJourney(page);
+  const pauseAt = await page.evaluate(
+    () => window.__journey!.beats.find((b) => b.key === 'archimedes:yourTurn')!.pauseAt!,
+  );
+  await seek(page, pauseAt - 0.4);
+  await page.evaluate(() => window.__journey!.play());
+  const panel = page.getByRole('complementary', { name: 'Your turn' });
+  await expect(panel).toBeVisible({ timeout: 30_000 });
+  await expect(panel).toContainText('It floats, 92 % under the surface');
+
+  await panel.getByRole('button', { name: 'Gold' }).click();
+  await expect(panel).toContainText('It sinks.');
+  // Iron floats on mercury.
+  await panel.getByRole('button', { name: 'Iron' }).click();
+  await panel.getByRole('button', { name: 'Mercury' }).click();
+  await expect(panel).toContainText('It floats, 58 % under the surface');
+  await expect(panel.getByRole('button', { name: 'Mercury' })).toHaveAttribute('aria-pressed', 'true');
+
+  await panel.getByRole('button', { name: /Continue/ }).click();
+  await expect(panel).toBeHidden();
+  expect(errors).toEqual([]);
+});
+
+test('jumping ahead loads the chapter the playhead lands in', async ({ page }) => {
+  const errors = collectErrors(page);
+  // Start at chapter 1, whose neighbours are loaded with it, then jump two chapters on.
+  await page.goto(`/play${Q}`);
+  await waitForJourney(page);
+  const t = await page.evaluate(
+    () => window.__journey!.beats.find((b) => b.key === 'archimedes:push')!.start + 2,
+  );
+  await seek(page, t);
+  // The overflow beaker's label only exists once chapter 3's station is mounted.
+  await expect(page.getByText('65 mL', { exact: true })).toBeVisible({ timeout: 60_000 });
   expect(errors).toEqual([]);
 });
 

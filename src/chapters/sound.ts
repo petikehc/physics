@@ -1,6 +1,7 @@
 import { audio } from '../audio';
 import { pythagorasMeter, pythagorasSides } from './01-pythagoras/sound';
 import { circleMeter } from './02-circle-area/sound';
+import { archimedesMeter } from './03-archimedes/sound';
 
 /** Levels of the continuous sound layers, 0..1. */
 export interface Levels {
@@ -13,7 +14,7 @@ export type Meter = (dt: number) => Levels;
 
 /** One meter over every chapter's rig: each layer plays at the loudest level any chapter asks for. */
 export function continuousMeter(): Meter {
-  const meters = [pythagorasMeter(), circleMeter()];
+  const meters = [pythagorasMeter(), circleMeter(), archimedesMeter()];
   return (dt) => {
     const out: Levels = { chalk: 0, pour: 0 };
     for (const m of meters) {

@@ -62,7 +62,7 @@ export const CHAPTERS: ChapterMeta[] = [
     kind: 'physics',
     accent: '#4fc3d9',
     dustIcon: 'crown',
-    status: 'soon',
+    status: 'ready',
   },
   {
     slug: 'kepler',

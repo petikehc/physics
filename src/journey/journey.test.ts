@@ -4,6 +4,8 @@ import { buildJourney } from './journey';
 import { runtime } from '../engine/runtime';
 import { pythagorasRig } from '../chapters/01-pythagoras/rig';
 import { circleRig } from '../chapters/02-circle-area/rig';
+import { archimedesRig } from '../chapters/03-archimedes/rig';
+import { hangState } from '../chapters/03-archimedes/hang';
 
 describe('the journey timeline', () => {
   const journey = buildJourney();
@@ -33,7 +35,17 @@ describe('the journey timeline', () => {
       'circle-area:yourTurn',
       'circle-area:handoff',
       'archimedes:flight',
-      'archimedes:soon',
+      'archimedes:title',
+      'archimedes:weigh',
+      'archimedes:lower',
+      'archimedes:push',
+      'archimedes:formula',
+      'archimedes:eureka',
+      'archimedes:float',
+      'archimedes:yourTurn',
+      'archimedes:handoff',
+      'kepler:flight',
+      'kepler:soon',
     ]);
     for (const b of journey.beats) expect(journey.master.labels[b.key]).toBeCloseTo(b.start, 6);
   });
@@ -59,9 +71,20 @@ describe('the journey timeline', () => {
     expect(len).toBeLessThan(110);
   });
 
+  it('runs chapter 3 for roughly 70–120 seconds', () => {
+    const ch3 = journey.chapters.find((c) => c.slug === 'archimedes')!;
+    const len = ch3.end - ch3.start;
+    expect(len).toBeGreaterThan(70);
+    expect(len).toBeLessThan(120);
+  });
+
   it('pauses once per chapter, inside its Your-turn beat', () => {
     const paused = journey.beats.filter((b) => b.pauseAt !== undefined);
-    expect(paused.map((b) => b.key)).toEqual(['pythagoras:yourTurn', 'circle-area:yourTurn']);
+    expect(paused.map((b) => b.key)).toEqual([
+      'pythagoras:yourTurn',
+      'circle-area:yourTurn',
+      'archimedes:yourTurn',
+    ]);
     for (const b of paused) {
       expect(b.pauseAt!).toBeGreaterThan(b.start);
       expect(b.pauseAt!).toBeLessThan(b.end);
@@ -155,5 +178,36 @@ describe('the journey timeline', () => {
       expect(lowest, `at ${t.toFixed(2)} s`).toBeGreaterThan(0.02);
     }
     expect(worst).toBeLessThan(Infinity);
+  });
+
+  it('runs the crown test deterministically: the crown spills more than the gold bar of the same weight', () => {
+    const { master } = journey;
+    const rig = archimedesRig();
+    const state = () => JSON.stringify(rig, (k, v) => (k === '_gsap' ? undefined : v));
+    const beat = (id: string) => journey.beats.find((b) => b.key === `archimedes:${id}`)!;
+
+    // After lowering: the crown is fully under, its whole volume spilled, the scale reads less.
+    master.seek(beat('push').start + 0.1, false);
+    const crown = hangState(rig);
+    expect(crown.isBar).toBe(false);
+    expect(crown.submerged).toBe(1);
+    expect(rig.spillA).toBe(1);
+    expect(crown.reading.toFixed(2)).toBe('9.16');
+
+    // After the eureka beat: the bar is under too, and the tank is back to the brim.
+    const t = beat('float').start;
+    master.seek(t, false);
+    const bar = hangState(rig);
+    expect(bar.isBar).toBe(true);
+    expect(bar.submerged).toBe(1);
+    expect(rig.spillB).toBe(1);
+    expect(rig.level).toBe(1);
+    expect(bar.reading).toBeGreaterThan(crown.reading);
+
+    const snap = state();
+    master.seek(0, false);
+    master.seek(journey.duration - 0.1, false);
+    master.seek(t, false);
+    expect(state()).toBe(snap);
   });
 });
