@@ -77,7 +77,7 @@ export const CHAPTERS: ChapterMeta[] = [
     kind: 'physics',
     accent: '#f2b04a',
     dustIcon: 'orbit',
-    status: 'soon',
+    status: 'ready',
   },
   {
     slug: 'newton',

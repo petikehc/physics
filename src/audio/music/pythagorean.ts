@@ -1,7 +1,7 @@
 import * as Tone from 'tone';
 import { C3, pyth, triangleChord, type Note } from '../tuning';
 
-export type Theme = 'pythagoras' | 'circle' | 'water';
+export type Theme = 'pythagoras' | 'circle' | 'water' | 'spheres';
 
 /** How the score sounds during one beat. Values are targets the score glides to. */
 export interface Layers {
@@ -23,12 +23,14 @@ export interface Layers {
 const QUIET: Layers = { drone: 0, pad: 0, cutoff: 500, plucks: 0, arp: 0, harmony: 'prog' };
 const CIRCLE: Theme = 'circle';
 const WATER: Theme = 'water';
+const SPHERES: Theme = 'spheres';
 
 /**
  * Per-beat arrangement. Chapter 1 is "Pythagorean Drone" (C–Am–F–G over a C–G drone); chapter 2 turns to
  * "Circles" (F–G–Em–Am over an A–E drone, the arpeggio going round its chord rather than up and down, and
  * climbing as the slices multiply); chapter 3, the bath, is "Water" (Dm–F–C–G over a D–A drone, the arpeggio
- * rippling). The drone glides into each new key during the flight.
+ * rippling); chapter 4, among the planets, is "Spheres" (Em–Am–C–G over an E–B drone, the arpeggio wheeling
+ * slowly). The drone glides into each new key during the flight.
  */
 export const ARRANGEMENT: Record<string, Layers> = {
   teaser: { drone: 0.55, pad: 0.6, cutoff: 700, plucks: 0.14, arp: 0, harmony: 'prog' },
@@ -254,9 +256,102 @@ export const ARRANGEMENT: Record<string, Layers> = {
     plucks: 0.2,
     arp: 0.5,
     harmony: 'prog',
-    theme: WATER,
+    theme: SPHERES,
   },
-  'kepler:soon': { drone: 0.5, pad: 0.5, cutoff: 900, plucks: 0.1, arp: 0, harmony: 'prog', theme: WATER },
+  'kepler:title': {
+    drone: 0.8,
+    pad: 0.8,
+    cutoff: 700,
+    plucks: 0.12,
+    arp: 0,
+    harmony: 'prog',
+    theme: SPHERES,
+  },
+  'kepler:circle': {
+    drone: 0.8,
+    pad: 0.7,
+    cutoff: 900,
+    plucks: 0.18,
+    arp: 0,
+    harmony: 'prog',
+    theme: SPHERES,
+  },
+  'kepler:ellipse': {
+    drone: 0.8,
+    pad: 0.75,
+    cutoff: 1200,
+    plucks: 0.12,
+    arp: 0.3,
+    harmony: 'prog',
+    theme: SPHERES,
+  },
+  // The planet sings through the next two beats, so the score steps back.
+  'kepler:areas': {
+    drone: 0.7,
+    pad: 0.6,
+    cutoff: 1100,
+    plucks: 0,
+    arp: 0.25,
+    harmony: 'prog',
+    theme: SPHERES,
+  },
+  'kepler:compare': {
+    drone: 0.7,
+    pad: 0.6,
+    cutoff: 1000,
+    plucks: 0.06,
+    arp: 0.2,
+    harmony: 'prog',
+    theme: SPHERES,
+  },
+  'kepler:formula': {
+    drone: 0.9,
+    pad: 1,
+    cutoff: 3000,
+    plucks: 0,
+    arp: 0,
+    harmony: 'resolve',
+    theme: SPHERES,
+  },
+  'kepler:yourTurn': {
+    drone: 0.45,
+    pad: 0.4,
+    cutoff: 700,
+    plucks: 0.06,
+    arp: 0,
+    harmony: 'prog',
+    theme: SPHERES,
+  },
+  'kepler:harmony': {
+    drone: 0.9,
+    pad: 0.9,
+    cutoff: 2600,
+    plucks: 0.14,
+    arp: 0.6,
+    harmony: 'prog',
+    theme: SPHERES,
+    arpOctave: 1,
+  },
+  'kepler:handoff': {
+    drone: 0.8,
+    pad: 0.75,
+    cutoff: 1800,
+    plucks: 0.1,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: SPHERES,
+  },
+  'kepler:lab': { drone: 0.4, pad: 0.35, cutoff: 800, plucks: 0.06, arp: 0, harmony: 'prog', theme: SPHERES },
+  'newton:flight': {
+    drone: 0.9,
+    pad: 0.9,
+    cutoff: 2600,
+    plucks: 0.2,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: SPHERES,
+  },
+  'newton:soon': { drone: 0.5, pad: 0.5, cutoff: 900, plucks: 0.1, arp: 0, harmony: 'prog', theme: SPHERES },
   lab: { drone: 0.45, pad: 0.4, cutoff: 800, plucks: 0.1, arp: 0, harmony: 'prog' },
 };
 
@@ -346,10 +441,39 @@ const WATER_CHORDS: Chord[] = [
   ],
 ];
 
+// Em – Am – C – G, over an E–B drone: chapter 4, the planets.
+const SPHERES_CHORDS: Chord[] = [
+  [
+    ['E', 2],
+    ['B', 2],
+    ['E', 3],
+    ['G', 3],
+  ],
+  [
+    ['A', 2],
+    ['E', 3],
+    ['A', 3],
+    ['C', 4],
+  ],
+  [
+    ['C', 3],
+    ['G', 3],
+    ['C', 4],
+    ['E', 4],
+  ],
+  [
+    ['G', 2],
+    ['D', 3],
+    ['G', 3],
+    ['B', 3],
+  ],
+];
+
 const THEMES: Record<Theme, { chords: Chord[]; drone: [number, number, number] }> = {
   pythagoras: { chords: PYTHAGORAS_CHORDS, drone: [pyth('C', 2), pyth('G', 2), pyth('C', 3)] },
   circle: { chords: CIRCLE_CHORDS, drone: [pyth('A', 1), pyth('E', 2), pyth('A', 2)] },
   water: { chords: WATER_CHORDS, drone: [pyth('D', 2), pyth('A', 2), pyth('D', 3)] },
+  spheres: { chords: SPHERES_CHORDS, drone: [pyth('E', 2), pyth('B', 2), pyth('E', 3)] },
 };
 
 const PENTATONIC: Array<[Note, number]> = [
@@ -367,6 +491,7 @@ function fallback(key: string | null): Layers {
   if (key?.startsWith('pythagoras')) return ARRANGEMENT['pythagoras:draw']!;
   if (key?.startsWith('circle-area')) return ARRANGEMENT['circle-area:slice']!;
   if (key?.startsWith('archimedes')) return ARRANGEMENT['archimedes:weigh']!;
+  if (key?.startsWith('kepler')) return ARRANGEMENT['kepler:circle']!;
   return QUIET;
 }
 
@@ -480,9 +605,15 @@ export class PythagoreanScore {
           l.harmony === 'resolve'
             ? triangleChord(pyth('C', 5))
             : chords[Math.max(this.chord - 1, 0) % chords.length]!.map(([n, o]) => pyth(n, o + up));
-        // Up and down (chapter 1), round and round (chapter 2), rippling (chapter 3).
+        // Up and down (chapter 1), round and round (chapter 2), rippling (chapter 3), wheeling (chapter 4).
         const order =
-          this.theme === 'circle' ? [0, 1, 2, 3] : this.theme === 'water' ? [0, 2, 1, 3] : [0, 1, 2, 3, 2, 1];
+          this.theme === 'circle'
+            ? [0, 1, 2, 3]
+            : this.theme === 'water'
+              ? [0, 2, 1, 3]
+              : this.theme === 'spheres'
+                ? [0, 3, 1, 2, 3, 1]
+                : [0, 1, 2, 3, 2, 1];
         const f = chord[order[step % order.length]! % chord.length]!;
         this.arpSynth.triggerAttackRelease(f, '16n', time, l.arpFast ? 0.38 : 0.5);
         step++;

@@ -40,16 +40,23 @@ test('the circle lab re-slices the disc and follows the radius', async ({ page }
   const panel = page.getByRole('complementary', { name: 'Circle area lab' });
   await expect(panel).toBeVisible();
   await expect(panel).toContainText('= 4.40 × 1.40 = 6.16');
+  // Read once, not polled: the panel must show the Lab's 16 slices as soon as it appears, or a key press can
+  // land on the slider before it has caught up.
+  expect(await panel.textContent()).toContain('16 straight-edged triangles');
 
   const slices = panel.getByLabel('Slices');
   await slices.focus();
   await page.keyboard.press('ArrowRight');
+  await expect(panel).toContainText('32 straight-edged triangles');
   await page.keyboard.press('ArrowRight');
   await expect(panel).toContainText('64 straight-edged triangles cover 6.15: 0.2% short');
 
   const radius = panel.getByLabel('Radius r');
   await radius.focus();
-  for (let i = 0; i < 4; i++) await page.keyboard.press('ArrowRight');
+  for (const r of ['1.45', '1.5', '1.55', '1.6']) {
+    await page.keyboard.press('ArrowRight');
+    await expect(radius).toHaveValue(r);
+  }
   await expect(panel).toContainText('= 5.03 × 1.60 = 8.04');
 
   await page.waitForTimeout(1500);
@@ -74,7 +81,23 @@ test('the Archimedes lab drops materials into fluids', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('labs that are not built yet say so', async ({ page }) => {
+test('the Kepler lab reshapes the orbit and shows all six planets', async ({ page }) => {
+  const errors = collectErrors(page);
   await page.goto('/lab/kepler?quality=low');
+  const panel = page.getByRole('complementary', { name: 'Kepler lab' });
+  await expect(panel).toBeVisible();
+  await expect(panel).toContainText('each fan = 1/12 of the area');
+  await panel.getByRole('button', { name: 'Earth' }).click();
+  await expect(panel).toContainText('semitone (16 : 15)');
+  await panel.getByRole('button', { name: /Show all six planets/ }).click();
+  await expect(panel.getByRole('button', { name: 'Back to one orbit' })).toBeEnabled({ timeout: 30_000 });
+  await page.waitForTimeout(1500);
+  await expectCanvasRendered(page);
+  await page.screenshot({ path: test.info().outputPath('lab-kepler.png') });
+  expect(errors).toEqual([]);
+});
+
+test('labs that are not built yet say so', async ({ page }) => {
+  await page.goto('/lab/newton?quality=low');
   await expect(page.getByText('This Lab is in production.')).toBeVisible();
 });

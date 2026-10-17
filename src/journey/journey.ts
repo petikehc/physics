@@ -1,5 +1,5 @@
 import { runtime } from '../engine/runtime';
-import { createCameraRig, createDustRig, resetRig } from '../engine/rigs';
+import { createCameraRig, createDustRig, createWorldRig, resetRig } from '../engine/rigs';
 import { shot } from '../engine/camera/shots';
 import { station } from '../engine/world/stations';
 import { chapterBySlug } from '../chapters/registry';
@@ -7,6 +7,7 @@ import { resetChapterRigs } from '../chapters/hooks';
 import { buildPythagoras } from '../chapters/01-pythagoras/timeline';
 import { buildCircleArea } from '../chapters/02-circle-area/timeline';
 import { buildArchimedes } from '../chapters/03-archimedes/timeline';
+import { buildKepler } from '../chapters/04-kepler/timeline';
 import { JourneyBuilder, type Journey } from './builder';
 
 /**
@@ -56,13 +57,15 @@ function buildComingSoon(j: JourneyBuilder, slug: string, body: string) {
 export function buildJourney(): Journey {
   resetRig(runtime.camera, createCameraRig());
   resetRig(runtime.dust, createDustRig());
+  resetRig(runtime.world, createWorldRig());
   resetChapterRigs();
 
   const j = new JourneyBuilder();
   buildPythagoras(j);
   buildCircleArea(j);
   buildArchimedes(j);
-  buildComingSoon(j, 'kepler', 'Kepler is charting the planets. This chapter is in production.');
+  buildKepler(j);
+  buildComingSoon(j, 'newton', 'Newton is working out why the apple falls. This chapter is in production.');
   const journey = j.finish();
   journey.master.progress(0);
   return journey;

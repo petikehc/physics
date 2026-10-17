@@ -1,4 +1,11 @@
-import { createCameraRig, createDustRig, type CameraRig, type DustRig } from './rigs';
+import {
+  createCameraRig,
+  createDustRig,
+  createWorldRig,
+  type CameraRig,
+  type DustRig,
+  type WorldRig,
+} from './rigs';
 
 /**
  * The single place where the live animation rigs are kept. Timelines tween these objects;
@@ -7,6 +14,7 @@ import { createCameraRig, createDustRig, type CameraRig, type DustRig } from './
 export interface Runtime {
   camera: CameraRig;
   dust: DustRig;
+  world: WorldRig;
   /** Per-chapter rigs keyed by chapter slug. */
   chapters: Record<string, object>;
 }
@@ -14,6 +22,7 @@ export interface Runtime {
 export const runtime: Runtime = {
   camera: createCameraRig(),
   dust: createDustRig(),
+  world: createWorldRig(),
   chapters: {},
 };
 

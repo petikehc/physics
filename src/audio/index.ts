@@ -2,6 +2,8 @@ import type { AudioEngine } from './engine';
 import type { Triangle } from '../chapters/01-pythagoras/math';
 
 export type Scene = 'teaser' | 'journey' | 'lab' | null;
+/** Continuous sound layers: a scratch of chalk, pouring water, and a singing planet (with `hz`). */
+export type ContinuousId = 'chalk' | 'pour' | 'voice';
 
 let engine: AudioEngine | null = null;
 let loading: Promise<AudioEngine | null> | null = null;
@@ -83,7 +85,7 @@ export const audio = {
     if (!state.muted) engine?.cue(id, params);
   },
 
-  continuous(id: 'chalk' | 'pour', level: number, params?: Record<string, number>) {
+  continuous(id: ContinuousId, level: number, params?: Record<string, number>) {
     engine?.continuous(id, state.muted ? 0 : level, params);
   },
 

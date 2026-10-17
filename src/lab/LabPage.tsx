@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ComponentType } from 'react';
 import { Link, useParams } from 'react-router';
 import gsap from 'gsap';
 import { useApp } from '../state/store';
@@ -11,7 +11,7 @@ import { createSoundFrame } from '../chapters/sound';
 import { resetChapterRigs } from '../chapters/hooks';
 import { orbitLimits } from '../engine/camera/CameraDirector';
 import { runtime } from '../engine/runtime';
-import { createCameraRig, resetRig } from '../engine/rigs';
+import { createCameraRig, createWorldRig, resetRig } from '../engine/rigs';
 import { useLiftAbove } from '../ui/useLiftAbove';
 
 /** /lab/:slug — a theorem as a sandbox. */
@@ -21,6 +21,9 @@ export default function LabPage() {
   const set = useApp((s) => s.set);
   const [menu, setMenu] = useState(false);
   const views = meta?.status === 'ready' ? VIEWS[meta.slug] : undefined;
+  // The panel reads the chapter's rig as it first renders, so it waits until the effect below has put the rig in
+  // its Lab state (it says so by switching the app into this Lab).
+  const entered = useApp((s) => s.mode === 'lab' && s.chapterSlug === meta?.slug);
 
   useEffect(() => {
     if (!views || !meta) {
@@ -30,6 +33,7 @@ export default function LabPage() {
     // Neighbouring stations stay mounted: clear whatever the journey left on them (and the teaser on the camera).
     resetChapterRigs();
     resetRig(runtime.camera, createCameraRig());
+    resetRig(runtime.world, createWorldRig());
     views.enterLab();
     Object.assign(orbitLimits, { minDistance: 2, maxDistance: 22 });
     set({ mode: 'lab', chapterSlug: meta.slug, cameraMode: 'directed' });
@@ -53,8 +57,6 @@ export default function LabPage() {
       set({ cameraMode: 'directed', dragging: false });
     };
   }, [views, meta, set]);
-  // On a phone the Lab's panel is a sheet across the bottom: keep the scene above it.
-  useLiftAbove(() => document.querySelector<HTMLElement>('.lab-panel'));
 
   return (
     <div className="overlay">
@@ -63,14 +65,16 @@ export default function LabPage() {
         onChapters={() => setMenu(true)}
       />
       {views ? (
-        <views.Lab />
+        entered ? (
+          <LabPanel Panel={views.Lab} />
+        ) : null
       ) : (
         <div className="page">
           <div className="page__inner">
             <span className="eyebrow">Lab</span>
             <h1>{meta ? meta.title : 'Unknown chapter'}</h1>
             <p style={{ color: 'var(--chalk-dim)' }}>
-              This Lab is in production. Chapters I–III are ready to explore now.
+              This Lab is in production. Chapters I–IV are ready to explore now.
             </p>
             <p style={{ marginTop: 24 }}>
               <Link className="btn btn--primary" to="/lab/pythagoras">
@@ -83,4 +87,10 @@ export default function LabPage() {
       {menu ? <ChaptersMenu onClose={() => setMenu(false)} /> : null}
     </div>
   );
+}
+
+function LabPanel({ Panel }: { Panel: ComponentType }) {
+  // On a phone the Lab's panel is a sheet across the bottom: keep the scene above it.
+  useLiftAbove(() => document.querySelector<HTMLElement>('.lab-panel'));
+  return <Panel />;
 }

@@ -118,6 +118,36 @@ test('chapter 3: Your turn floats and sinks things in different fluids', async (
   expect(errors).toEqual([]);
 });
 
+test('chapter 4: Your turn reshapes the orbit, and the fans stay equal', async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.goto(`/play/kepler${Q}`);
+  await waitForJourney(page);
+  const pauseAt = await page.evaluate(
+    () => window.__journey!.beats.find((b) => b.key === 'kepler:yourTurn')!.pauseAt!,
+  );
+  await seek(page, pauseAt - 0.4);
+  await page.evaluate(() => window.__journey!.play());
+  const panel = page.getByRole('complementary', { name: 'Your turn' });
+  await expect(panel).toBeVisible({ timeout: 30_000 });
+  await expect(panel).toContainText('each fan = 1/12 of the area, in 1/12 of the year');
+
+  // Mars' real orbit: its speed swings through Kepler's fifth.
+  await panel.getByRole('button', { name: 'Mars' }).click();
+  await expect(panel).toContainText('so it turns 1.5× faster: a fifth (3 : 2), as Kepler heard it.');
+  await panel.getByLabel('Equal times per year').focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(panel).toContainText('each fan = 1/16 of the area');
+  const fans = () => page.evaluate(() => (window.__journey!.rigs['kepler'] as { fanCount: number }).fanCount);
+  expect(await fans()).toBe(16);
+
+  await panel.getByRole('button', { name: /Continue/ }).click();
+  await expect(panel).toBeHidden();
+  await expect
+    .poll(() => page.evaluate(() => window.__journey!.time()), { timeout: 20_000 })
+    .toBeGreaterThan(pauseAt + 0.2);
+  expect(errors).toEqual([]);
+});
+
 test('jumping ahead loads the chapter the playhead lands in', async ({ page }) => {
   const errors = collectErrors(page);
   // Start at chapter 1, whose neighbours are loaded with it, then jump two chapters on.
