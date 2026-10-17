@@ -10,6 +10,8 @@ import { VIEWS } from '../chapters/views';
 import { createSoundFrame } from '../chapters/sound';
 import { resetChapterRigs } from '../chapters/hooks';
 import { orbitLimits } from '../engine/camera/CameraDirector';
+import { runtime } from '../engine/runtime';
+import { createCameraRig, resetRig } from '../engine/rigs';
 
 /** /lab/:slug — a theorem as a sandbox. */
 export default function LabPage() {
@@ -24,8 +26,9 @@ export default function LabPage() {
       set({ mode: 'page' });
       return;
     }
-    // Neighbouring stations stay mounted: clear whatever the journey left on them.
+    // Neighbouring stations stay mounted: clear whatever the journey left on them (and the teaser on the camera).
     resetChapterRigs();
+    resetRig(runtime.camera, createCameraRig());
     views.enterLab();
     Object.assign(orbitLimits, { minDistance: 2, maxDistance: 22 });
     set({ mode: 'lab', chapterSlug: meta.slug, cameraMode: 'directed' });
