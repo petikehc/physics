@@ -82,6 +82,7 @@ export function ChalkLine({
   }, [color, width, depthTest, renderOrder]);
 
   const last = useRef('');
+  const count = useRef(0);
 
   useEffect(() => {
     handle.current = {
@@ -91,10 +92,20 @@ export function ChalkLine({
         line.visible = visible;
         line.material.opacity = opacity;
         if (!visible) return;
-        const flat = pts.flat();
+        // three remembers how many segments an instanced line had when it first drew it, so a line that grows
+        // would stay cut short: keep the count fixed by repeating the last point (zero-length segments draw
+        // nothing), and start a fresh geometry if the count itself changes.
+        const padded = pts.length < points.length ? [...pts] : pts;
+        while (padded.length < points.length) padded.push(padded[padded.length - 1]!);
+        const flat = padded.flat();
         const key = flat.map((v) => v.toFixed(4)).join(',');
         if (key === last.current) return;
         last.current = key;
+        if (flat.length !== count.current) {
+          count.current = flat.length;
+          line.geometry.dispose();
+          line.geometry = new LineGeometry();
+        }
         line.geometry.setPositions(flat);
         line.computeLineDistances();
       },
