@@ -43,13 +43,18 @@ test('the circle lab re-slices the disc and follows the radius', async ({ page }
 
   const slices = panel.getByLabel('Slices');
   await slices.focus();
+  // One step at a time: on a slow machine a second key press can land before the first has re-rendered the slider.
   await page.keyboard.press('ArrowRight');
+  await expect(panel).toContainText('32 straight-edged triangles');
   await page.keyboard.press('ArrowRight');
   await expect(panel).toContainText('64 straight-edged triangles cover 6.15: 0.2% short');
 
   const radius = panel.getByLabel('Radius r');
   await radius.focus();
-  for (let i = 0; i < 4; i++) await page.keyboard.press('ArrowRight');
+  for (const r of ['1.45', '1.5', '1.55', '1.6']) {
+    await page.keyboard.press('ArrowRight');
+    await expect(radius).toHaveValue(r);
+  }
   await expect(panel).toContainText('= 5.03 × 1.60 = 8.04');
 
   await page.waitForTimeout(1500);
