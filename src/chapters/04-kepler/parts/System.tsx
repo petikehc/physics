@@ -3,9 +3,9 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { ChalkLine, type ChalkLineHandle } from '../../../engine/lines/ChalkLine';
 import { MathLabel } from '../../../engine/labels/MathLabel';
-import { clamp01, easeOutCubic, staggered } from '../../../engine/ease';
-import { ellipsePoint, lawThree, PLANETS } from '../math';
-import { AU, keplerRig, PILLARS, SYM4 } from '../rig';
+import { clamp01, easeInOutCubic, easeOutCubic, lerp, staggered } from '../../../engine/ease';
+import { ellipsePoint, lawThree, MARS, orbitAt, PLANETS, STORY } from '../math';
+import { AU, GROWN_EARTH, keplerRig, PILLARS, plane, SYM4 } from '../rig';
 import { planetAt, systemPoint } from '../system';
 
 const OTHERS = PLANETS.filter((p) => p.id !== 'mars');
@@ -54,6 +54,7 @@ export function System() {
   const ruleText = useRef<HTMLDivElement>(null);
   const ruleAt = useRef<THREE.Group>(null);
   const rule = useRef<ChalkLineHandle | null>(null);
+  const forces = useMemo(() => PLANETS.map(() => ({ current: null as ChalkLineHandle | null })), []);
   const mats = useMemo(
     () =>
       PLANETS.map(
@@ -98,11 +99,23 @@ export function System() {
         // Gone once faded: a see-through planet would still hide the orbit lines behind it.
         g.visible = on > 0.001 && fade > 0.01;
         g.position.set(...planetAt(p, rig.years));
-        g.scale.setScalar(Math.max(p.size * easeOutCubic(on), 0.001));
+        // In the handoff the Earth swells into the next chapter's small planet.
+        const size = p.id === 'earth' ? lerp(p.size, GROWN_EARTH, easeInOutCubic(rig.grow)) : p.size;
+        g.scale.setScalar(Math.max(size * easeOutCubic(on), 0.001));
       }
       fadeTo(mats[PLANETS.indexOf(p)]!, fade);
       lines[i]!.visible = on > 0.001;
       lineMats[i]!.opacity = on * (p.id === 'earth' ? 0.55 : 0.3 * keep);
+    });
+
+    // A force reaching out from the Sun to every planet, as Kepler suspected.
+    PLANETS.forEach((p, i) => {
+      let to: [number, number, number];
+      if (p.id === 'mars') {
+        const q = orbitAt(STORY.a, rig.e, rig.phase + rig.years / MARS.T);
+        to = plane(q.x, q.y);
+      } else to = planetAt(p, rig.years);
+      forces[i]!.current?.set([[0, 0, 0], to], rig.reach, clamp01(rig.pull) * 0.75);
     });
 
     // Pillars: in a row in front of the system, rising one after another.
@@ -177,6 +190,9 @@ export function System() {
         </group>
       ))}
       <ChalkLine handle={rule} color={SYM4.area} width={1.6} />
+      {forces.map((handle, i) => (
+        <ChalkLine key={`f-${i}`} handle={handle} color={SYM4.sun} width={1.4} />
+      ))}
       <group ref={ruleAt}>
         <MathLabel ref={ruleText} className="math-label math-label--chip" color={SYM4.area}>
           T² ÷ a³ = 1

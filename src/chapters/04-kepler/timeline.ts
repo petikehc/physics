@@ -3,7 +3,7 @@ import { shot } from '../../engine/camera/shots';
 import { station } from '../../engine/world/stations';
 import type { JourneyBuilder } from '../../journey/builder';
 import { MARS, STORY } from './math';
-import { KEPLER_DEFAULTS, keplerRig, SIGHTINGS } from './rig';
+import { GROWN_EARTH, KEPLER_DEFAULTS, keplerRig, SIGHTINGS } from './rig';
 import { EARTH, planetAt } from './system';
 
 const SLUG = 'kepler';
@@ -297,8 +297,8 @@ export function buildKepler(j: JourneyBuilder) {
     },
   );
 
-  // The dive comes in on the Earth from the side, with the Sun behind the camera rather than in the way. The apple
-  // forms beside the Earth, across the line of sight (not along it, where it would sit in front of the planet).
+  // The dive comes in on the Earth from the side, with the Sun behind the camera rather than in the way, and
+  // looks a little above it, where the apple lands.
   const earth = planetAt(EARTH, YEARS);
   const r = Math.hypot(earth[0], earth[2]);
   const out = [earth[0] / r, earth[2] / r] as const;
@@ -308,26 +308,34 @@ export function buildKepler(j: JourneyBuilder) {
     earth[1] + h,
     earth[2] + out[1] * o + side[1] * s,
   ];
-  const view = { o: -0.6, s: 1.6, h: 0.7 };
-  const across = Math.hypot(view.o, view.s);
-  const apple = near((0.4 * view.s) / across, (-0.4 * view.o) / across, 0.05);
+  // The apple (the Dust's icon, about 2.6 tall with its bottom 1.1 below its origin) forms above the swollen
+  // Earth, then falls and comes to rest on top of it.
+  const APPLE = 0.06;
+  const above = earth[1] + GROWN_EARTH + 0.38;
+  const rest = earth[1] + GROWN_EARTH + 1.1 * APPLE + 0.01;
   j.beat(
     SLUG,
     {
       id: 'handoff',
       heading: 'How, but not why',
-      body: "Kepler's laws say how the planets move, but not why. He suspected a force reaching out from the Sun, but could not pin it down. Nearly seventy years later, Isaac Newton did.",
+      body: "Kepler's laws say how the planets move, but not why. He suspected a force reaching out from the Sun, but could not pin it down. Nearly seventy years later Isaac Newton did, and the story goes that it began with a falling apple.",
     },
     ({ tl, cue }) => {
       tl.set(rig, { years: YEARS }, 0);
-      tl.to(rig, { dive: 1, pillars: 0, duration: 2.2, ease: 'power2.inOut' }, 0.4);
-      // Down towards the third planet…
+      // A force reaching out from the Sun to every planet… that fades, unexplained.
+      tl.to(rig, { pull: 1, duration: 0.5 }, 0.6);
+      tl.to(rig, { reach: 1, duration: 2, ease: 'power2.out' }, 0.6);
+      cue(0.6, 'glow', { which: 0 });
+      tl.to(rig, { pull: 0, duration: 1.4 }, 4.2);
+      // Down towards the third planet, as the others fade and it swells into the next chapter's small world…
+      tl.to(rig, { dive: 1, pillars: 0, duration: 2, ease: 'power2.inOut' }, 2.6);
+      tl.to(rig, { grow: 1, duration: 3, ease: 'none' }, 3);
       shot(
         tl,
         SLUG,
         {
-          pos: near(view.o, view.s, view.h),
-          target: earth,
+          pos: near(-0.81, 2.16, 0.95),
+          target: [earth[0], earth[1] + 0.2, earth[2]],
           focus: earth,
           fov: 38,
           dof: 0.3,
@@ -337,27 +345,31 @@ export function buildKepler(j: JourneyBuilder) {
         0.6,
         'power2.inOut',
       );
-      // …where the stars gather into an apple.
+      // …where the stars gather into an apple above it, and it falls.
       tl.set(dust, { from: 'stars', to: 'apple', morph: 0 }, 4.6);
-      tl.to(dust, { morph: 1, duration: 3.4, ease: 'power2.inOut' }, 4.6);
+      tl.to(dust, { morph: 1, duration: 3.2, ease: 'power2.inOut' }, 4.6);
       tl.to(
         dust,
         {
-          x: o.x + apple[0],
-          y: o.y + apple[1],
-          z: o.z + apple[2],
-          scale: 0.055,
+          x: o.x + earth[0],
+          y: o.y + above,
+          z: o.z + earth[2],
+          scale: APPLE,
           size: 0.9,
           spin: 0.2,
           swirl: 0.8,
+          drift: 0.2,
           colorA: '#ffe7d6',
           colorB: '#d9534f',
-          duration: 3.4,
+          duration: 3.2,
           ease: 'power2.inOut',
         },
         4.6,
       );
       cue(4.7, 'gather');
+      tl.to(dust, { y: o.y + rest, duration: 0.6, ease: 'power2.in' }, 8.2);
+      tl.to(dust, { spin: 0, swirl: 0.3, duration: 0.6 }, 8.2);
+      cue(8.8, 'land');
     },
   );
 }

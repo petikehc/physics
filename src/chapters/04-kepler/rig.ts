@@ -41,8 +41,13 @@ export interface KeplerRig {
   years: number;
   /** The third law's pillars rising, 0..1 (staggered). */
   pillars: number;
+  /** Handoff: lines of force reach out from the Sun to every planet (0..1 of the way), and glow (0..1). */
+  reach: number;
+  pull: number;
   /** Handoff: everything but the Earth fades, 0..1. */
   dive: number;
+  /** Handoff: the Earth swells into the small planet of the next chapter, 0..1. */
+  grow: number;
   /** The planet's song (a tone that follows how fast it turns), 0..1. */
   voice: number;
   interactive: number;
@@ -69,7 +74,10 @@ export const KEPLER_DEFAULTS: KeplerRig = {
   system: 0,
   years: 0,
   pillars: 0,
+  reach: 0,
+  pull: 0,
   dive: 0,
+  grow: 0,
   voice: 0,
   interactive: 0,
   lab: 0,
@@ -89,6 +97,9 @@ export function plane(x: number, y: number, h = 0): [number, number, number] {
 
 /** World units per astronomical unit, so that Mars' real orbit is the story orbit's size. */
 export const AU = STORY.a / 1.5237;
+
+/** The Earth's drawn radius once it has swelled for the handoff (it starts at its size in PLANETS). */
+export const GROWN_EARTH = 0.3;
 
 /** Most fans an orbit can be cut into (the Your-turn slider's top end). */
 export const MAX_FANS = 24;

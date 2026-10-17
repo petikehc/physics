@@ -442,6 +442,11 @@ export class SfxKit {
         chord.forEach((f, i) => this.bell.triggerAttackRelease(f, 4, t + 3.3 + i * 0.03, 0.18));
         return;
       }
+      case 'land':
+        // Something small landing softly on a planet: a low thump and a tick.
+        this.thump.triggerAttackRelease(pyth('G', 2), 0.25, t, 0.4);
+        this.click.triggerAttackRelease(0.015, t, 0.3);
+        return;
       case 'uiHover':
         return this.blip.triggerAttackRelease(1800, 0.02, t, 0.12);
       case 'uiClick':
