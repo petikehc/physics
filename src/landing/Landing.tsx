@@ -7,6 +7,7 @@ import { runtime } from '../engine/runtime';
 import { createCameraRig, createDustRig, resetRig } from '../engine/rigs';
 import { ICON_ORDER } from '../engine/dust/shapes';
 import { TEASER } from '../engine/world/stations';
+import { portraitFit } from '../engine/camera/fit';
 import { CHAPTERS } from '../chapters/registry';
 import { audio } from '../audio';
 import { TopBar } from '../ui/TopBar';
@@ -15,6 +16,34 @@ import { PlayIcon } from '../ui/Icons';
 
 const MORPH = 2.4;
 const HOLD = 1.8;
+
+/** The teaser camera circles TEASER at this distance, with this lens, and the icons float DUST_LIFT above it. */
+const RADIUS = 11.5;
+const FOV = 40;
+const DUST_LIFT = 1.6;
+/** How far the largest icons reach above and below their centre (world units, at the teaser's scale). */
+const ICON_UP = 1.95;
+const ICON_DOWN = 1.75;
+
+/**
+ * Fits the icons into the sky between the top of the screen and the chip that names them, so they never sit
+ * on the text: steps the camera back if the gap is too small (or in, a little, if it is roomy) and returns the
+ * lens shift that centres them in it.
+ */
+function teaserFrame(width: number, height: number, chipTop: number) {
+  const fit = portraitFit(width / height);
+  // Screen heights in NDC (−1 at the bottom, 1 at the top).
+  const top = 1 - (2 * Math.max(16, height * 0.05)) / height;
+  const bottom = Math.min(1 - (2 * (chipTop - 18)) / height, top - 0.3);
+  const perUnit = 1 / (RADIUS * fit.dolly * Math.tan((((FOV * fit.fov) / 2) * Math.PI) / 180));
+  const hi = (DUST_LIFT + ICON_UP) * perUnit;
+  const lo = (DUST_LIFT - ICON_DOWN) * perUnit;
+  const room = top - bottom;
+  const k = hi - lo > room ? Math.min((hi - lo) / room, 2.5) : Math.max((hi - lo) / (0.8 * room), 0.75);
+  // Stepping back by k gathers the icon towards the target, which sits in the middle of the screen.
+  const mid = (hi + lo) / 2 / k;
+  return { orbitRadius: RADIUS * k, lensY: ((top + bottom) / 2 - mid) / 2 };
+}
 
 /** Builds the looping sneak-peek: the Dust re-forms into each chapter's icon while the camera drifts. */
 function buildTeaser(onIcon: (i: number) => void) {
@@ -28,13 +57,14 @@ function buildTeaser(onIcon: (i: number) => void) {
     tz: TEASER.z,
     orbitMix: 1,
     orbitAngle: Math.PI / 2,
-    orbitRadius: 11.5,
+    orbitRadius: RADIUS,
     orbitHeight: -0.3,
+    fov: FOV,
     shake: 0.7,
   });
   Object.assign(dust, {
     x: TEASER.x,
-    y: TEASER.y + 1.6,
+    y: TEASER.y + DUST_LIFT,
     z: TEASER.z,
     scale: 0.85,
     from: 'pythagoras',
@@ -70,12 +100,29 @@ export default function Landing() {
   const [leaving, setLeaving] = useState(false);
   const teaser = useRef<ReturnType<typeof buildTeaser> | null>(null);
   const root = useRef<HTMLDivElement>(null);
+  const chip = useRef<HTMLSpanElement>(null);
+  const left = useRef(false);
 
   useEffect(() => {
     set({ mode: 'teaser', cameraMode: 'directed' });
     audio.setScene('teaser');
     teaser.current = buildTeaser(setIcon);
+    // Keep the icons above the text whenever the layout changes (resizing, rotating, web fonts arriving).
+    const frame = () => {
+      const el = chip.current;
+      if (!el || left.current) return;
+      Object.assign(
+        runtime.camera,
+        teaserFrame(window.innerWidth, window.innerHeight, el.getBoundingClientRect().top),
+      );
+    };
+    frame();
+    const observer = new ResizeObserver(frame);
+    if (chip.current?.parentElement) observer.observe(chip.current.parentElement);
+    window.addEventListener('resize', frame);
     return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', frame);
       teaser.current?.loop.kill();
       teaser.current?.sway.kill();
       audio.setScene(null);
@@ -110,6 +157,7 @@ export default function Landing() {
   const begin = (withSound: boolean) => {
     if (leaving) return;
     setLeaving(true);
+    left.current = true;
     if (withSound) {
       void audio.enable();
       set({ soundEnabled: true });
@@ -129,7 +177,14 @@ export default function Landing() {
     }
     out.to(
       cam,
-      { orbitAngle: Math.PI / 2, orbitHeight: -0.3, orbitRadius: 11.5, duration: 1.1, ease: 'power2.inOut' },
+      {
+        orbitAngle: Math.PI / 2,
+        orbitHeight: -0.3,
+        orbitRadius: RADIUS,
+        lensY: 0,
+        duration: 1.1,
+        ease: 'power2.inOut',
+      },
       0,
     );
     out.to('.landing__inner, .landing__foot', { autoAlpha: 0, y: -12, duration: 0.6, ease: 'power2.in' }, 0);
@@ -152,6 +207,7 @@ export default function Landing() {
       <div className="landing">
         <div className="landing__inner">
           <span
+            ref={chip}
             className="chip"
             aria-live="polite"
             style={{ borderColor: `${current.accent}66`, color: current.accent }}

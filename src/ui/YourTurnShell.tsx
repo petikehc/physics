@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { useApp } from '../state/store';
+import { useLiftAbove } from './useLiftAbove';
 
 const AUTO_SECONDS = 14;
 
@@ -19,7 +20,9 @@ export function YourTurnShell({ body, labHref, onContinue, children }: Props) {
   const [touched, setTouched] = useState(false);
   const [left, setLeft] = useState(AUTO_SECONDS);
   const start = useRef(0);
+  const panel = useRef<HTMLElement>(null);
   const auto = autoContinue && !reduced && !touched;
+  useLiftAbove(() => panel.current);
 
   // Any interaction with the scene cancels the auto-continue countdown.
   useEffect(() => {
@@ -51,7 +54,7 @@ export function YourTurnShell({ body, labHref, onContinue, children }: Props) {
   const circumference = 2 * Math.PI * 7;
 
   return (
-    <aside className="your-turn" aria-label="Your turn">
+    <aside ref={panel} className="your-turn" aria-label="Your turn">
       <h2 className="your-turn__title">Your turn</h2>
       <p className="your-turn__body">{body}</p>
       {children}

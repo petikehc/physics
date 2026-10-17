@@ -6,6 +6,7 @@ import gsap from 'gsap';
 import { runtime } from '../runtime';
 import { useApp } from '../../state/store';
 import type { CameraRig } from '../rigs';
+import { portraitFit } from './fit';
 
 /** Limits for the free camera in "Your turn" and the Labs. Stations set these when they take over. */
 export const orbitLimits = {
@@ -29,19 +30,6 @@ export function directedPose(rig: CameraRig, outPos: THREE.Vector3, outTarget: T
   outTarget.set(rig.tx, rig.ty, rig.tz);
 }
 
-/** Shots are composed for a landscape screen of about this aspect ratio. */
-const DESIGN_ASPECT = 1.6;
-
-/**
- * On a narrower screen (a phone held upright), step back from the target and widen the lens a little, so a shot
- * keeps most of its composed width instead of cropping the sides of wide scenes.
- */
-function portraitFit(aspect: number) {
-  const r = DESIGN_ASPECT / Math.max(aspect, 0.3);
-  if (r <= 1) return { dolly: 1, fov: 1 };
-  return { dolly: Math.min(Math.pow(r, 0.8), 2.4), fov: Math.min(Math.pow(r, 0.2), 1.25) };
-}
-
 function handheld(t: number, seed: number) {
   return (
     Math.sin(t * 0.63 + seed) * 0.55 +
@@ -59,6 +47,7 @@ export function CameraDirector() {
   const cameraMode = useApp((s) => s.cameraMode);
   const dragging = useApp((s) => s.dragging);
   const reduced = useApp((s) => s.reducedMotion);
+  const lens = useRef('');
   const controls = useRef<CameraControlsImpl>(null);
   const lastTarget = useRef(new THREE.Vector3(0, 0, 0));
   const blend = useRef({ t: 0, pos: new THREE.Vector3(), target: new THREE.Vector3() });
@@ -89,6 +78,16 @@ export function CameraDirector() {
   }, [cameraMode, camera]);
 
   useFrame((state) => {
+    // The lens shift: a view window moved down the full picture lifts everything in it.
+    const { width, height } = state.size;
+    const lift = runtime.camera.lensY;
+    const key = `${width}x${height}:${lift.toFixed(4)}`;
+    if (key !== lens.current) {
+      lens.current = key;
+      if (Math.abs(lift) > 1e-4) camera.setViewOffset(width, height, 0, lift * height, width, height);
+      else camera.clearViewOffset();
+    }
+
     if (cameraMode === 'interactive') {
       controls.current?.getTarget(lastTarget.current);
       return;

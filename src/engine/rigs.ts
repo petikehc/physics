@@ -30,6 +30,8 @@ export interface CameraRig {
   dof: number;
   /** Black veil used to hide flights for reduced-motion viewers. */
   veil: number;
+  /** Lifts the whole picture by this fraction of the screen height (a lens shift: the perspective is unchanged). */
+  lensY: number;
 }
 
 export function createCameraRig(): CameraRig {
@@ -54,6 +56,7 @@ export function createCameraRig(): CameraRig {
     fz: 0,
     dof: 0,
     veil: 0,
+    lensY: 0,
   };
 }
 
