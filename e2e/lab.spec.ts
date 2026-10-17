@@ -40,10 +40,12 @@ test('the circle lab re-slices the disc and follows the radius', async ({ page }
   const panel = page.getByRole('complementary', { name: 'Circle area lab' });
   await expect(panel).toBeVisible();
   await expect(panel).toContainText('= 4.40 × 1.40 = 6.16');
+  // Read once, not polled: the panel must show the Lab's 16 slices as soon as it appears, or a key press can
+  // land on the slider before it has caught up.
+  expect(await panel.textContent()).toContain('16 straight-edged triangles');
 
   const slices = panel.getByLabel('Slices');
   await slices.focus();
-  // One step at a time: on a slow machine a second key press can land before the first has re-rendered the slider.
   await page.keyboard.press('ArrowRight');
   await expect(panel).toContainText('32 straight-edged triangles');
   await page.keyboard.press('ArrowRight');

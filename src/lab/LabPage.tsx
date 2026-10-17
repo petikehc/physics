@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ComponentType } from 'react';
 import { Link, useParams } from 'react-router';
 import gsap from 'gsap';
 import { useApp } from '../state/store';
@@ -21,6 +21,9 @@ export default function LabPage() {
   const set = useApp((s) => s.set);
   const [menu, setMenu] = useState(false);
   const views = meta?.status === 'ready' ? VIEWS[meta.slug] : undefined;
+  // The panel reads the chapter's rig as it first renders, so it waits until the effect below has put the rig in
+  // its Lab state (it says so by switching the app into this Lab).
+  const entered = useApp((s) => s.mode === 'lab' && s.chapterSlug === meta?.slug);
 
   useEffect(() => {
     if (!views || !meta) {
@@ -54,8 +57,6 @@ export default function LabPage() {
       set({ cameraMode: 'directed', dragging: false });
     };
   }, [views, meta, set]);
-  // On a phone the Lab's panel is a sheet across the bottom: keep the scene above it.
-  useLiftAbove(() => document.querySelector<HTMLElement>('.lab-panel'));
 
   return (
     <div className="overlay">
@@ -64,7 +65,9 @@ export default function LabPage() {
         onChapters={() => setMenu(true)}
       />
       {views ? (
-        <views.Lab />
+        entered ? (
+          <LabPanel Panel={views.Lab} />
+        ) : null
       ) : (
         <div className="page">
           <div className="page__inner">
@@ -84,4 +87,10 @@ export default function LabPage() {
       {menu ? <ChaptersMenu onClose={() => setMenu(false)} /> : null}
     </div>
   );
+}
+
+function LabPanel({ Panel }: { Panel: ComponentType }) {
+  // On a phone the Lab's panel is a sheet across the bottom: keep the scene above it.
+  useLiftAbove(() => document.querySelector<HTMLElement>('.lab-panel'));
+  return <Panel />;
 }
