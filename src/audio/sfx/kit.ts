@@ -299,6 +299,16 @@ export class SfxKit {
         return;
       }
       case 'formula':
+        if (params.chapter === 5) {
+          // An apple's fall: four notes dropping, each a little sooner than the last, then the open chord.
+          [pyth('G', 5), pyth('E', 5), pyth('C', 5), pyth('G', 4)].forEach((f, i) =>
+            this.bell.triggerAttackRelease(f, 1.2, t + [0, 0.36, 0.6, 0.76][i]!, 0.3),
+          );
+          [pyth('G', 3), pyth('D', 4), pyth('B', 4)].forEach((f, i) =>
+            this.bell.triggerAttackRelease(f, 3.5, t + 1.1 + i * 0.1, 0.42),
+          );
+          return;
+        }
         if (params.chapter === 4) {
           // The Earth's song in Harmonices Mundi, mi–fa–mi, then the open chord.
           [pyth('E', 5), pyth('F', 5), pyth('E', 5)].forEach((f, i) =>
@@ -441,6 +451,25 @@ export class SfxKit {
         const chord = [pyth('D', 6), pyth('B', 5), pyth('G', 5), pyth('D', 5), pyth('B', 4), pyth('G', 4)];
         chord.forEach((f, i) => this.bell.triggerAttackRelease(f, 2.4, t + 0.9 + i * 0.36, 0.26));
         chord.forEach((f, i) => this.bell.triggerAttackRelease(f, 4, t + 3.3 + i * 0.03, 0.18));
+        return;
+      }
+      case 'cannon':
+        // Newton's cannon: a deep boom, the crack of the charge, and the roll of it fading away.
+        this.thump.triggerAttackRelease(pyth('G', 1), 0.6, t, 0.95);
+        this.clackNoise.triggerAttackRelease(0.08, t, 0.9);
+        this.click.triggerAttackRelease(0.03, t, 0.6);
+        this.rumble(t, 1.1, 0.7, 520, 90);
+        return;
+      case 'thud':
+        // The ball coming down far away: a dull, distant thump.
+        this.thump.triggerAttackRelease(pyth('D', 2), 0.3, t, 0.35);
+        this.clackNoise.triggerAttackRelease(0.03, t, 0.25);
+        return;
+      case 'flash': {
+        // A strobe flash: a bright tick, a step lower each flash, as the apple falls.
+        const k = params.k ?? 0;
+        this.click.triggerAttackRelease(0.012, t, 0.5);
+        this.blip.triggerAttackRelease(2400 * Math.pow(0.94, k), 0.03, t, 0.3);
         return;
       }
       case 'land':

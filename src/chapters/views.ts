@@ -7,6 +7,8 @@ import { YourTurnPanel as ArchimedesYourTurn } from './03-archimedes/ui/YourTurn
 import { LabPanel as ArchimedesLab, enterArchimedesLab } from './03-archimedes/ui/LabPanel';
 import { YourTurnPanel as KeplerYourTurn } from './04-kepler/ui/YourTurnPanel';
 import { LabPanel as KeplerLab, enterKeplerLab } from './04-kepler/ui/LabPanel';
+import { YourTurnPanel as NewtonYourTurn } from './05-newton/ui/YourTurnPanel';
+import { LabPanel as NewtonLab, enterNewtonLab } from './05-newton/ui/LabPanel';
 
 /** The page-level React side of a chapter: its Your-turn panel, its Lab and its formula. */
 export interface ChapterViews {
@@ -53,6 +55,15 @@ export const VIEWS: Record<string, ChapterViews> = {
     formula: {
       tex: '\\frac{\\textcolor{#f2b04a}{\\Delta A}}{\\textcolor{#8fd3ff}{\\Delta t}} = \\text{constant}',
       caption: "Kepler's second law",
+    },
+  },
+  newton: {
+    YourTurn: NewtonYourTurn,
+    Lab: NewtonLab,
+    enterLab: enterNewtonLab,
+    formula: {
+      tex: '\\textcolor{#e25c56}{F} = G\\,\\frac{m_1\\, m_2}{r^2}',
+      caption: "Newton's law of universal gravitation",
     },
   },
 };

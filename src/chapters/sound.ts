@@ -3,12 +3,13 @@ import { pythagorasMeter, pythagorasSides } from './01-pythagoras/sound';
 import { circleMeter } from './02-circle-area/sound';
 import { archimedesMeter } from './03-archimedes/sound';
 import { keplerMeter } from './04-kepler/sound';
+import { newtonMeter } from './05-newton/sound';
 
 /** Levels of the continuous sound layers, 0..1. */
 export interface Levels {
   chalk: number;
   pour: number;
-  /** A singing planet (chapter 4): how loud, and its pitch. */
+  /** A singing planet (chapter 4) or a whistling cannonball (chapter 5): how loud, and its pitch. */
   voice?: number;
   voiceHz?: number;
 }
@@ -18,7 +19,7 @@ export type Meter = (dt: number) => Levels;
 
 /** One meter over every chapter's rig: each layer plays at the loudest level any chapter asks for. */
 export function continuousMeter(): Meter {
-  const meters = [pythagorasMeter(), circleMeter(), archimedesMeter(), keplerMeter()];
+  const meters = [pythagorasMeter(), circleMeter(), archimedesMeter(), keplerMeter(), newtonMeter()];
   return (dt) => {
     const out: Required<Levels> = { chalk: 0, pour: 0, voice: 0, voiceHz: 0 };
     for (const m of meters) {

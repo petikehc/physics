@@ -7,13 +7,14 @@ The full research, storyboards and architecture are in [`docs/PLAN.md`](docs/PLA
 
 ## Status
 
-| #   | Chapter                                           | Status                                                         |
-| --- | ------------------------------------------------- | -------------------------------------------------------------- |
-| I   | The Pythagorean Theorem                           | **Playable**: journey, Your turn, Lab, score and sound effects |
-| II  | The Area of a Circle                              | **Playable**: journey, Your turn, Lab, score and sound effects |
-| III | Archimedes' Principle                             | **Playable**: journey, Your turn, Lab, score and sound effects |
-| IV  | Kepler's Laws                                     | **Playable**: journey, Your turn, Lab, score and sound effects |
-| V–X | Newton, Calculus, Euler, Fourier, Doppler, Energy | In production                                                  |
+| #    | Chapter                                   | Status                                                         |
+| ---- | ----------------------------------------- | -------------------------------------------------------------- |
+| I    | The Pythagorean Theorem                   | **Playable**: journey, Your turn, Lab, score and sound effects |
+| II   | The Area of a Circle                      | **Playable**: journey, Your turn, Lab, score and sound effects |
+| III  | Archimedes' Principle                     | **Playable**: journey, Your turn, Lab, score and sound effects |
+| IV   | Kepler's Laws                             | **Playable**: journey, Your turn, Lab, score and sound effects |
+| V    | Universal Gravitation                     | **Playable**: journey, Your turn, Lab, score and sound effects |
+| VI–X | Calculus, Euler, Fourier, Doppler, Energy | In production                                                  |
 
 ## Running it
 
@@ -68,9 +69,9 @@ pull request.
   every transition and the landing teaser.
 - **Sound** (`src/audio`) is procedural Tone.js, lazy-loaded when the viewer chooses sound. The score is in
   Pythagorean tuning throughout: chapter 1 resolves on a 3:4:5 chord, chapter 2 glides into its own key, its
-  arpeggio circling and climbing as the slices multiply, chapter 3's bath ripples in D, and in chapter 4 Mars sings a
-  note that follows how fast it turns, as Kepler imagined in Harmonices Mundi. The same engine renders offline
-  previews.
+  arpeggio circling and climbing as the slices multiply, chapter 3's bath ripples in D, in chapter 4 Mars sings a
+  note that follows how fast it turns, as Kepler imagined in Harmonices Mundi, and in chapter 5 Newton's cannonball
+  whistles higher the faster it falls. The same engine renders offline previews.
 - **The world** (`runtime.world`) fades from the dusk beach of the first chapters into deep space (`space` 0 → 1)
   as the journey rises to the planets.
 
