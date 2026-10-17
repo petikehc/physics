@@ -12,6 +12,7 @@ import { resetChapterRigs } from '../chapters/hooks';
 import { orbitLimits } from '../engine/camera/CameraDirector';
 import { runtime } from '../engine/runtime';
 import { createCameraRig, resetRig } from '../engine/rigs';
+import { useLiftAbove } from '../ui/useLiftAbove';
 
 /** /lab/:slug — a theorem as a sandbox. */
 export default function LabPage() {
@@ -52,6 +53,8 @@ export default function LabPage() {
       set({ cameraMode: 'directed', dragging: false });
     };
   }, [views, meta, set]);
+  // On a phone the Lab's panel is a sheet across the bottom: keep the scene above it.
+  useLiftAbove(() => document.querySelector<HTMLElement>('.lab-panel'));
 
   return (
     <div className="overlay">
