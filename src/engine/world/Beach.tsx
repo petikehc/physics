@@ -1,16 +1,22 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Environment, Lightformer } from '@react-three/drei';
 import * as THREE from 'three';
 import { createSandMaterial } from '../materials/sand';
-import { DUSK, SUN_DIR } from './Sky';
+import { SUN_DIR } from './Sky';
+import { createPalette, DUSK, skyPalette } from './palette';
 import { useApp } from '../../state/store';
+import { runtime } from '../runtime';
 import { station } from './stations';
 
 /** Half-size of the shadow frustum around the active station (centred by its `shadow` offset). */
 const SHADOW_HALF = 11;
 /** Elevation of the shadow-casting sun (the visible sun sits much lower, on the horizon). */
 const SHADOW_ELEVATION = (50 * Math.PI) / 180;
+/** Light and fog as the world turns from the dusk beach (space 0) into deep space (space 1). */
+const SUN_LIGHT = 1.7;
+const HEMI_LIGHT = 0.75;
+const FOG: Record<'near' | 'far', [number, number]> = { near: [26, 140], far: [150, 460] };
 
 const sand = createSandMaterial();
 sand.uniforms.uZenith.value.set(DUSK.zenith);
@@ -30,18 +36,19 @@ export function Beach() {
   const quality = useApp((s) => s.quality);
   const scene = useThree((s) => s.scene);
 
+  const fog = useMemo(() => new THREE.Fog(DUSK.fog, FOG.near[0], FOG.far[0]), []);
   useEffect(() => {
-    scene.fog = new THREE.Fog(DUSK.fog, 26, 150);
+    scene.fog = fog;
     return () => {
       scene.fog = null;
     };
-  }, [scene]);
+  }, [scene, fog]);
 
   const chapterSlug = useApp((s) => s.chapterSlug);
 
   const sun = useMemo(() => {
     // Dim enough that the high shadow-casting angle doesn't flatten the dusk light.
-    const light = new THREE.DirectionalLight('#ffb27a', 1.7);
+    const light = new THREE.DirectionalLight('#ffb27a', SUN_LIGHT);
     light.castShadow = quality !== 'low';
     light.shadow.mapSize.set(2048, 2048);
     const cam = light.shadow.camera;
@@ -59,7 +66,12 @@ export function Beach() {
     return light;
   }, [quality]);
 
-  useEffect(() => () => sun.dispose(), [sun]);
+  // The last `space` the lights and haze were set for (a new sun light starts at full dusk strength).
+  const last = useRef(-1);
+  useEffect(() => {
+    last.current = -1;
+    return () => sun.dispose();
+  }, [sun]);
 
   // The shadow frustum is fixed around the active station. Following the camera made shadows swim and jump.
   useEffect(() => {
@@ -79,17 +91,37 @@ export function Beach() {
     sun.shadow.needsUpdate = true;
   }, [sun, chapterSlug]);
 
+  const hemi = useRef<THREE.HemisphereLight>(null);
+  const ground = useRef<THREE.Mesh>(null);
+  const palette = useMemo(() => createPalette(), []);
+
   useFrame((state) => {
     beachSand.uTime.value = state.clock.elapsedTime;
+    const space = runtime.world.space;
+    if (space === last.current) return;
+    last.current = space;
+    // Rising into space: the sun and the sky's glow go out, the haze (and the sand far below, which fades into
+    // it) turns the colour of the night, and the fog draws back so a whole solar system fits in view.
+    skyPalette(space, palette);
+    beachSand.uZenith.value.copy(palette.zenith);
+    beachSand.uMid.value.copy(palette.mid);
+    beachSand.uHorizon.value.copy(palette.horizon);
+    beachSand.uGlow.value.copy(palette.glow);
+    fog.color.copy(palette.fog);
+    fog.near = THREE.MathUtils.lerp(FOG.near[0], FOG.near[1], space);
+    fog.far = THREE.MathUtils.lerp(FOG.far[0], FOG.far[1], space);
+    sun.intensity = SUN_LIGHT * (1 - space);
+    if (hemi.current) hemi.current.intensity = HEMI_LIGHT * (1 - 0.85 * space);
+    if (ground.current) ground.current.visible = space < 0.99;
   });
 
   return (
     <>
       <primitive object={sun} />
       <primitive object={sun.target} />
-      <hemisphereLight args={['#6a78a8', '#3a2418', 0.75]} />
+      <hemisphereLight ref={hemi} args={['#6a78a8', '#3a2418', HEMI_LIGHT]} />
       <ambientLight intensity={0.08} />
-      <mesh rotation-x={-Math.PI / 2} receiveShadow material={sand.material}>
+      <mesh ref={ground} rotation-x={-Math.PI / 2} receiveShadow material={sand.material}>
         <planeGeometry args={[4000, 4000, 1, 1]} />
       </mesh>
       <Environment resolution={128} frames={1}>

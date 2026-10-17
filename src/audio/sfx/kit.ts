@@ -62,6 +62,9 @@ export class SfxKit {
   private sideOsc: Tone.Oscillator[];
   private sideGain: Tone.Gain;
   private sideIdle = 0;
+  /** A planet's song: one soft voice whose pitch follows how fast the planet turns. */
+  private voiceOsc: Tone.Oscillator;
+  private voiceGain: Tone.Gain;
 
   private sources: Array<{ start: (t?: number) => unknown; dispose: () => unknown }> = [];
 
@@ -186,7 +189,14 @@ export class SfxKit {
       new Tone.Oscillator({ type: 'sine', frequency: 200, volume: -14 }).connect(this.sideGain),
     );
 
+    // The planet's voice: a triangle, softened, with a slow shimmer.
+    this.voiceGain = new Tone.Gain(0).connect(this.verb);
+    const voiceFilter = new Tone.Filter({ type: 'lowpass', frequency: 2200, Q: 0.5 }).connect(this.voiceGain);
+    const voiceTrem = new Tone.Tremolo({ frequency: 4.5, depth: 0.18 }).connect(voiceFilter).start();
+    this.voiceOsc = new Tone.Oscillator({ type: 'triangle', frequency: 130, volume: -12 }).connect(voiceTrem);
+
     this.sources = [
+      this.voiceOsc,
       scrapeNoise,
       whooshNoise,
       rumbleNoise,
@@ -207,10 +217,13 @@ export class SfxKit {
 
   // ---------- Continuous ----------
 
-  continuous(id: 'chalk' | 'pour', level: number, time = Tone.now()) {
+  continuous(id: 'chalk' | 'pour' | 'voice', level: number, time = Tone.now(), hz = 0) {
     const l = Math.min(Math.max(level, 0), 1);
     if (id === 'chalk') this.chalkGain.gain.setTargetAtTime(l * 0.55, time, 0.03);
-    else {
+    else if (id === 'voice') {
+      if (hz > 0) this.voiceOsc.frequency.setTargetAtTime(hz, time, 0.03);
+      this.voiceGain.gain.setTargetAtTime(l * 0.2, time, l > 0 ? 0.12 : 0.3);
+    } else {
       this.pourGain.gain.setTargetAtTime(l * 0.9, time, 0.08);
       this.bubbleLevel = l;
     }
@@ -285,6 +298,16 @@ export class SfxKit {
         return;
       }
       case 'formula':
+        if (params.chapter === 4) {
+          // The Earth's song in Harmonices Mundi, mi–fa–mi, then the open chord.
+          [pyth('E', 5), pyth('F', 5), pyth('E', 5)].forEach((f, i) =>
+            this.bell.triggerAttackRelease(f, 1.2, t + i * 0.3, 0.3),
+          );
+          [pyth('C', 4), pyth('G', 4), pyth('E', 5)].forEach((f, i) =>
+            this.bell.triggerAttackRelease(f, 3.5, t + 1.0 + i * 0.1, 0.42),
+          );
+          return;
+        }
         if (params.chapter === 3) {
           // Three drops falling into still water, then the open chord.
           [pyth('G', 5), pyth('E', 5), pyth('C', 5)].forEach((f, i) => this.drop(t + i * 0.22, f));
@@ -394,6 +417,29 @@ export class SfxKit {
           this.bell.triggerAttackRelease(f, 3, t + 0.4 + i * 0.05, 0.36),
         );
         this.whoosh(t, 0.35, 1.4);
+        return;
+      }
+      case 'sighting': {
+        // One of Tycho's sightings marked: a small, high star of a note.
+        const f = PENTA_UP[(params.i ?? 0) % PENTA_UP.length]! * 2;
+        this.blip.triggerAttackRelease(f, 0.06, t, 0.4);
+        return;
+      }
+      case 'miss':
+        // Where the circle misses: two notes a semitone apart, rubbing.
+        this.bell.triggerAttackRelease(pyth('B', 4), 2.2, t, 0.22);
+        this.bell.triggerAttackRelease(pyth('C', 5), 2.2, t + 0.04, 0.2);
+        this.rumble(t, 0.9, 0.25, 500, 180);
+        return;
+      case 'pin':
+        this.metal.triggerAttackRelease([pyth('A', 6), pyth('E', 6)][(params.i ?? 0) % 2]!, 0.5, t, 0.5);
+        this.click.triggerAttackRelease(0.015, t, 0.35);
+        return;
+      case 'pillars': {
+        // The six planets' pillars rise one by one (Mercury first, each a note lower), then sound together.
+        const chord = [pyth('D', 6), pyth('B', 5), pyth('G', 5), pyth('D', 5), pyth('B', 4), pyth('G', 4)];
+        chord.forEach((f, i) => this.bell.triggerAttackRelease(f, 2.4, t + 0.9 + i * 0.36, 0.26));
+        chord.forEach((f, i) => this.bell.triggerAttackRelease(f, 4, t + 3.3 + i * 0.03, 0.18));
         return;
       }
       case 'uiHover':

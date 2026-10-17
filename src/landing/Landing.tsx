@@ -4,7 +4,7 @@ import gsap from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 import { useApp } from '../state/store';
 import { runtime } from '../engine/runtime';
-import { createCameraRig, createDustRig, resetRig } from '../engine/rigs';
+import { createCameraRig, createDustRig, createWorldRig, resetRig } from '../engine/rigs';
 import { ICON_ORDER } from '../engine/dust/shapes';
 import { TEASER } from '../engine/world/stations';
 import { portraitFit } from '../engine/camera/fit';
@@ -51,6 +51,7 @@ function buildTeaser(onIcon: (i: number) => void) {
   const cam = runtime.camera;
   resetRig(cam, createCameraRig());
   resetRig(dust, createDustRig());
+  resetRig(runtime.world, createWorldRig());
   Object.assign(cam, {
     tx: TEASER.x,
     ty: TEASER.y,
@@ -238,7 +239,7 @@ export default function Landing() {
           </div>
         </div>
         <p className="landing__foot">
-          Chapters I–III are ready (about 6 minutes) · best with headphones · space to pause, arrows to step
+          Chapters I–IV are ready (about 8 minutes) · best with headphones · space to pause, arrows to step
         </p>
       </div>
       {menu ? <ChaptersMenu onClose={() => setMenu(false)} /> : null}

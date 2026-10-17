@@ -74,7 +74,23 @@ test('the Archimedes lab drops materials into fluids', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('labs that are not built yet say so', async ({ page }) => {
+test('the Kepler lab reshapes the orbit and shows all six planets', async ({ page }) => {
+  const errors = collectErrors(page);
   await page.goto('/lab/kepler?quality=low');
+  const panel = page.getByRole('complementary', { name: 'Kepler lab' });
+  await expect(panel).toBeVisible();
+  await expect(panel).toContainText('each fan = 1/12 of the area');
+  await panel.getByRole('button', { name: 'Earth' }).click();
+  await expect(panel).toContainText('semitone (16 : 15)');
+  await panel.getByRole('button', { name: /Show all six planets/ }).click();
+  await expect(panel.getByRole('button', { name: 'Back to one orbit' })).toBeEnabled({ timeout: 30_000 });
+  await page.waitForTimeout(1500);
+  await expectCanvasRendered(page);
+  await page.screenshot({ path: test.info().outputPath('lab-kepler.png') });
+  expect(errors).toEqual([]);
+});
+
+test('labs that are not built yet say so', async ({ page }) => {
+  await page.goto('/lab/newton?quality=low');
   await expect(page.getByText('This Lab is in production.')).toBeVisible();
 });

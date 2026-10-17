@@ -16,6 +16,8 @@
   --sym-pi: #8fd3ff;
   --sym-w: #f2b04a;
   --sym-p: #5fd3e8;
+  --sym-area: #f2b04a;
+  --sym-t: #8fd3ff;
 
   --accent: #e2704f;
 
@@ -557,6 +559,14 @@ a {
 
 .captions__body .sym-p {
   color: var(--sym-p);
+}
+
+.captions__body .sym-area {
+  color: var(--sym-area);
+}
+
+.captions__body .sym-t {
+  color: var(--sym-t);
 }
 
 .bottom-shade {

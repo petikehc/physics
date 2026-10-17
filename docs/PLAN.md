@@ -335,6 +335,25 @@ is corrected at beat labels when it exceeds 50 ms.
 - Score "Water": Dm–F–C–G over a D–A drone, the arpeggio rippling. SFX: plunk (immersion), splash, the pour, a
   bubble's bloop, a eureka run and three drops before the formula chord.
 
+**Chapter 4 (built)**
+- The flight rises out of the dusk into deep space (`runtime.world.space`: the sky, haze, fog and dusk lights fade
+  to a starfield with a faint Milky Way). Prague, 1601: Kepler inherits Tycho Brahe's sightings. Mars circles the
+  Sun on its orbit, stretched to e = 0.5 so the shape can be seen (its real one is 0.093, and the caption says so);
+  Tycho's twelve sightings appear; the best circle through them misses at the sides by "8′" (Kepler's lunula),
+  the crescents glowing red. Two pins at the foci, a loop of string and a pencil draw the ellipse through every
+  sighting; the Sun takes one focus. Mars sweeps twelve equal-time fans (amber for area, blue ticks for time); the
+  nearest and farthest fans are picked out, each labelled 1/12 of the area. The formula ΔA/Δt = constant (1609).
+  Your turn. Then the third law (1619): Mars' orbit relaxes to its real shape, the other five planets join on
+  their real orbits and periods, and six pillars of T²/a³ rise to the same height. Handoff: the camera dives to
+  Earth, and the stars gather into an apple beside it ("how, but not why": Newton, nearly seventy years later).
+- Your turn / Lab: eccentricity (0–0.9) with presets (Earth, Mars, Mercury, a comet) and equal times per year
+  (4–24). The readout names the interval Kepler heard in each orbit (Earth a semitone, Mars a fifth); the Lab can
+  pull back to all six planets and the pillars.
+- Score "Spheres": Em–Am–C–G over an E–B drone, the arpeggio wheeling. Mars sings: a soft voice whose pitch
+  follows how fast it turns seen from the Sun, so its swing is Kepler's interval. SFX: a high note per sighting,
+  a semitone rub where the circle misses, the pins, chalk for the circle and the pencil, a tick per equal time,
+  the Earth's mi–fa–mi before the formula chord, and the six pillars' chord.
+
 ---
 
 ## 5. Technical architecture

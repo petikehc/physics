@@ -264,13 +264,13 @@ function exposeTestHook(c: JourneyController) {
       c.pause();
       // Sample the continuous layers by stepping the timeline, exactly as playback would.
       const step = 1 / 30;
-      const continuous: Array<[number, number, number]> = [];
+      const continuous: Array<[number, number, number, number, number]> = [];
       j.master.seek(0, false);
       const meter = continuousMeter();
       for (let t = step; t <= duration; t += step) {
         j.master.seek(t, false);
         const l = meter(step);
-        continuous.push([t, l.chalk, l.pour]);
+        continuous.push([t, l.chalk, l.pour, l.voice ?? 0, l.voiceHz ?? 0]);
       }
       j.master.seek(saved, false);
       const buffer = await renderPlan({

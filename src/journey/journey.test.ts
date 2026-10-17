@@ -6,6 +6,8 @@ import { pythagorasRig } from '../chapters/01-pythagoras/rig';
 import { circleRig } from '../chapters/02-circle-area/rig';
 import { archimedesRig } from '../chapters/03-archimedes/rig';
 import { hangState } from '../chapters/03-archimedes/hang';
+import { keplerRig } from '../chapters/04-kepler/rig';
+import { MARS, STORY } from '../chapters/04-kepler/math';
 
 describe('the journey timeline', () => {
   const journey = buildJourney();
@@ -45,7 +47,17 @@ describe('the journey timeline', () => {
       'archimedes:yourTurn',
       'archimedes:handoff',
       'kepler:flight',
-      'kepler:soon',
+      'kepler:title',
+      'kepler:circle',
+      'kepler:ellipse',
+      'kepler:areas',
+      'kepler:compare',
+      'kepler:formula',
+      'kepler:yourTurn',
+      'kepler:harmony',
+      'kepler:handoff',
+      'newton:flight',
+      'newton:soon',
     ]);
     for (const b of journey.beats) expect(journey.master.labels[b.key]).toBeCloseTo(b.start, 6);
   });
@@ -78,12 +90,20 @@ describe('the journey timeline', () => {
     expect(len).toBeLessThan(120);
   });
 
+  it('runs chapter 4 for roughly 80–120 seconds', () => {
+    const ch4 = journey.chapters.find((c) => c.slug === 'kepler')!;
+    const len = ch4.end - ch4.start;
+    expect(len).toBeGreaterThan(80);
+    expect(len).toBeLessThan(120);
+  });
+
   it('pauses once per chapter, inside its Your-turn beat', () => {
     const paused = journey.beats.filter((b) => b.pauseAt !== undefined);
     expect(paused.map((b) => b.key)).toEqual([
       'pythagoras:yourTurn',
       'circle-area:yourTurn',
       'archimedes:yourTurn',
+      'kepler:yourTurn',
     ]);
     for (const b of paused) {
       expect(b.pauseAt!).toBeGreaterThan(b.start);
@@ -206,6 +226,38 @@ describe('the journey timeline', () => {
 
     const snap = state();
     master.seek(0, false);
+    master.seek(journey.duration - 0.1, false);
+    master.seek(t, false);
+    expect(state()).toBe(snap);
+  });
+
+  it('rises into space for chapter 4, sweeps the fans in step with Mars, and comes back down on a seek', () => {
+    const { master } = journey;
+    const rig = keplerRig();
+    const world = runtime.world;
+    const beat = (id: string) => journey.beats.find((b) => b.key === id)!;
+    const state = () => JSON.stringify({ rig, world }, (k, v) => (k === '_gsap' ? undefined : v));
+
+    master.seek(beat('archimedes:handoff').start + 1, false);
+    expect(world.space).toBe(0);
+    master.seek(beat('kepler:title').start, false);
+    expect(world.space).toBe(1);
+
+    // Half-way through the sweep, half the fans are swept and Mars is half a year past perihelion.
+    const areas = beat('kepler:areas');
+    master.seek(areas.start + 0.8 + 4.5, false);
+    expect(rig.swept).toBeCloseTo(STORY.fans / 2, 6);
+    expect(rig.phase % 1).toBeCloseTo(0.5, 6);
+
+    // By the dive to Earth the orbit is Mars' own, the other planets and all six pillars are up.
+    const t = beat('kepler:handoff').start;
+    master.seek(t, false);
+    expect(rig.e).toBeCloseTo(MARS.e, 9);
+    expect(rig.system).toBe(1);
+    expect(rig.pillars).toBe(1);
+    const snap = state();
+    master.seek(0, false);
+    expect(world.space).toBe(0);
     master.seek(journey.duration - 0.1, false);
     master.seek(t, false);
     expect(state()).toBe(snap);

@@ -5,4 +5,5 @@ export const STATION_VIEWS: Record<string, LazyExoticComponent<ComponentType>> =
   pythagoras: lazy(() => import('./01-pythagoras/Station')),
   'circle-area': lazy(() => import('./02-circle-area/Station')),
   archimedes: lazy(() => import('./03-archimedes/Station')),
+  kepler: lazy(() => import('./04-kepler/Station')),
 };

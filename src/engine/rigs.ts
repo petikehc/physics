@@ -104,6 +104,18 @@ export function createDustRig(): DustRig {
   };
 }
 
+export interface WorldRig {
+  /**
+   * 0 = the dusk beach; 1 = deep space, where the sky is a full starfield and the beach, its low sun and its
+   * haze have faded away.
+   */
+  space: number;
+}
+
+export function createWorldRig(): WorldRig {
+  return { space: 0 };
+}
+
 /** Copies every own property of `src` onto `dst` (used to reset rigs between modes). */
 export function resetRig<T extends object>(dst: T, src: T): T {
   Object.assign(dst, src);

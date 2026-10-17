@@ -5,6 +5,8 @@ import { circleRig, CIRCLE_DEFAULTS } from './02-circle-area/rig';
 import { leaveCircleYourTurn } from './02-circle-area/interaction';
 import { archimedesRig, ARCHIMEDES_DEFAULTS } from './03-archimedes/rig';
 import { leaveArchimedesYourTurn } from './03-archimedes/interaction';
+import { keplerRig, KEPLER_DEFAULTS } from './04-kepler/rig';
+import { leaveKeplerYourTurn } from './04-kepler/interaction';
 
 /** What the journey controller needs from a chapter, outside React. */
 export interface ChapterHooks {
@@ -31,6 +33,10 @@ export const HOOKS: Record<string, ChapterHooks> = {
   archimedes: {
     reset: () => resetRig(archimedesRig(), { ...ARCHIMEDES_DEFAULTS }),
     leaveYourTurn: leaveArchimedesYourTurn,
+  },
+  kepler: {
+    reset: () => resetRig(keplerRig(), { ...KEPLER_DEFAULTS }),
+    leaveYourTurn: leaveKeplerYourTurn,
   },
 };
 

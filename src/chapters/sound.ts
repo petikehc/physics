@@ -2,11 +2,15 @@ import { audio } from '../audio';
 import { pythagorasMeter, pythagorasSides } from './01-pythagoras/sound';
 import { circleMeter } from './02-circle-area/sound';
 import { archimedesMeter } from './03-archimedes/sound';
+import { keplerMeter } from './04-kepler/sound';
 
 /** Levels of the continuous sound layers, 0..1. */
 export interface Levels {
   chalk: number;
   pour: number;
+  /** A singing planet (chapter 4): how loud, and its pitch. */
+  voice?: number;
+  voiceHz?: number;
 }
 
 /** Called once per frame with the elapsed time; returns the continuous levels since the last call. */
@@ -14,13 +18,17 @@ export type Meter = (dt: number) => Levels;
 
 /** One meter over every chapter's rig: each layer plays at the loudest level any chapter asks for. */
 export function continuousMeter(): Meter {
-  const meters = [pythagorasMeter(), circleMeter(), archimedesMeter()];
+  const meters = [pythagorasMeter(), circleMeter(), archimedesMeter(), keplerMeter()];
   return (dt) => {
-    const out: Levels = { chalk: 0, pour: 0 };
+    const out: Required<Levels> = { chalk: 0, pour: 0, voice: 0, voiceHz: 0 };
     for (const m of meters) {
       const l = m(dt);
       out.chalk = Math.max(out.chalk, l.chalk);
       out.pour = Math.max(out.pour, l.pour);
+      if ((l.voice ?? 0) > out.voice) {
+        out.voice = l.voice ?? 0;
+        out.voiceHz = l.voiceHz ?? 0;
+      }
     }
     return out;
   };
@@ -36,6 +44,7 @@ export function createSoundFrame() {
     const l = meter(dt);
     audio.continuous('chalk', l.chalk);
     audio.continuous('pour', l.pour);
+    audio.continuous('voice', l.voice ?? 0, { hz: l.voiceHz ?? 0 });
     pythagorasSides(interactive === 'pythagoras');
   };
 }

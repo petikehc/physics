@@ -2,7 +2,7 @@ import * as Tone from 'tone';
 import { SfxKit } from './sfx/kit';
 import { PythagoreanScore } from './music/pythagorean';
 import type { Triangle } from '../chapters/01-pythagoras/math';
-import type { Scene } from './index';
+import type { ContinuousId, Scene } from './index';
 
 const toGain = (v: number) => Math.pow(Math.min(Math.max(v, 0), 1), 2);
 /** Make-up gain into the limiter (the synths are voiced quietly to leave headroom). */
@@ -91,16 +91,18 @@ export class AudioEngine {
     this.score.setActive(running, time);
     if (running && this.transport.state !== 'started') this.transport.start(time);
     if (!running && this.transport.state === 'started') this.transport.pause(time + 0.8);
-    if (!running) this.sfx.continuous('chalk', 0, time);
+    if (!running) {
+      this.sfx.continuous('chalk', 0, time);
+      this.sfx.continuous('voice', 0, time);
+    }
   }
 
   cue(id: string, params?: Record<string, number>) {
     this.sfx.cue(id, params);
   }
 
-  continuous(id: 'chalk' | 'pour', level: number, params?: Record<string, number>) {
-    void params;
-    this.sfx.continuous(id, level);
+  continuous(id: ContinuousId, level: number, params?: Record<string, number>) {
+    this.sfx.continuous(id, level, Tone.now(), params?.hz);
   }
 
   sides(t: Triangle | null, moved: boolean) {

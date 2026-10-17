@@ -11,7 +11,7 @@ import { createSoundFrame } from '../chapters/sound';
 import { resetChapterRigs } from '../chapters/hooks';
 import { orbitLimits } from '../engine/camera/CameraDirector';
 import { runtime } from '../engine/runtime';
-import { createCameraRig, resetRig } from '../engine/rigs';
+import { createCameraRig, createWorldRig, resetRig } from '../engine/rigs';
 import { useLiftAbove } from '../ui/useLiftAbove';
 
 /** /lab/:slug — a theorem as a sandbox. */
@@ -30,6 +30,7 @@ export default function LabPage() {
     // Neighbouring stations stay mounted: clear whatever the journey left on them (and the teaser on the camera).
     resetChapterRigs();
     resetRig(runtime.camera, createCameraRig());
+    resetRig(runtime.world, createWorldRig());
     views.enterLab();
     Object.assign(orbitLimits, { minDistance: 2, maxDistance: 22 });
     set({ mode: 'lab', chapterSlug: meta.slug, cameraMode: 'directed' });
@@ -70,7 +71,7 @@ export default function LabPage() {
             <span className="eyebrow">Lab</span>
             <h1>{meta ? meta.title : 'Unknown chapter'}</h1>
             <p style={{ color: 'var(--chalk-dim)' }}>
-              This Lab is in production. Chapters I–III are ready to explore now.
+              This Lab is in production. Chapters I–IV are ready to explore now.
             </p>
             <p style={{ marginTop: 24 }}>
               <Link className="btn btn--primary" to="/lab/pythagoras">
