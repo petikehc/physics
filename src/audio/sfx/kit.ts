@@ -53,6 +53,12 @@ export class SfxKit {
   private pourFilter: Tone.Filter;
   private bubble: Tone.Synth;
   private bubbleLevel = 0;
+  /**
+   * Voices for the drops and bubbles that cues schedule ahead of time. Kept apart from the pour's bubble loop
+   * (and from each other while busy): a mono synth can't take a note earlier than one already scheduled on it.
+   * Built up front, since an offline render only accepts nodes made while it is being set up.
+   */
+  private drops: Array<{ synth: Tone.Synth; free: number }>;
   private sideOsc: Tone.Oscillator[];
   private sideGain: Tone.Gain;
   private sideIdle = 0;
@@ -157,6 +163,14 @@ export class SfxKit {
       envelope: { attack: 0.002, decay: 0.07, sustain: 0, release: 0.03 },
       volume: -22,
     }).connect(this.verb);
+    this.drops = Array.from({ length: 6 }, () => ({
+      synth: new Tone.Synth({
+        oscillator: { type: 'sine' },
+        envelope: { attack: 0.002, decay: 0.07, sustain: 0, release: 0.03 },
+        volume: -22,
+      }).connect(this.verb),
+      free: 0,
+    }));
     new Tone.Loop((time) => {
       if (this.bubbleLevel > 0.05 && Math.random() < this.bubbleLevel * 0.85) {
         const f = 380 + Math.random() * 900;
@@ -394,9 +408,13 @@ export class SfxKit {
 
   /** One water drop or bubble: a sine blip that slides up in pitch. */
   private drop(t: number, f: number, velocity = 0.6, dur = 0.05, rise = 1.8) {
-    this.bubble.frequency.setValueAtTime(f, t);
-    this.bubble.frequency.exponentialRampToValueAtTime(f * rise, t + dur);
-    this.bubble.triggerAttackRelease(f, dur * 0.8, t, velocity);
+    const voice = this.drops.find((d) => d.free <= t);
+    // Six at once is more than any cue asks for; if they are all busy, this drop is lost in the others.
+    if (!voice) return;
+    voice.free = t + dur + 0.1;
+    voice.synth.frequency.setValueAtTime(f, t);
+    voice.synth.frequency.exponentialRampToValueAtTime(f * rise, t + dur);
+    voice.synth.triggerAttackRelease(f, dur * 0.8, t, velocity);
   }
 
   private whoosh(t: number, gain: number, dur: number) {
@@ -429,6 +447,7 @@ export class SfxKit {
   }
 
   dispose() {
+    for (const d of this.drops) d.synth.dispose();
     for (const s of this.sources) s.dispose();
     this.out.dispose();
   }
