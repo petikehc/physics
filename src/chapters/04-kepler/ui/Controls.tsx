@@ -84,9 +84,16 @@ export function OrbitControls({ o, disabled = false, idPrefix }: Props) {
 const withArticle = (name: string) =>
   name.startsWith('two') ? name : name.startsWith('octave') ? `an ${name}` : `a ${name}`;
 
-/** What the orbit does: every fan the same area, the speed range, and the interval Kepler would hear in it. */
+/** "1.03", "3.0", "19": enough digits to tell a near-circle apart, and no more. */
+const times = (x: number) => x.toFixed(x < 1.1 ? 2 : x < 10 ? 1 : 0);
+
+/**
+ * What the orbit does: every fan the same area; at its nearest the planet is faster and closer by the same
+ * factor, so it turns faster by its square, and that is the interval Kepler heard (or how far its note slides).
+ */
 export function OrbitReadout({ o }: { o: OrbitSnapshot }) {
   const f = orbitFacts(o.e);
+  const s = times(f.speed);
   return (
     <div className="readout" aria-live="polite">
       <span className="readout__eq">
@@ -96,10 +103,10 @@ export function OrbitReadout({ o }: { o: OrbitSnapshot }) {
       <span style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--chalk-dim)' }}>
         {f.circle
           ? 'A circle: the same speed all the way round, and one steady note.'
-          : `${f.speed.toFixed(f.speed < 1.1 ? 2 : 1)}× faster near the Sun than far away. ${
+          : `At its nearest it's ${s}× faster and ${s}× closer to the Sun, so it turns ${times(f.turn)}× faster: ${
               f.interval
-                ? `Kepler would hear ${withArticle(f.interval.name)} (${f.interval.ratio[0]} : ${f.interval.ratio[1]}).`
-                : `Its note would slide through ${f.octaves.toFixed(1)} octaves.`
+                ? `${withArticle(f.interval.name)} (${f.interval.ratio[0]} : ${f.interval.ratio[1]}), as Kepler heard it.`
+                : `its note slides up ${f.octaves.toFixed(1)} octaves.`
             }`}
       </span>
     </div>

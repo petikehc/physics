@@ -97,6 +97,9 @@ describe("Kepler's laws", () => {
     expect(orbitFacts(0.0934).interval?.name).toBe('fifth');
     // The story's stretched orbit swings through over three octaves: no named interval is that wide.
     const story = orbitFacts(STORY.e);
+    // 3× faster and 3× closer at its nearest, so it turns 9× faster.
+    expect(story.speed).toBeCloseTo(3, 9);
+    expect(story.turn).toBeCloseTo(9, 9);
     expect(story.interval).toBeNull();
     expect(story.octaves).toBeCloseTo(Math.log2(9), 9);
     expect(orbitFacts(0).circle).toBe(true);

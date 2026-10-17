@@ -133,7 +133,7 @@ test('chapter 4: Your turn reshapes the orbit, and the fans stay equal', async (
 
   // Mars' real orbit: its speed swings through Kepler's fifth.
   await panel.getByRole('button', { name: 'Mars' }).click();
-  await expect(panel).toContainText('Kepler would hear a fifth (3 : 2)');
+  await expect(panel).toContainText('so it turns 1.5× faster: a fifth (3 : 2), as Kepler heard it.');
   await panel.getByLabel('Equal times per year').focus();
   await page.keyboard.press('ArrowRight');
   await expect(panel).toContainText('each fan = 1/16 of the area');

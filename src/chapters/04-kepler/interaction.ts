@@ -55,6 +55,7 @@ export function orbitFacts(e: number) {
   const near = nearestInterval(turn);
   return {
     speed: speedRange(e),
+    turn,
     circle: e < 0.004,
     interval: Math.abs(near.cents) <= 80 ? near : null,
     octaves: Math.log2(turn),
