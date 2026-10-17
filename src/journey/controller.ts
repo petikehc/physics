@@ -213,7 +213,7 @@ class JourneyController {
     }
     audio.setPlaying(isPlaying || s.yourTurn);
 
-    this.soundFrame(realDt, s.yourTurn ? (beat?.chapter ?? null) : null);
+    this.soundFrame(realDt, s.yourTurn ? (beat?.chapter ?? null) : null, normal);
     this.lastTime = t;
   };
 }

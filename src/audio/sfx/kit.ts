@@ -222,7 +222,8 @@ export class SfxKit {
     if (id === 'chalk') this.chalkGain.gain.setTargetAtTime(l * 0.55, time, 0.03);
     else if (id === 'voice') {
       if (hz > 0) this.voiceOsc.frequency.setTargetAtTime(hz, time, 0.03);
-      this.voiceGain.gain.setTargetAtTime(l * 0.2, time, l > 0 ? 0.12 : 0.3);
+      // Fades in as the planet sets off, and out (a little slower) when it stops.
+      this.voiceGain.gain.setTargetAtTime(l * 0.2, time, l > 0 ? 0.15 : 0.35);
     } else {
       this.pourGain.gain.setTargetAtTime(l * 0.9, time, 0.08);
       this.bubbleLevel = l;

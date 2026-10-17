@@ -36,15 +36,16 @@ export function continuousMeter(): Meter {
 
 /**
  * Per-frame sound for the journey and the Labs: the continuous layers, plus the interactive tones of the
- * chapter the viewer is playing with (`interactive`), if any.
+ * chapter the viewer is playing with (`interactive`), if any. `playing` is false while the journey is paused,
+ * scrubbed or skipping: a planet whizzing round under a fast seek stays quiet.
  */
 export function createSoundFrame() {
   const meter = continuousMeter();
-  return (dt: number, interactive: string | null) => {
+  return (dt: number, interactive: string | null, playing = true) => {
     const l = meter(dt);
     audio.continuous('chalk', l.chalk);
     audio.continuous('pour', l.pour);
-    audio.continuous('voice', l.voice ?? 0, { hz: l.voiceHz ?? 0 });
+    audio.continuous('voice', playing || interactive ? (l.voice ?? 0) : 0, { hz: l.voiceHz ?? 0 });
     pythagorasSides(interactive === 'pythagoras');
   };
 }

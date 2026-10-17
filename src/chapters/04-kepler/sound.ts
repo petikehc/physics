@@ -25,9 +25,13 @@ export function keplerSample(rig: KeplerRig): KeplerSoundSample {
   };
 }
 
+/** How fast (orbits per second) the planet must go round to sing at full voice. */
+const SINGING = 0.02;
+
 /**
  * The pencil and the chalk circle scratch as they draw; the planet sings a note that follows how fast it turns
- * as seen from the Sun (Kepler's own idea, in Harmonices Mundi). Pure, so offline renders use it.
+ * as seen from the Sun (Kepler's own idea, in Harmonices Mundi), but only while it moves: paused, it falls
+ * silent, and it sings again when it sets off. Pure, so offline renders use it.
  */
 export function keplerLevels(prev: KeplerSoundSample, cur: KeplerSoundSample, dt: number): Levels {
   const step = Math.max(dt, 1 / 240);
@@ -35,7 +39,7 @@ export function keplerLevels(prev: KeplerSoundSample, cur: KeplerSoundSample, dt
   return {
     chalk: Math.min(1, drawing * 0.9),
     pour: 0,
-    voice: cur.song,
+    voice: cur.song * Math.min(1, Math.abs(cur.phase - prev.phase) / step / SINGING),
     voiceHz: Math.min(HIGHEST, SLOWEST * turnRate(cur.e, cur.phase)),
   };
 }
