@@ -94,7 +94,10 @@ export function CameraDirector() {
     }
     const rig = runtime.camera;
     directedPose(rig, pos.current, target.current);
-    const fit = portraitFit(state.size.width / Math.max(state.size.height, 1));
+    // A portrait screen steps back and widens the lens, as much as the shot allows.
+    const full = portraitFit(state.size.width / Math.max(state.size.height, 1));
+    const k = Math.min(Math.max(rig.portrait, 0), 1);
+    const fit = { dolly: 1 + (full.dolly - 1) * k, fov: 1 + (full.fov - 1) * k };
     if (fit.dolly !== 1) pos.current.sub(target.current).multiplyScalar(fit.dolly).add(target.current);
 
     const amp = reduced ? 0 : rig.shake;

@@ -49,6 +49,8 @@ interface Props {
   handle: React.RefObject<ChalkLineHandle | null>;
   depthTest?: boolean;
   renderOrder?: number;
+  /** Fades into the distance with the scene's fog (off for lines that must read from far away). */
+  fog?: boolean;
 }
 
 /**
@@ -61,6 +63,7 @@ export function ChalkLine({
   handle,
   depthTest = true,
   renderOrder = 5,
+  fog = true,
 }: Props) {
   const size = useThree((s) => s.size);
   const line = useMemo(() => {
@@ -74,12 +77,13 @@ export function ChalkLine({
       depthWrite: false,
       worldUnits: false,
     });
+    material.fog = fog;
     const l = new Line2(geometry, material);
     l.frustumCulled = false;
     l.renderOrder = renderOrder;
     l.visible = false;
     return l;
-  }, [color, width, depthTest, renderOrder]);
+  }, [color, width, depthTest, renderOrder, fog]);
 
   const last = useRef('');
   const count = useRef(0);
