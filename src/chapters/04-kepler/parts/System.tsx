@@ -21,6 +21,15 @@ const SHORT: Record<string, string> = {
   saturn: 'S',
 };
 
+/**
+ * Sets a material's opacity; while it is fading (`fade` below 1) it stops writing depth, so it never hides the
+ * lines behind it.
+ */
+function fadeTo(mat: THREE.Material, opacity: number, fade = opacity) {
+  mat.opacity = opacity;
+  mat.depthWrite = fade > 0.99;
+}
+
 function orbitLine(p: (typeof PLANETS)[number]) {
   const pts: number[] = [];
   for (let i = 0; i <= 180; i++) {
@@ -86,11 +95,12 @@ export function System() {
       const g = bodies.current[i];
       const fade = p.id === 'earth' ? 1 : keep;
       if (g) {
-        g.visible = on > 0.001;
+        // Gone once faded: a see-through planet would still hide the orbit lines behind it.
+        g.visible = on > 0.001 && fade > 0.01;
         g.position.set(...planetAt(p, rig.years));
         g.scale.setScalar(Math.max(p.size * easeOutCubic(on), 0.001));
       }
-      mats[PLANETS.indexOf(p)]!.opacity = fade;
+      fadeTo(mats[PLANETS.indexOf(p)]!, fade);
       lines[i]!.visible = on > 0.001;
       lineMats[i]!.opacity = on * (p.id === 'earth' ? 0.55 : 0.3 * keep);
     });
@@ -102,16 +112,16 @@ export function System() {
       const g = pillars.current[i];
       const x = PILLARS.x0 + i * PILLARS.dx;
       if (g) {
-        g.visible = k > 0.001;
+        g.visible = k > 0.001 && keep > 0.01;
         g.position.set(x, 0, PILLARS.z);
         const h = PILLARS.height * lawThree(p) * k;
         g.children[0]?.scale.set(PILLARS.radius, Math.max(h, 0.001), PILLARS.radius);
         g.children[1]?.position.set(0, h + 0.2, 0);
         g.children[1]?.scale.setScalar(Math.max(0.14 * k, 0.001));
       }
-      pillarMats[i]!.opacity = 0.8 * keep;
+      fadeTo(pillarMats[i]!, 0.8 * keep, keep);
       // Mars is drawn by Orbit; here it only tops its pillar.
-      if (p.id === 'mars') mats[i]!.opacity = keep;
+      if (p.id === 'mars') fadeTo(mats[i]!, keep);
       nameAt.current[i]?.position.set(x, -0.35 - (narrow ? (i % 2) * 0.45 : 0), PILLARS.z);
       const el = names.current[i];
       if (el) {

@@ -297,8 +297,8 @@ export function buildKepler(j: JourneyBuilder) {
     },
   );
 
-  // The dive comes in on the Earth from the side, with the Sun behind the camera rather than in the way; the
-  // apple forms just beside it.
+  // The dive comes in on the Earth from the side, with the Sun behind the camera rather than in the way. The apple
+  // forms beside the Earth, across the line of sight (not along it, where it would sit in front of the planet).
   const earth = planetAt(EARTH, YEARS);
   const r = Math.hypot(earth[0], earth[2]);
   const out = [earth[0] / r, earth[2] / r] as const;
@@ -308,7 +308,9 @@ export function buildKepler(j: JourneyBuilder) {
     earth[1] + h,
     earth[2] + out[1] * o + side[1] * s,
   ];
-  const apple = near(-0.2, 0.5, 0.2);
+  const view = { o: -0.6, s: 1.6, h: 0.7 };
+  const across = Math.hypot(view.o, view.s);
+  const apple = near((0.4 * view.s) / across, (-0.4 * view.o) / across, 0.05);
   j.beat(
     SLUG,
     {
@@ -324,7 +326,7 @@ export function buildKepler(j: JourneyBuilder) {
         tl,
         SLUG,
         {
-          pos: near(-0.6, 1.6, 0.7),
+          pos: near(view.o, view.s, view.h),
           target: earth,
           focus: earth,
           fov: 38,

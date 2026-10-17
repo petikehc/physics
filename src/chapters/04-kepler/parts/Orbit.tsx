@@ -136,10 +136,12 @@ export function Orbit() {
     const p = orbitAt(A, e, phase);
     const m = planet.current;
     if (m) {
-      m.visible = rig.planet > 0.001;
+      // Gone once faded in the dive: a see-through Mars would still cut a gap in its orbit line.
+      m.visible = rig.planet > 0.001 && rig.dive < 0.99;
       m.position.set(...plane(p.x, p.y));
       m.scale.setScalar(Math.max(lerp(0.14, 0.11, rig.system) * easeOutCubic(rig.planet), 0.001));
       marsMat.opacity = 1 - clamp01(rig.dive);
+      marsMat.depthWrite = rig.dive < 0.01;
     }
     marsLabel.current?.position.set(...plane(p.x, p.y, 0.42));
     if (marsText.current) marsText.current.style.opacity = String(clamp01(rig.trail) * clamp01(rig.planet));
