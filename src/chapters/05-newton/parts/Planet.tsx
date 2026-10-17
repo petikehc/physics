@@ -95,7 +95,7 @@ function mountainGeometry() {
   const pos = g.getAttribute('position') as THREE.BufferAttribute;
   const colors: number[] = [];
   const rock = new THREE.Color('#7d7268');
-  const snow = new THREE.Color('#c9d0d9');
+  const snow = new THREE.Color('#dde3ea');
   const c = new THREE.Color();
   // The same jitter for vertices that share a place (the lathe's seam), so the faces stay joined.
   const jitter = new Map<string, [number, number]>();
@@ -202,7 +202,7 @@ export function Planet() {
     airMat.uniforms.uOpacity!.value = clamp01(rig.air) * on;
     if (air.current) air.current.visible = rig.air > 0.001 && on > 0.001;
     // The station's own sun: off while the chapter is not on screen, so it never lights its neighbours.
-    if (key.current) key.current.intensity = 1.9 * on;
+    if (key.current) key.current.intensity = 2.3 * on;
     if (rim.current) rim.current.intensity = 0.8 * on;
 
     const m = mountain.current;
