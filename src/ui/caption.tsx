@@ -1,10 +1,11 @@
 import { Fragment, type ReactNode } from 'react';
 
-const TOKEN = /\[(a|b|c|r|pi|w|p|area|t|v|pull):([^\]]+)\]/g;
+const TOKEN = /\[(a|b|c|r|pi|w|p|area|t|v|pull|f):([^\]]+)\]/g;
 
 /**
  * Turns `[a:text]` markup into spans coloured with a symbol's colour: a, b, c, r, pi, w for weight, p for the
- * water's push, area for an area swept and t for the time it took, v for a velocity and pull for gravity's pull.
+ * water's push, area for an area swept and t for the time it took, v for a velocity, pull for gravity's pull and
+ * f for a curve and its height.
  */
 export function renderCaption(text: string | undefined): ReactNode {
   if (!text) return null;

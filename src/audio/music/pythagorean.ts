@@ -1,7 +1,7 @@
 import * as Tone from 'tone';
 import { C3, pyth, triangleChord, type Note } from '../tuning';
 
-export type Theme = 'pythagoras' | 'circle' | 'water' | 'spheres' | 'gravity';
+export type Theme = 'pythagoras' | 'circle' | 'water' | 'spheres' | 'gravity' | 'rising';
 
 /** How the score sounds during one beat. Values are targets the score glides to. */
 export interface Layers {
@@ -25,13 +25,15 @@ const CIRCLE: Theme = 'circle';
 const WATER: Theme = 'water';
 const SPHERES: Theme = 'spheres';
 const GRAVITY: Theme = 'gravity';
+const RISING: Theme = 'rising';
 
 /**
  * Per-beat arrangement. Chapter 1 is "Pythagorean Drone" (C–Am–F–G over a C–G drone); chapter 2 turns to
  * "Circles" (F–G–Em–Am over an A–E drone, the arpeggio going round its chord rather than up and down, and
  * climbing as the slices multiply); chapter 3, the bath, is "Water" (Dm–F–C–G over a D–A drone, the arpeggio
  * rippling); chapter 4, among the planets, is "Spheres" (Em–Am–C–G over an E–B drone, the arpeggio wheeling
- * slowly); chapter 5, Newton's, is "Falling" (G–Em–Am–C over a G–D drone, the arpeggio falling). The drone glides
+ * slowly); chapter 5, Newton's, is "Falling" (G–Em–Am–C over a G–D drone, the arpeggio falling); chapter 6, in the
+ * abstract realm, is "Rising" (F–Am–Dm–G over an F–C drone, the arpeggio climbing like a stair). The drone glides
  * into each new key during the flight.
  */
 export const ARRANGEMENT: Record<string, Layers> = {
@@ -461,16 +463,124 @@ export const ARRANGEMENT: Record<string, Layers> = {
     plucks: 0.2,
     arp: 0.5,
     harmony: 'prog',
-    theme: GRAVITY,
+    theme: RISING,
+    arpOctave: -1,
   },
-  'calculus:soon': {
+  'calculus:title': {
+    drone: 0.67,
+    pad: 0.8,
+    cutoff: 700,
+    plucks: 0.12,
+    arp: 0,
+    harmony: 'prog',
+    theme: RISING,
+  },
+  'calculus:speed': {
+    drone: 0.62,
+    pad: 0.7,
+    cutoff: 1000,
+    plucks: 0.1,
+    arp: 0.2,
+    harmony: 'prog',
+    theme: RISING,
+    arpOctave: -1,
+  },
+  // The columns sing as they split, so the arpeggio stays light.
+  'calculus:columns': {
+    drone: 0.62,
+    pad: 0.7,
+    cutoff: 1400,
+    plucks: 0.06,
+    arp: 0.2,
+    harmony: 'prog',
+    theme: RISING,
+    arpOctave: -1,
+  },
+  'calculus:stack': {
+    drone: 0.67,
+    pad: 0.8,
+    cutoff: 1800,
+    plucks: 0.08,
+    arp: 0.45,
+    harmony: 'prog',
+    theme: RISING,
+    arpOctave: -1,
+  },
+  'calculus:slope': {
+    drone: 0.62,
+    pad: 0.7,
+    cutoff: 1200,
+    plucks: 0.1,
+    arp: 0.2,
+    harmony: 'prog',
+    theme: RISING,
+    arpOctave: -1,
+  },
+  // A voice sings the curve's height as the probe moves, alone over the pad.
+  'calculus:match': {
+    drone: 0.62,
+    pad: 0.7,
+    cutoff: 1000,
+    plucks: 0,
+    arp: 0,
+    harmony: 'prog',
+    theme: RISING,
+  },
+  'calculus:formula': {
+    drone: 0.75,
+    pad: 1,
+    cutoff: 3000,
+    plucks: 0,
+    arp: 0,
+    harmony: 'resolve',
+    theme: RISING,
+  },
+  'calculus:yourTurn': {
+    drone: 0.38,
+    pad: 0.4,
+    cutoff: 700,
+    plucks: 0.06,
+    arp: 0,
+    harmony: 'prog',
+    theme: RISING,
+  },
+  'calculus:handoff': {
+    drone: 0.67,
+    pad: 0.75,
+    cutoff: 1800,
+    plucks: 0.1,
+    arp: 0.4,
+    harmony: 'prog',
+    theme: RISING,
+    arpOctave: -1,
+  },
+  'calculus:lab': {
+    drone: 0.33,
+    pad: 0.35,
+    cutoff: 800,
+    plucks: 0.06,
+    arp: 0,
+    harmony: 'prog',
+    theme: RISING,
+  },
+  'euler:flight': {
+    drone: 0.75,
+    pad: 0.9,
+    cutoff: 2600,
+    plucks: 0.2,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: RISING,
+    arpOctave: -1,
+  },
+  'euler:soon': {
     drone: 0.42,
     pad: 0.5,
     cutoff: 900,
     plucks: 0.1,
     arp: 0,
     harmony: 'prog',
-    theme: GRAVITY,
+    theme: RISING,
   },
   lab: { drone: 0.45, pad: 0.4, cutoff: 800, plucks: 0.1, arp: 0, harmony: 'prog' },
 };
@@ -617,12 +727,41 @@ const GRAVITY_CHORDS: Chord[] = [
   ],
 ];
 
+// F – Am – Dm – G, over an F–C drone: chapter 6, the abstract realm (G over F, a Lydian brightness).
+const RISING_CHORDS: Chord[] = [
+  [
+    ['F', 2],
+    ['C', 3],
+    ['F', 3],
+    ['A', 3],
+  ],
+  [
+    ['A', 2],
+    ['E', 3],
+    ['A', 3],
+    ['C', 4],
+  ],
+  [
+    ['D', 2],
+    ['A', 2],
+    ['D', 3],
+    ['F', 3],
+  ],
+  [
+    ['G', 2],
+    ['D', 3],
+    ['G', 3],
+    ['B', 3],
+  ],
+];
+
 const THEMES: Record<Theme, { chords: Chord[]; drone: [number, number, number] }> = {
   pythagoras: { chords: PYTHAGORAS_CHORDS, drone: [pyth('C', 2), pyth('G', 2), pyth('C', 3)] },
   circle: { chords: CIRCLE_CHORDS, drone: [pyth('A', 1), pyth('E', 2), pyth('A', 2)] },
   water: { chords: WATER_CHORDS, drone: [pyth('D', 2), pyth('A', 2), pyth('D', 3)] },
   spheres: { chords: SPHERES_CHORDS, drone: [pyth('E', 2), pyth('B', 2), pyth('E', 3)] },
   gravity: { chords: GRAVITY_CHORDS, drone: [pyth('G', 2), pyth('D', 3), pyth('G', 3)] },
+  rising: { chords: RISING_CHORDS, drone: [pyth('F', 2), pyth('C', 3), pyth('F', 3)] },
 };
 
 const PENTATONIC: Array<[Note, number]> = [
@@ -642,6 +781,7 @@ function fallback(key: string | null): Layers {
   if (key?.startsWith('archimedes')) return ARRANGEMENT['archimedes:weigh']!;
   if (key?.startsWith('kepler')) return ARRANGEMENT['kepler:circle']!;
   if (key?.startsWith('newton')) return ARRANGEMENT['newton:cannon']!;
+  if (key?.startsWith('calculus')) return ARRANGEMENT['calculus:speed']!;
   return QUIET;
 }
 
@@ -756,7 +896,7 @@ export class PythagoreanScore {
             ? triangleChord(pyth('C', 5))
             : chords[Math.max(this.chord - 1, 0) % chords.length]!.map(([n, o]) => pyth(n, o + up));
         // Up and down (chapter 1), round and round (chapter 2), rippling (chapter 3), wheeling (chapter 4),
-        // falling (chapter 5).
+        // falling (chapter 5), climbing a stair of octaves (chapter 6).
         const order =
           this.theme === 'circle'
             ? [0, 1, 2, 3]
@@ -766,8 +906,12 @@ export class PythagoreanScore {
                 ? [0, 3, 1, 2, 3, 1]
                 : this.theme === 'gravity'
                   ? [3, 2, 1, 0]
-                  : [0, 1, 2, 3, 2, 1];
-        const f = chord[order[step % order.length]! % chord.length]!;
+                  : this.theme === 'rising'
+                    ? [0, 1, 2, 3, 5, 6, 7]
+                    : [0, 1, 2, 3, 2, 1];
+        const k = order[step % order.length]!;
+        // Past the top of the chord, the stair goes on an octave up.
+        const f = chord[k % chord.length]! * (this.theme === 'rising' ? 2 ** Math.floor(k / 4) : 1);
         this.arpSynth.triggerAttackRelease(f, '16n', time, l.arpFast ? 0.38 : 0.5);
         step++;
       }, '16n').start(0),

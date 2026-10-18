@@ -9,6 +9,7 @@ import { buildCircleArea } from '../chapters/02-circle-area/timeline';
 import { buildArchimedes } from '../chapters/03-archimedes/timeline';
 import { buildKepler } from '../chapters/04-kepler/timeline';
 import { buildNewton } from '../chapters/05-newton/timeline';
+import { buildCalculus } from '../chapters/06-calculus/timeline';
 import { JourneyBuilder, type Journey } from './builder';
 
 /**
@@ -67,10 +68,11 @@ export function buildJourney(): Journey {
   buildArchimedes(j);
   buildKepler(j);
   buildNewton(j);
+  buildCalculus(j);
   buildComingSoon(
     j,
-    'calculus',
-    'Newton and Leibniz each invent calculus: how a curve changes, and the area beneath it. This chapter is in production.',
+    'euler',
+    'Euler turns growth into rotation: e to the power iθ goes round a circle, and at θ = π lands on −1. This chapter is in production.',
   );
   const journey = j.finish();
   journey.master.progress(0);

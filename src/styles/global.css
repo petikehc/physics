@@ -20,6 +20,7 @@
   --sym-t: #8fd3ff;
   --sym-v: #8fd3ff;
   --sym-pull: #e25c56;
+  --sym-f: #b69cff;
 
   --accent: #e2704f;
 
@@ -577,6 +578,10 @@ a {
 
 .captions__body .sym-pull {
   color: var(--sym-pull);
+}
+
+.captions__body .sym-f {
+  color: var(--sym-f);
 }
 
 .bottom-shade {

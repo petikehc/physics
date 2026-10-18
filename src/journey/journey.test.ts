@@ -9,6 +9,8 @@ import { hangState } from '../chapters/03-archimedes/hang';
 import { keplerRig } from '../chapters/04-kepler/rig';
 import { MARS, STORY } from '../chapters/04-kepler/math';
 import { newtonRig, SHOT, STORY_FLIGHTS } from '../chapters/05-newton/rig';
+import { calculusRig } from '../chapters/06-calculus/rig';
+import { STORY_YS } from '../chapters/06-calculus/math';
 
 describe('the journey timeline', () => {
   const journey = buildJourney();
@@ -69,7 +71,17 @@ describe('the journey timeline', () => {
       'newton:yourTurn',
       'newton:handoff',
       'calculus:flight',
-      'calculus:soon',
+      'calculus:title',
+      'calculus:speed',
+      'calculus:columns',
+      'calculus:stack',
+      'calculus:slope',
+      'calculus:match',
+      'calculus:formula',
+      'calculus:yourTurn',
+      'calculus:handoff',
+      'euler:flight',
+      'euler:soon',
     ]);
     for (const b of journey.beats) expect(journey.master.labels[b.key]).toBeCloseTo(b.start, 6);
   });
@@ -116,6 +128,13 @@ describe('the journey timeline', () => {
     expect(len).toBeLessThan(145);
   });
 
+  it('runs chapter 6 for roughly 100–145 seconds', () => {
+    const ch6 = journey.chapters.find((c) => c.slug === 'calculus')!;
+    const len = ch6.end - ch6.start;
+    expect(len).toBeGreaterThan(100);
+    expect(len).toBeLessThan(145);
+  });
+
   it('pauses once per chapter, inside its Your-turn beat', () => {
     const paused = journey.beats.filter((b) => b.pauseAt !== undefined);
     expect(paused.map((b) => b.key)).toEqual([
@@ -124,6 +143,7 @@ describe('the journey timeline', () => {
       'archimedes:yourTurn',
       'kepler:yourTurn',
       'newton:yourTurn',
+      'calculus:yourTurn',
     ]);
     for (const b of paused) {
       expect(b.pauseAt!).toBeGreaterThan(b.start);
@@ -138,7 +158,15 @@ describe('the journey timeline', () => {
     expect(times[times.length - 1]).toBeLessThanOrEqual(journey.duration);
     expect(journey.cues.filter((c) => c.id === 'clack')).toHaveLength(7);
     expect(journey.cues.filter((c) => c.id === 'cut')).toHaveLength(4);
-    expect(journey.cues.filter((c) => c.id === 'double')).toHaveLength(5);
+    const ch2 = journey.chapters.find((c) => c.slug === 'circle-area')!;
+    const ch6 = journey.chapters.find((c) => c.slug === 'calculus')!;
+    const inside = (ch: { start: number; end: number }) => (c: { time: number }) =>
+      c.time >= ch.start && c.time <= ch.end;
+    expect(journey.cues.filter((c) => c.id === 'double').filter(inside(ch2))).toHaveLength(5);
+    // Chapter 6: four columns rise with a note each, then each split climbs a step; eight land on the stair.
+    expect(journey.cues.filter((c) => c.id === 'column')).toHaveLength(4);
+    expect(journey.cues.filter((c) => c.id === 'step')).toHaveLength(8);
+    expect(journey.cues.filter((c) => c.id === 'double').filter(inside(ch6))).toHaveLength(13);
   });
 
   it('finds the beat at a time and the cues crossed between two times', () => {
@@ -312,6 +340,34 @@ describe('the journey timeline', () => {
     master.seek(0, false);
     master.seek(journey.duration - 0.1, false);
     expect(rig.curve).toBe(1);
+    master.seek(t, false);
+    expect(state()).toBe(snap);
+  });
+
+  it('builds the area in chapter 6 deterministically: columns, the stair, then the smooth curve', () => {
+    const { master } = journey;
+    const rig = calculusRig();
+    const beat = (id: string) => journey.beats.find((b) => b.key === `calculus:${id}`)!;
+    const state = () => JSON.stringify(rig, (k, v) => (k === '_gsap' ? undefined : v));
+
+    // The apple's straight line has become the story's curve, split into 512 columns.
+    master.seek(beat('stack').start, false);
+    expect(rig.split).toBe(7);
+    expect([rig.k0, rig.k1, rig.k2, rig.k3, rig.k4, rig.k5]).toEqual(STORY_YS);
+    // Eight columns, all stacked on the area's wall.
+    master.seek(beat('slope').start, false);
+    expect(rig.split).toBe(1);
+    expect(rig.stack).toBe(1);
+    // The stair smoothed into the area curve.
+    const t = beat('match').start;
+    master.seek(t, false);
+    expect(rig.split).toBe(7);
+    expect(rig.areaCurve).toBe(1);
+
+    const snap = state();
+    master.seek(0, false);
+    master.seek(journey.duration - 0.1, false);
+    expect(rig.turn).toBe(1);
     master.seek(t, false);
     expect(state()).toBe(snap);
   });

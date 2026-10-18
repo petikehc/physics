@@ -182,6 +182,43 @@ test("chapter 5: Your turn fires Newton's cannon, and the ball lands, circles or
   expect(errors).toEqual([]);
 });
 
+test('chapter 6: Your turn reshapes the curve, and the area from a to b always equals the climb', async ({
+  page,
+}) => {
+  const errors = collectErrors(page);
+  await page.goto(`/play/calculus${Q}`);
+  await waitForJourney(page);
+  const pauseAt = await page.evaluate(
+    () => window.__journey!.beats.find((b) => b.key === 'calculus:yourTurn')!.pauseAt!,
+  );
+  await seek(page, pauseAt - 0.4);
+  await page.evaluate(() => window.__journey!.play());
+  const panel = page.getByRole('complementary', { name: 'Your turn' });
+  await expect(panel).toBeVisible({ timeout: 30_000 });
+  await expect(panel).toContainText('Area from a to b: 2.37');
+  await expect(panel).toContainText('A(b) − A(a) = 4.36 − 1.99 = 2.37');
+  // In the scene, the area shaded between a and b, and the climb of the area curve between them, agree.
+  await expect(page.getByText('area: 2.37')).toBeVisible();
+  await expect(page.getByText('climb: 2.37')).toBeVisible();
+
+  await panel.getByRole('button', { name: 'Flat' }).click();
+  await expect(panel).toContainText('Area from a to b: 3.00');
+  // Ten steps of b to the right, from 3 to 3.5: a flat curve 1.5 high gains 0.75.
+  const b = panel.getByLabel('b', { exact: true });
+  await b.focus();
+  for (let i = 0; i < 10; i++) await page.keyboard.press('ArrowRight');
+  await expect(b).toHaveValue('3.5');
+  await expect(panel).toContainText('Area from a to b: 3.75');
+  await expect(page.getByText('climb: 3.75')).toBeVisible();
+
+  await panel.getByRole('button', { name: /Continue/ }).click();
+  await expect(panel).toBeHidden();
+  await expect
+    .poll(() => page.evaluate(() => window.__journey!.time()), { timeout: 20_000 })
+    .toBeGreaterThan(pauseAt + 0.2);
+  expect(errors).toEqual([]);
+});
+
 test('jumping ahead loads the chapter the playhead lands in', async ({ page }) => {
   const errors = collectErrors(page);
   // Start at chapter 1, whose neighbours are loaded with it, then jump two chapters on.

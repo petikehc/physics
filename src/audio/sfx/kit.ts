@@ -303,6 +303,14 @@ export class SfxKit {
         return;
       }
       case 'formula':
+        if (params.chapter === 6) {
+          // Columns adding up: a quick stair of notes climbing, then an open F chord with its seventh.
+          PENTA_UP.slice(0, 8).forEach((f, i) => this.bell.triggerAttackRelease(f, 1.2, t + i * 0.08, 0.22));
+          [pyth('F', 3), pyth('C', 4), pyth('A', 4), pyth('E', 5)].forEach((f, i) =>
+            this.bell.triggerAttackRelease(f, 3.5, t + 0.75 + i * 0.1, 0.4),
+          );
+          return;
+        }
         if (params.chapter === 5) {
           // An apple's fall: four notes dropping, each a little sooner than the last, then the open chord.
           [pyth('G', 5), pyth('E', 5), pyth('C', 5), pyth('G', 4)].forEach((f, i) =>
@@ -476,6 +484,22 @@ export class SfxKit {
         const k = params.k ?? 0;
         this.mono(this.click, t, (at) => this.click.triggerAttackRelease(0.012, at, 0.5));
         this.blip.triggerAttackRelease(2400 * Math.pow(0.94, k), 0.03, t, 0.3);
+        return;
+      }
+      case 'column': {
+        // A column rising: a soft note as high as the column is tall.
+        const hz = params.hz ?? 330;
+        this.bell.triggerAttackRelease(hz, 1.4, t, 0.3);
+        this.blip.triggerAttackRelease(hz * 2, 0.05, t, 0.25);
+        return;
+      }
+      case 'step': {
+        // A column landing on the stair: a soft knock, and a note a step higher each time.
+        const i = Math.max(0, Math.min(params.i ?? 0, PENTA_UP.length - 1));
+        this.mono(this.clackBody, t, (at) =>
+          this.clackBody.triggerAttackRelease(pyth('G', 2), 0.06, at, 0.45),
+        );
+        this.bell.triggerAttackRelease(PENTA_UP[i]!, 1, t, 0.26);
         return;
       }
       case 'land':

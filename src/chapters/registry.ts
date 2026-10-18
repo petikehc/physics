@@ -103,11 +103,11 @@ export const CHAPTERS: ChapterMeta[] = [
     formulaTeX: '\\int_a^b f\\,dx = F(b) - F(a)',
     year: '1660s–1680s',
     figure: 'Newton & Leibniz',
-    place: 'Cambridge & Hanover',
+    place: 'Cambridge & Paris',
     kind: 'math',
     accent: '#9b7bf0',
     dustIcon: 'calculus',
-    status: 'soon',
+    status: 'ready',
   },
   {
     slug: 'euler',
