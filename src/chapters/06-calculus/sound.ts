@@ -41,12 +41,12 @@ export function calculusLevels(prev: CalculusSoundSample, cur: CalculusSoundSamp
   const drawing = (Math.abs(cur.curve - prev.curve) + Math.abs(cur.areaCurve - prev.areaCurve)) / step;
   const moving = (Math.abs(cur.grow - prev.grow) + Math.abs(cur.round - prev.round)) / step > 1e-3 ? 1 : 0;
   const hum = cur.vector * moving * 0.75;
-  const voice = Math.max(cur.sing * 0.8, hum);
+  const voice = Math.max(cur.sing * 0.95, hum);
   return {
     chalk: Math.min(1, drawing * 0.9),
     pour: 0,
     voice,
-    voiceHz: hum > cur.sing * 0.8 ? 196 * Math.pow(radiusAt(cur.grow) / GROWTH.from, 0.6) : cur.hz,
+    voiceHz: hum > cur.sing * 0.95 ? 196 * Math.pow(radiusAt(cur.grow) / GROWTH.from, 0.6) : cur.hz,
   };
 }
 
