@@ -97,7 +97,33 @@ test('the Kepler lab reshapes the orbit and shows all six planets', async ({ pag
   expect(errors).toEqual([]);
 });
 
-test('labs that are not built yet say so', async ({ page }) => {
+test('the Newton lab fires the cannon at any speed and angle, and shows the forces', async ({ page }) => {
+  const errors = collectErrors(page);
   await page.goto('/lab/newton?quality=low');
+  const panel = page.getByRole('complementary', { name: 'Newton lab' });
+  await expect(panel).toBeVisible();
+  await expect(panel).toContainText('It lands 9,790 km away');
+  await panel.getByRole('button', { name: 'Ellipse' }).click();
+  await expect(panel).toContainText('An ellipse, up to 7,800 km high');
+
+  const angle = panel.getByLabel('Angle above the horizon');
+  await angle.focus();
+  for (const a of ['1', '2', '3']) {
+    await page.keyboard.press('ArrowRight');
+    await expect(angle).toHaveValue(a);
+  }
+  await expect(panel).toContainText('3°');
+
+  await panel.getByRole('button', { name: 'Show the forces' }).click();
+  await expect(panel.getByRole('button', { name: 'Hide the forces' })).toBeVisible();
+  await expect(page.getByText('straight on')).toBeVisible();
+  await page.waitForTimeout(1500);
+  await expectCanvasRendered(page);
+  await page.screenshot({ path: test.info().outputPath('lab-newton.png') });
+  expect(errors).toEqual([]);
+});
+
+test('labs that are not built yet say so', async ({ page }) => {
+  await page.goto('/lab/calculus?quality=low');
   await expect(page.getByText('This Lab is in production.')).toBeVisible();
 });

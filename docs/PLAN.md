@@ -354,6 +354,30 @@ is corrected at beat labels when it exceeds 50 ms.
   a semitone rub where the circle misses, the pins, chalk for the circle and the pencil, a tick per equal time,
   the Earth's mi–fa–mi before the formula chord, and the six pillars' chord.
 
+**Chapter 5 (built)**
+- A new station: the small planet of Newton's thought experiment (chapter 4's Earth, drawn with seas and land, a
+  thin shell of air and its own sunlight; chapter 4's Sun goes out behind the flight). The apple flies ahead and
+  falls on it: Woolsthorpe, 1666, and does the same pull reach the Moon? Newton's cannon: a mountain rises, 1,600 km
+  tall (far taller than any real one, as in Newton's own figure, so the orbit stands clear of the ground), and three
+  level shots (3, 5 and 6.3 km/s) land 19°, 42° and 88° round. At 7.1 km/s the ball falls all the way round (a chase
+  camera follows it over the edge of the world, rolled so the ground stays below, then pulls out to see the
+  circle). Slow motion on the forces: velocity, the pull to the centre, the straight line it would take, and the
+  gap between that line and its path, its fall. The Moon test, to scale: 60 Earth radii marked off bead by bead,
+  the apple's 4.9 m and the Moon's 1.36 mm in a second, 3,600 = 60 × 60. The inverse square: three shells and the
+  same cone of pull crossing 1, 4 and 9 tiles. The formula F = G m₁m₂/r² (1687). Kepler, explained: a 9 km/s
+  shot swings out on an ellipse with the planet's centre at one focus, Kepler's ellipse laid over it in chapter 4's
+  amber. Handoff: the stars gather into an apple that falls under a strobe, a ghost at every flash (1, 3, 5, 7…);
+  time laid out sideways turns the flashes into a curve, and the dust becomes chapter 6's icon (calculus is a
+  "coming soon" stop for now).
+- Physics: velocity Verlet under GM/r² in Earth units (one orbit in 4,000 steps; energy drifts by under 10⁻⁵), so
+  shots land, circle, swing out or escape (10 km/s from the mountain top) exactly where the maths says.
+- Your turn / Lab: the cannon's speed (1–12 km/s) with presets (falls short, circles, ellipse, escapes); the Lab
+  adds the angle and the forces. The readout says where it lands and when, how high an ellipse reaches and how long
+  it takes, or that it escapes.
+- Score "Falling": G–Em–Am–C over a G–D drone, the arpeggio falling. The ball whistles higher the faster it goes
+  (so an ellipse sounds its equal areas). SFX: the cannon's boom, a distant thud as each ball lands, a strobe tick
+  a step lower each flash, and four falling notes, each a little sooner, before the formula chord.
+
 ---
 
 ## 5. Technical architecture

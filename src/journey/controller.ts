@@ -230,8 +230,8 @@ interface TestHook {
   camera: typeof runtime.camera;
   /** Every chapter's live rig, by slug (read-only use in tests). */
   rigs: typeof runtime.chapters;
-  /** Renders the soundtrack of the first `seconds` offline and returns a base64 WAV. */
-  renderAudio: (seconds?: number) => Promise<string>;
+  /** Renders `seconds` of the soundtrack offline, from `from` (default: the start), and returns a base64 WAV. */
+  renderAudio: (seconds?: number, from?: number) => Promise<string>;
 }
 
 declare global {
@@ -257,26 +257,33 @@ function exposeTestHook(c: JourneyController) {
     beats: j.beats.map((b) => ({ key: b.key, start: b.start, end: b.end, pauseAt: b.pauseAt })),
     camera: runtime.camera,
     rigs: runtime.chapters,
-    renderAudio: async (seconds) => {
+    renderAudio: async (seconds, from = 0) => {
       const { renderPlan, encodeWav, toBase64 } = await import('../audio/offline');
-      const duration = Math.min(seconds ?? j.duration, j.duration);
+      const start = Math.min(Math.max(from, 0), j.duration);
+      const duration = Math.min(seconds ?? j.duration, j.duration - start);
+      const end = start + duration;
       const saved = j.master.time();
       c.pause();
       // Sample the continuous layers by stepping the timeline, exactly as playback would.
       const step = 1 / 30;
       const continuous: Array<[number, number, number, number, number]> = [];
-      j.master.seek(0, false);
+      j.master.seek(start, false);
       const meter = continuousMeter();
       for (let t = step; t <= duration; t += step) {
-        j.master.seek(t, false);
+        j.master.seek(start + t, false);
         const l = meter(step);
         continuous.push([t, l.chalk, l.pour, l.voice ?? 0, l.voiceHz ?? 0]);
       }
       j.master.seek(saved, false);
+      // Everything shifted so the render starts at 0, with the score in the beat that `start` falls in.
       const buffer = await renderPlan({
         duration,
-        beats: j.beats.filter((b) => b.start < duration).map((b) => ({ key: b.key, start: b.start })),
-        cues: j.cues.filter((q) => q.time < duration),
+        beats: j.beats
+          .filter((b) => b.start < end && b.end > start)
+          .map((b) => ({ key: b.key, start: Math.max(0, b.start - start) })),
+        cues: j.cues
+          .filter((q) => q.time >= start && q.time < end)
+          .map((q) => ({ ...q, time: q.time - start })),
         continuous,
       });
       return toBase64(encodeWav(buffer));
