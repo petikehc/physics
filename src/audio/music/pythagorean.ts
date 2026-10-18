@@ -345,7 +345,7 @@ export const ARRANGEMENT: Record<string, Layers> = {
   },
   'kepler:lab': { drone: 0.4, pad: 0.35, cutoff: 800, plucks: 0.06, arp: 0, harmony: 'prog', theme: SPHERES },
   'newton:flight': {
-    drone: 0.9,
+    drone: 0.75,
     pad: 0.9,
     cutoff: 2600,
     plucks: 0.2,
@@ -354,7 +354,7 @@ export const ARRANGEMENT: Record<string, Layers> = {
     theme: GRAVITY,
   },
   'newton:title': {
-    drone: 0.8,
+    drone: 0.67,
     pad: 0.8,
     cutoff: 700,
     plucks: 0.12,
@@ -364,7 +364,7 @@ export const ARRANGEMENT: Record<string, Layers> = {
   },
   // The cannon booms and the ball whistles through the next beats, so the score keeps out of their way.
   'newton:cannon': {
-    drone: 0.75,
+    drone: 0.62,
     pad: 0.65,
     cutoff: 900,
     plucks: 0.08,
@@ -373,7 +373,7 @@ export const ARRANGEMENT: Record<string, Layers> = {
     theme: GRAVITY,
   },
   'newton:orbit': {
-    drone: 0.8,
+    drone: 0.67,
     pad: 0.7,
     cutoff: 1400,
     plucks: 0,
@@ -382,7 +382,7 @@ export const ARRANGEMENT: Record<string, Layers> = {
     theme: GRAVITY,
   },
   'newton:laws': {
-    drone: 0.75,
+    drone: 0.62,
     pad: 0.7,
     cutoff: 1000,
     plucks: 0.1,
@@ -391,7 +391,7 @@ export const ARRANGEMENT: Record<string, Layers> = {
     theme: GRAVITY,
   },
   'newton:moon': {
-    drone: 0.85,
+    drone: 0.7,
     pad: 0.85,
     cutoff: 1800,
     plucks: 0.1,
@@ -401,7 +401,7 @@ export const ARRANGEMENT: Record<string, Layers> = {
     arpOctave: 1,
   },
   'newton:shells': {
-    drone: 0.85,
+    drone: 0.7,
     pad: 0.8,
     cutoff: 2200,
     plucks: 0.12,
@@ -410,7 +410,7 @@ export const ARRANGEMENT: Record<string, Layers> = {
     theme: GRAVITY,
   },
   'newton:formula': {
-    drone: 0.9,
+    drone: 0.75,
     pad: 1,
     cutoff: 3000,
     plucks: 0,
@@ -419,7 +419,7 @@ export const ARRANGEMENT: Record<string, Layers> = {
     theme: GRAVITY,
   },
   'newton:ellipse': {
-    drone: 0.8,
+    drone: 0.67,
     pad: 0.7,
     cutoff: 1600,
     plucks: 0,
@@ -428,7 +428,7 @@ export const ARRANGEMENT: Record<string, Layers> = {
     theme: GRAVITY,
   },
   'newton:yourTurn': {
-    drone: 0.45,
+    drone: 0.38,
     pad: 0.4,
     cutoff: 700,
     plucks: 0.06,
@@ -437,7 +437,7 @@ export const ARRANGEMENT: Record<string, Layers> = {
     theme: GRAVITY,
   },
   'newton:handoff': {
-    drone: 0.8,
+    drone: 0.67,
     pad: 0.75,
     cutoff: 1800,
     plucks: 0.1,
@@ -445,9 +445,17 @@ export const ARRANGEMENT: Record<string, Layers> = {
     harmony: 'prog',
     theme: GRAVITY,
   },
-  'newton:lab': { drone: 0.4, pad: 0.35, cutoff: 800, plucks: 0.06, arp: 0, harmony: 'prog', theme: GRAVITY },
+  'newton:lab': {
+    drone: 0.33,
+    pad: 0.35,
+    cutoff: 800,
+    plucks: 0.06,
+    arp: 0,
+    harmony: 'prog',
+    theme: GRAVITY,
+  },
   'calculus:flight': {
-    drone: 0.9,
+    drone: 0.75,
     pad: 0.9,
     cutoff: 2600,
     plucks: 0.2,
@@ -456,7 +464,7 @@ export const ARRANGEMENT: Record<string, Layers> = {
     theme: GRAVITY,
   },
   'calculus:soon': {
-    drone: 0.5,
+    drone: 0.42,
     pad: 0.5,
     cutoff: 900,
     plucks: 0.1,
@@ -614,7 +622,7 @@ const THEMES: Record<Theme, { chords: Chord[]; drone: [number, number, number] }
   circle: { chords: CIRCLE_CHORDS, drone: [pyth('A', 1), pyth('E', 2), pyth('A', 2)] },
   water: { chords: WATER_CHORDS, drone: [pyth('D', 2), pyth('A', 2), pyth('D', 3)] },
   spheres: { chords: SPHERES_CHORDS, drone: [pyth('E', 2), pyth('B', 2), pyth('E', 3)] },
-  gravity: { chords: GRAVITY_CHORDS, drone: [pyth('G', 1), pyth('D', 2), pyth('G', 2)] },
+  gravity: { chords: GRAVITY_CHORDS, drone: [pyth('G', 2), pyth('D', 3), pyth('G', 3)] },
 };
 
 const PENTATONIC: Array<[Note, number]> = [
