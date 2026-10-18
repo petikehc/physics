@@ -457,8 +457,8 @@ export const ARRANGEMENT: Record<string, Layers> = {
     theme: GRAVITY,
   },
   'calculus:flight': {
-    drone: 0.75,
-    pad: 0.9,
+    drone: 0.85,
+    pad: 1.0,
     cutoff: 2600,
     plucks: 0.2,
     arp: 0.5,
@@ -467,8 +467,8 @@ export const ARRANGEMENT: Record<string, Layers> = {
     arpOctave: -1,
   },
   'calculus:title': {
-    drone: 0.67,
-    pad: 0.8,
+    drone: 0.77,
+    pad: 0.9,
     cutoff: 700,
     plucks: 0.12,
     arp: 0,
@@ -476,8 +476,8 @@ export const ARRANGEMENT: Record<string, Layers> = {
     theme: RISING,
   },
   'calculus:speed': {
-    drone: 0.62,
-    pad: 0.7,
+    drone: 0.72,
+    pad: 0.8,
     cutoff: 1000,
     plucks: 0.1,
     arp: 0.2,
@@ -487,8 +487,8 @@ export const ARRANGEMENT: Record<string, Layers> = {
   },
   // The columns sing as they split, so the arpeggio stays light.
   'calculus:columns': {
-    drone: 0.62,
-    pad: 0.7,
+    drone: 0.72,
+    pad: 0.8,
     cutoff: 1400,
     plucks: 0.06,
     arp: 0.2,
@@ -497,8 +497,8 @@ export const ARRANGEMENT: Record<string, Layers> = {
     arpOctave: -1,
   },
   'calculus:stack': {
-    drone: 0.67,
-    pad: 0.8,
+    drone: 0.77,
+    pad: 0.9,
     cutoff: 1800,
     plucks: 0.08,
     arp: 0.45,
@@ -507,8 +507,8 @@ export const ARRANGEMENT: Record<string, Layers> = {
     arpOctave: -1,
   },
   'calculus:slope': {
-    drone: 0.62,
-    pad: 0.7,
+    drone: 0.72,
+    pad: 0.8,
     cutoff: 1200,
     plucks: 0.1,
     arp: 0.2,
@@ -518,8 +518,8 @@ export const ARRANGEMENT: Record<string, Layers> = {
   },
   // A voice sings the curve's height as the probe moves, alone over the pad.
   'calculus:match': {
-    drone: 0.62,
-    pad: 0.7,
+    drone: 0.72,
+    pad: 0.8,
     cutoff: 1000,
     plucks: 0,
     arp: 0,
@@ -545,8 +545,8 @@ export const ARRANGEMENT: Record<string, Layers> = {
     theme: RISING,
   },
   'calculus:handoff': {
-    drone: 0.67,
-    pad: 0.75,
+    drone: 0.77,
+    pad: 0.85,
     cutoff: 1800,
     plucks: 0.1,
     arp: 0.4,
@@ -564,8 +564,8 @@ export const ARRANGEMENT: Record<string, Layers> = {
     theme: RISING,
   },
   'euler:flight': {
-    drone: 0.75,
-    pad: 0.9,
+    drone: 0.85,
+    pad: 1.0,
     cutoff: 2600,
     plucks: 0.2,
     arp: 0.5,
