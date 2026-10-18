@@ -253,7 +253,7 @@ export class SfxKit {
       case 'lift':
         return this.whoosh(t, 0.45, 1.0);
       case 'grainLand':
-        this.thump.triggerAttackRelease(pyth('C', 2), 0.3, t, 0.5);
+        this.mono(this.thump, t, (at) => this.thump.triggerAttackRelease(pyth('C', 2), 0.3, at, 0.5));
         this.bell.triggerAttackRelease(pyth('E', 6), 1.4, t + 0.02, 0.25);
         this.bell.triggerAttackRelease(pyth('G', 6), 1.4, t + 0.12, 0.18);
         return;
@@ -262,11 +262,13 @@ export class SfxKit {
         return this.blip.triggerAttackRelease(notes[params.pitch ?? 0] ?? notes[0]!, 0.08, t, 0.7);
       }
       case 'tick':
-        this.click.triggerAttackRelease(0.02, t, 0.9);
+        this.mono(this.click, t, (at) => this.click.triggerAttackRelease(0.02, at, 0.9));
         return this.blip.triggerAttackRelease(2200, 0.03, t, 0.35);
       case 'rise':
         this.rumble(t, 1.8, params.gain ?? 1, 180, 900);
-        this.thump.triggerAttackRelease(pyth('G', 1), 0.4, t + 1.6, 0.35 * (params.gain ?? 1));
+        this.mono(this.thump, t + 1.6, (at) =>
+          this.thump.triggerAttackRelease(pyth('G', 1), 0.4, at, 0.35 * (params.gain ?? 1)),
+        );
         [pyth('G', 5), pyth('C', 6), pyth('E', 6)].forEach((f, i) =>
           this.bell.triggerAttackRelease(f, 1.6, t + 1.0 + i * 0.16, 0.12),
         );
@@ -276,7 +278,9 @@ export class SfxKit {
       case 'count':
         for (let i = 0; i < 12; i++) {
           const k = i / 11;
-          this.click.triggerAttackRelease(0.015, t + 1.7 * (1 - Math.pow(1 - k, 1.6)), 0.4);
+          this.mono(this.click, t + 1.7 * (1 - Math.pow(1 - k, 1.6)), (at) =>
+            this.click.triggerAttackRelease(0.015, at, 0.4),
+          );
         }
         return;
       case 'splash':
@@ -289,8 +293,8 @@ export class SfxKit {
       case 'clack': {
         const i = params.i ?? 0;
         const f = [55, 61.7, 49, 58.3, 65.4, 52, 69.3][i % 7]!;
-        this.clackBody.triggerAttackRelease(f * 2, 0.08, t, 0.9);
-        this.clackNoise.triggerAttackRelease(0.05, t, 0.8);
+        this.mono(this.clackBody, t, (at) => this.clackBody.triggerAttackRelease(f * 2, 0.08, at, 0.9));
+        this.mono(this.clackNoise, t, (at) => this.clackNoise.triggerAttackRelease(0.05, at, 0.8));
         return;
       }
       case 'glow': {
@@ -299,6 +303,16 @@ export class SfxKit {
         return;
       }
       case 'formula':
+        if (params.chapter === 5) {
+          // An apple's fall: four notes dropping, each a little sooner than the last, then the open chord.
+          [pyth('G', 5), pyth('E', 5), pyth('C', 5), pyth('G', 4)].forEach((f, i) =>
+            this.bell.triggerAttackRelease(f, 1.2, t + [0, 0.36, 0.6, 0.76][i]!, 0.3),
+          );
+          [pyth('G', 3), pyth('D', 4), pyth('B', 4)].forEach((f, i) =>
+            this.bell.triggerAttackRelease(f, 3.5, t + 1.1 + i * 0.1, 0.42),
+          );
+          return;
+        }
         if (params.chapter === 4) {
           // The Earth's song in Harmonices Mundi, mi–fa–mi, then the open chord.
           [pyth('E', 5), pyth('F', 5), pyth('E', 5)].forEach((f, i) =>
@@ -382,7 +396,9 @@ export class SfxKit {
         for (let i = 0; i < n; i++) {
           const jitter = (((i * 7919) % 13) / 13 - 0.5) * (dur / n) * 0.5;
           const at = t0 + (dur * i) / n + jitter;
-          this.clackNoise.triggerAttackRelease(0.03, Math.max(t0, at), 0.18 + ((i * 31) % 7) / 30);
+          this.mono(this.clackNoise, Math.max(t0, at), (at) =>
+            this.clackNoise.triggerAttackRelease(0.03, at, 0.18 + ((i * 31) % 7) / 30),
+          );
         }
         return;
       }
@@ -400,7 +416,7 @@ export class SfxKit {
       case 'plunk': {
         // Something heavy slipping under the surface: a soft low thump and a burst of bubbles.
         const k = params.small ? 0.6 : 1;
-        this.thump.triggerAttackRelease(pyth('D', 2), 0.25, t, 0.45 * k);
+        this.mono(this.thump, t, (at) => this.thump.triggerAttackRelease(pyth('D', 2), 0.25, at, 0.45 * k));
         this.rumble(t, 0.6, 0.35 * k, 700, 250);
         for (let i = 0; i < 6; i++)
           this.drop(t + 0.06 + i * 0.07 + ((i * 37) % 5) * 0.01, 420 + ((i * 173) % 7) * 90, 0.5);
@@ -434,7 +450,7 @@ export class SfxKit {
         return;
       case 'pin':
         this.metal.triggerAttackRelease([pyth('A', 6), pyth('E', 6)][(params.i ?? 0) % 2]!, 0.5, t, 0.5);
-        this.click.triggerAttackRelease(0.015, t, 0.35);
+        this.mono(this.click, t, (at) => this.click.triggerAttackRelease(0.015, at, 0.35));
         return;
       case 'pillars': {
         // The six planets' pillars rise one by one (Mercury first, each a note lower), then sound together.
@@ -443,15 +459,34 @@ export class SfxKit {
         chord.forEach((f, i) => this.bell.triggerAttackRelease(f, 4, t + 3.3 + i * 0.03, 0.18));
         return;
       }
+      case 'cannon':
+        // Newton's cannon: a deep boom, the crack of the charge, and the roll of it fading away.
+        this.mono(this.thump, t, (at) => this.thump.triggerAttackRelease(pyth('G', 1), 0.6, at, 0.95));
+        this.mono(this.clackNoise, t, (at) => this.clackNoise.triggerAttackRelease(0.08, at, 0.9));
+        this.mono(this.click, t, (at) => this.click.triggerAttackRelease(0.03, at, 0.6));
+        this.rumble(t, 1.1, 0.7, 520, 90);
+        return;
+      case 'thud':
+        // The ball coming down far away: a dull, distant thump.
+        this.mono(this.thump, t, (at) => this.thump.triggerAttackRelease(pyth('D', 2), 0.3, at, 0.35));
+        this.mono(this.clackNoise, t, (at) => this.clackNoise.triggerAttackRelease(0.03, at, 0.25));
+        return;
+      case 'flash': {
+        // A strobe flash: a bright tick, a step lower each flash, as the apple falls.
+        const k = params.k ?? 0;
+        this.mono(this.click, t, (at) => this.click.triggerAttackRelease(0.012, at, 0.5));
+        this.blip.triggerAttackRelease(2400 * Math.pow(0.94, k), 0.03, t, 0.3);
+        return;
+      }
       case 'land':
         // Something small landing softly on a planet: a low thump and a tick.
-        this.thump.triggerAttackRelease(pyth('G', 2), 0.25, t, 0.4);
-        this.click.triggerAttackRelease(0.015, t, 0.3);
+        this.mono(this.thump, t, (at) => this.thump.triggerAttackRelease(pyth('G', 2), 0.25, at, 0.4));
+        this.mono(this.click, t, (at) => this.click.triggerAttackRelease(0.015, at, 0.3));
         return;
       case 'uiHover':
         return this.blip.triggerAttackRelease(1800, 0.02, t, 0.12);
       case 'uiClick':
-        this.click.triggerAttackRelease(0.015, t, 0.4);
+        this.mono(this.click, t, (at) => this.click.triggerAttackRelease(0.015, at, 0.4));
         return this.blip.triggerAttackRelease(880, 0.04, t, 0.3);
       default:
         return;
@@ -459,6 +494,22 @@ export class SfxKit {
   }
 
   /** One water drop or bubble: a sine blip that slides up in pitch. */
+  /** When each one-voice synth last started a note. */
+  private lastStart = new Map<object, number>();
+
+  /**
+   * Plays a note on a one-voice synth. Such a synth can't start a note at or before one it has already started, but
+   * two cues can land at the same instant: the second then starts just after the first, or, if that would be audibly
+   * late, is dropped.
+   */
+  private mono(synth: object, t: number, play: (at: number) => unknown) {
+    const last = this.lastStart.get(synth) ?? -Infinity;
+    const at = t > last ? t : last + 0.003;
+    if (at - t > 0.05) return;
+    this.lastStart.set(synth, at);
+    play(at);
+  }
+
   private drop(t: number, f: number, velocity = 0.6, dur = 0.05, rise = 1.8) {
     const voice = this.drops.find((d) => d.free <= t);
     // Six at once is more than any cue asks for; if they are all busy, this drop is lost in the others.

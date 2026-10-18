@@ -148,6 +148,40 @@ test('chapter 4: Your turn reshapes the orbit, and the fans stay equal', async (
   expect(errors).toEqual([]);
 });
 
+test("chapter 5: Your turn fires Newton's cannon, and the ball lands, circles or escapes", async ({
+  page,
+}) => {
+  const errors = collectErrors(page);
+  await page.goto(`/play/newton${Q}`);
+  await waitForJourney(page);
+  const pauseAt = await page.evaluate(
+    () => window.__journey!.beats.find((b) => b.key === 'newton:yourTurn')!.pauseAt!,
+  );
+  await seek(page, pauseAt - 0.4);
+  await page.evaluate(() => window.__journey!.play());
+  const panel = page.getByRole('complementary', { name: 'Your turn' });
+  await expect(panel).toBeVisible({ timeout: 30_000 });
+  await expect(panel).toContainText('It lands 12,410 km away');
+
+  // The ball is in the air, and keeps flying while the story waits.
+  const fly = () => page.evaluate(() => (window.__journey!.rigs['newton'] as { fly: number }).fly);
+  const before = await fly();
+  await expect.poll(fly, { timeout: 10_000 }).toBeGreaterThan(before);
+
+  await panel.getByRole('button', { name: 'Circles' }).click();
+  await expect(panel).toContainText('A circle, 1,600 km up');
+  await expect(panel).toContainText('Once round every 1 h 58 min');
+  await panel.getByRole('button', { name: 'Escapes' }).click();
+  await expect(panel).toContainText('It escapes');
+
+  await panel.getByRole('button', { name: /Continue/ }).click();
+  await expect(panel).toBeHidden();
+  await expect
+    .poll(() => page.evaluate(() => window.__journey!.time()), { timeout: 20_000 })
+    .toBeGreaterThan(pauseAt + 0.2);
+  expect(errors).toEqual([]);
+});
+
 test('jumping ahead loads the chapter the playhead lands in', async ({ page }) => {
   const errors = collectErrors(page);
   // Start at chapter 1, whose neighbours are loaded with it, then jump two chapters on.

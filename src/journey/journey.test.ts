@@ -8,6 +8,7 @@ import { archimedesRig } from '../chapters/03-archimedes/rig';
 import { hangState } from '../chapters/03-archimedes/hang';
 import { keplerRig } from '../chapters/04-kepler/rig';
 import { MARS, STORY } from '../chapters/04-kepler/math';
+import { newtonRig, SHOT, STORY_FLIGHTS } from '../chapters/05-newton/rig';
 
 describe('the journey timeline', () => {
   const journey = buildJourney();
@@ -57,7 +58,18 @@ describe('the journey timeline', () => {
       'kepler:harmony',
       'kepler:handoff',
       'newton:flight',
-      'newton:soon',
+      'newton:title',
+      'newton:cannon',
+      'newton:orbit',
+      'newton:laws',
+      'newton:moon',
+      'newton:shells',
+      'newton:formula',
+      'newton:ellipse',
+      'newton:yourTurn',
+      'newton:handoff',
+      'calculus:flight',
+      'calculus:soon',
     ]);
     for (const b of journey.beats) expect(journey.master.labels[b.key]).toBeCloseTo(b.start, 6);
   });
@@ -97,6 +109,13 @@ describe('the journey timeline', () => {
     expect(len).toBeLessThan(120);
   });
 
+  it('runs chapter 5 for roughly 100–145 seconds', () => {
+    const ch5 = journey.chapters.find((c) => c.slug === 'newton')!;
+    const len = ch5.end - ch5.start;
+    expect(len).toBeGreaterThan(100);
+    expect(len).toBeLessThan(145);
+  });
+
   it('pauses once per chapter, inside its Your-turn beat', () => {
     const paused = journey.beats.filter((b) => b.pauseAt !== undefined);
     expect(paused.map((b) => b.key)).toEqual([
@@ -104,6 +123,7 @@ describe('the journey timeline', () => {
       'circle-area:yourTurn',
       'archimedes:yourTurn',
       'kepler:yourTurn',
+      'newton:yourTurn',
     ]);
     for (const b of paused) {
       expect(b.pauseAt!).toBeGreaterThan(b.start);
@@ -259,6 +279,39 @@ describe('the journey timeline', () => {
     master.seek(0, false);
     expect(world.space).toBe(0);
     master.seek(journey.duration - 0.1, false);
+    master.seek(t, false);
+    expect(state()).toBe(snap);
+  });
+
+  it("fires Newton's shots in order, lands each where it should, and seeks back to the same state", () => {
+    const { master } = journey;
+    const rig = newtonRig();
+    const beat = (id: string) => journey.beats.find((b) => b.key === `newton:${id}`)!;
+    const state = () => JSON.stringify(rig, (k, v) => (k === '_gsap' ? undefined : v));
+
+    // By the end of the cannon beat the third shot has landed; the first two are left as faint paths.
+    master.seek(beat('orbit').start - 0.05, false);
+    expect(rig.shot).toBe(2);
+    expect(rig.fly).toBeCloseTo(STORY_FLIGHTS[2]!.duration, 5);
+    expect(rig.ghosts).toBe(1);
+    expect(rig.mountain).toBe(1);
+
+    // The orbit goes round twice and a twelfth before the slow look at the forces.
+    master.seek(beat('laws').start, false);
+    expect(rig.shot).toBe(SHOT.orbit);
+    expect(rig.fly / STORY_FLIGHTS[SHOT.orbit]!.period).toBeCloseTo(2 + 1 / 12, 5);
+
+    // The ellipse shot comes back round to the mountain top in its beat.
+    const t = beat('ellipse').end - 0.05;
+    master.seek(t, false);
+    expect(rig.shot).toBe(SHOT.ellipse);
+    expect(rig.fly).toBeCloseTo(STORY_FLIGHTS[SHOT.ellipse]!.period, 4);
+    expect(rig.kepler).toBe(1);
+
+    const snap = state();
+    master.seek(0, false);
+    master.seek(journey.duration - 0.1, false);
+    expect(rig.curve).toBe(1);
     master.seek(t, false);
     expect(state()).toBe(snap);
   });

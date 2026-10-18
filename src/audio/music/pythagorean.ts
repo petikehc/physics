@@ -1,7 +1,7 @@
 import * as Tone from 'tone';
 import { C3, pyth, triangleChord, type Note } from '../tuning';
 
-export type Theme = 'pythagoras' | 'circle' | 'water' | 'spheres';
+export type Theme = 'pythagoras' | 'circle' | 'water' | 'spheres' | 'gravity';
 
 /** How the score sounds during one beat. Values are targets the score glides to. */
 export interface Layers {
@@ -24,13 +24,15 @@ const QUIET: Layers = { drone: 0, pad: 0, cutoff: 500, plucks: 0, arp: 0, harmon
 const CIRCLE: Theme = 'circle';
 const WATER: Theme = 'water';
 const SPHERES: Theme = 'spheres';
+const GRAVITY: Theme = 'gravity';
 
 /**
  * Per-beat arrangement. Chapter 1 is "Pythagorean Drone" (C–Am–F–G over a C–G drone); chapter 2 turns to
  * "Circles" (F–G–Em–Am over an A–E drone, the arpeggio going round its chord rather than up and down, and
  * climbing as the slices multiply); chapter 3, the bath, is "Water" (Dm–F–C–G over a D–A drone, the arpeggio
  * rippling); chapter 4, among the planets, is "Spheres" (Em–Am–C–G over an E–B drone, the arpeggio wheeling
- * slowly). The drone glides into each new key during the flight.
+ * slowly); chapter 5, Newton's, is "Falling" (G–Em–Am–C over a G–D drone, the arpeggio falling). The drone glides
+ * into each new key during the flight.
  */
 export const ARRANGEMENT: Record<string, Layers> = {
   teaser: { drone: 0.55, pad: 0.6, cutoff: 700, plucks: 0.14, arp: 0, harmony: 'prog' },
@@ -343,15 +345,133 @@ export const ARRANGEMENT: Record<string, Layers> = {
   },
   'kepler:lab': { drone: 0.4, pad: 0.35, cutoff: 800, plucks: 0.06, arp: 0, harmony: 'prog', theme: SPHERES },
   'newton:flight': {
-    drone: 0.9,
+    drone: 0.75,
     pad: 0.9,
     cutoff: 2600,
     plucks: 0.2,
     arp: 0.5,
     harmony: 'prog',
-    theme: SPHERES,
+    theme: GRAVITY,
   },
-  'newton:soon': { drone: 0.5, pad: 0.5, cutoff: 900, plucks: 0.1, arp: 0, harmony: 'prog', theme: SPHERES },
+  'newton:title': {
+    drone: 0.67,
+    pad: 0.8,
+    cutoff: 700,
+    plucks: 0.12,
+    arp: 0,
+    harmony: 'prog',
+    theme: GRAVITY,
+  },
+  // The cannon booms and the ball whistles through the next beats, so the score keeps out of their way.
+  'newton:cannon': {
+    drone: 0.62,
+    pad: 0.65,
+    cutoff: 900,
+    plucks: 0.08,
+    arp: 0,
+    harmony: 'prog',
+    theme: GRAVITY,
+  },
+  'newton:orbit': {
+    drone: 0.67,
+    pad: 0.7,
+    cutoff: 1400,
+    plucks: 0,
+    arp: 0.35,
+    harmony: 'prog',
+    theme: GRAVITY,
+  },
+  'newton:laws': {
+    drone: 0.62,
+    pad: 0.7,
+    cutoff: 1000,
+    plucks: 0.1,
+    arp: 0.2,
+    harmony: 'prog',
+    theme: GRAVITY,
+  },
+  'newton:moon': {
+    drone: 0.7,
+    pad: 0.85,
+    cutoff: 1800,
+    plucks: 0.1,
+    arp: 0.3,
+    harmony: 'prog',
+    theme: GRAVITY,
+    arpOctave: 1,
+  },
+  'newton:shells': {
+    drone: 0.7,
+    pad: 0.8,
+    cutoff: 2200,
+    plucks: 0.12,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: GRAVITY,
+  },
+  'newton:formula': {
+    drone: 0.75,
+    pad: 1,
+    cutoff: 3000,
+    plucks: 0,
+    arp: 0,
+    harmony: 'resolve',
+    theme: GRAVITY,
+  },
+  'newton:ellipse': {
+    drone: 0.67,
+    pad: 0.7,
+    cutoff: 1600,
+    plucks: 0,
+    arp: 0.3,
+    harmony: 'prog',
+    theme: GRAVITY,
+  },
+  'newton:yourTurn': {
+    drone: 0.38,
+    pad: 0.4,
+    cutoff: 700,
+    plucks: 0.06,
+    arp: 0,
+    harmony: 'prog',
+    theme: GRAVITY,
+  },
+  'newton:handoff': {
+    drone: 0.67,
+    pad: 0.75,
+    cutoff: 1800,
+    plucks: 0.1,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: GRAVITY,
+  },
+  'newton:lab': {
+    drone: 0.33,
+    pad: 0.35,
+    cutoff: 800,
+    plucks: 0.06,
+    arp: 0,
+    harmony: 'prog',
+    theme: GRAVITY,
+  },
+  'calculus:flight': {
+    drone: 0.75,
+    pad: 0.9,
+    cutoff: 2600,
+    plucks: 0.2,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: GRAVITY,
+  },
+  'calculus:soon': {
+    drone: 0.42,
+    pad: 0.5,
+    cutoff: 900,
+    plucks: 0.1,
+    arp: 0,
+    harmony: 'prog',
+    theme: GRAVITY,
+  },
   lab: { drone: 0.45, pad: 0.4, cutoff: 800, plucks: 0.1, arp: 0, harmony: 'prog' },
 };
 
@@ -469,11 +589,40 @@ const SPHERES_CHORDS: Chord[] = [
   ],
 ];
 
+// G – Em – Am – C, over a G–D drone: chapter 5, Newton's falling things.
+const GRAVITY_CHORDS: Chord[] = [
+  [
+    ['G', 2],
+    ['D', 3],
+    ['G', 3],
+    ['B', 3],
+  ],
+  [
+    ['E', 2],
+    ['B', 2],
+    ['E', 3],
+    ['G', 3],
+  ],
+  [
+    ['A', 2],
+    ['E', 3],
+    ['A', 3],
+    ['C', 4],
+  ],
+  [
+    ['C', 3],
+    ['G', 3],
+    ['C', 4],
+    ['E', 4],
+  ],
+];
+
 const THEMES: Record<Theme, { chords: Chord[]; drone: [number, number, number] }> = {
   pythagoras: { chords: PYTHAGORAS_CHORDS, drone: [pyth('C', 2), pyth('G', 2), pyth('C', 3)] },
   circle: { chords: CIRCLE_CHORDS, drone: [pyth('A', 1), pyth('E', 2), pyth('A', 2)] },
   water: { chords: WATER_CHORDS, drone: [pyth('D', 2), pyth('A', 2), pyth('D', 3)] },
   spheres: { chords: SPHERES_CHORDS, drone: [pyth('E', 2), pyth('B', 2), pyth('E', 3)] },
+  gravity: { chords: GRAVITY_CHORDS, drone: [pyth('G', 2), pyth('D', 3), pyth('G', 3)] },
 };
 
 const PENTATONIC: Array<[Note, number]> = [
@@ -492,6 +641,7 @@ function fallback(key: string | null): Layers {
   if (key?.startsWith('circle-area')) return ARRANGEMENT['circle-area:slice']!;
   if (key?.startsWith('archimedes')) return ARRANGEMENT['archimedes:weigh']!;
   if (key?.startsWith('kepler')) return ARRANGEMENT['kepler:circle']!;
+  if (key?.startsWith('newton')) return ARRANGEMENT['newton:cannon']!;
   return QUIET;
 }
 
@@ -605,7 +755,8 @@ export class PythagoreanScore {
           l.harmony === 'resolve'
             ? triangleChord(pyth('C', 5))
             : chords[Math.max(this.chord - 1, 0) % chords.length]!.map(([n, o]) => pyth(n, o + up));
-        // Up and down (chapter 1), round and round (chapter 2), rippling (chapter 3), wheeling (chapter 4).
+        // Up and down (chapter 1), round and round (chapter 2), rippling (chapter 3), wheeling (chapter 4),
+        // falling (chapter 5).
         const order =
           this.theme === 'circle'
             ? [0, 1, 2, 3]
@@ -613,7 +764,9 @@ export class PythagoreanScore {
               ? [0, 2, 1, 3]
               : this.theme === 'spheres'
                 ? [0, 3, 1, 2, 3, 1]
-                : [0, 1, 2, 3, 2, 1];
+                : this.theme === 'gravity'
+                  ? [3, 2, 1, 0]
+                  : [0, 1, 2, 3, 2, 1];
         const f = chord[order[step % order.length]! % chord.length]!;
         this.arpSynth.triggerAttackRelease(f, '16n', time, l.arpFast ? 0.38 : 0.5);
         step++;

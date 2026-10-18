@@ -8,6 +8,7 @@ import { buildPythagoras } from '../chapters/01-pythagoras/timeline';
 import { buildCircleArea } from '../chapters/02-circle-area/timeline';
 import { buildArchimedes } from '../chapters/03-archimedes/timeline';
 import { buildKepler } from '../chapters/04-kepler/timeline';
+import { buildNewton } from '../chapters/05-newton/timeline';
 import { JourneyBuilder, type Journey } from './builder';
 
 /**
@@ -65,7 +66,12 @@ export function buildJourney(): Journey {
   buildCircleArea(j);
   buildArchimedes(j);
   buildKepler(j);
-  buildComingSoon(j, 'newton', 'Newton is working out why the apple falls. This chapter is in production.');
+  buildNewton(j);
+  buildComingSoon(
+    j,
+    'calculus',
+    'Newton and Leibniz each invent calculus: how a curve changes, and the area beneath it. This chapter is in production.',
+  );
   const journey = j.finish();
   journey.master.progress(0);
   return journey;

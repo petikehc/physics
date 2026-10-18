@@ -7,6 +7,8 @@ import { archimedesRig, ARCHIMEDES_DEFAULTS } from './03-archimedes/rig';
 import { leaveArchimedesYourTurn } from './03-archimedes/interaction';
 import { keplerRig, KEPLER_DEFAULTS } from './04-kepler/rig';
 import { leaveKeplerYourTurn } from './04-kepler/interaction';
+import { newtonRig, NEWTON_DEFAULTS } from './05-newton/rig';
+import { leaveNewtonYourTurn } from './05-newton/interaction';
 
 /** What the journey controller needs from a chapter, outside React. */
 export interface ChapterHooks {
@@ -37,6 +39,10 @@ export const HOOKS: Record<string, ChapterHooks> = {
   kepler: {
     reset: () => resetRig(keplerRig(), { ...KEPLER_DEFAULTS }),
     leaveYourTurn: leaveKeplerYourTurn,
+  },
+  newton: {
+    reset: () => resetRig(newtonRig(), { ...NEWTON_DEFAULTS }),
+    leaveYourTurn: leaveNewtonYourTurn,
   },
 };
 

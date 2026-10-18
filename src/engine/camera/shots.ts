@@ -14,6 +14,7 @@ export interface Shot {
   roll?: number;
   lift?: number;
   veil?: number;
+  portrait?: number;
   orbit?: { mix?: number; angle?: number; radius?: number; height?: number };
 }
 
@@ -29,6 +30,7 @@ export function shotVars(slug: string, s: Shot): Record<string, number> {
   if (s.roll !== undefined) v.roll = s.roll;
   if (s.lift !== undefined) v.lift = s.lift;
   if (s.veil !== undefined) v.veil = s.veil;
+  if (s.portrait !== undefined) v.portrait = s.portrait;
   if (s.orbit) {
     if (s.orbit.mix !== undefined) v.orbitMix = s.orbit.mix;
     if (s.orbit.angle !== undefined) v.orbitAngle = s.orbit.angle;
