@@ -324,7 +324,7 @@ export function buildCalculus(j: JourneyBuilder) {
           dof: 0,
           shake: 0.25,
           // On a phone the panel fills the lower half: both walls step back to fit above it.
-          portrait: 0.6,
+          portrait: 0.8,
         },
         2.6,
         0,
