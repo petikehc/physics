@@ -266,18 +266,18 @@ export function buildNewton(j: JourneyBuilder) {
       tl.set(rig, { moonAngle: MOON_AT }, 0);
       tl.to(rig, { moon: 1, duration: 1.5 }, 0.8);
       tl.to(rig, { moonAngle: MOON_AT - 0.03, duration: 16, ease: 'none' }, 0.8);
-      // Far out, to see the Moon's orbit to scale.
+      // Far out, to see the Moon's orbit to scale, the Earth held up clear of the caption.
       shot(
         tl,
         SLUG,
         {
-          pos: [MID[0] - 5, MID[1] - 26, 228],
-          target: [MID[0] + 4, MID[1] - 3, 0],
+          pos: [MID[0] - 11, MID[1] - 36, 228],
+          target: [MID[0] - 2, MID[1] - 13, 0],
           focus: MID,
           dof: 0,
           shake: 0.2,
-          // Upright already: a phone needs no stepping back.
-          portrait: 0,
+          // Upright already: a phone steps back only a little, to keep the Earth above its taller caption.
+          portrait: 0.25,
         },
         5.5,
         0.2,

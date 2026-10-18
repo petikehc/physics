@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { ChalkLine, type ChalkLineHandle, type Pts } from '../../../engine/lines/ChalkLine';
+import { beside, clearOf } from '../../../engine/labels/beside';
 import { MathLabel } from '../../../engine/labels/MathLabel';
 import { clamp01 } from '../../../engine/ease';
 import { flightAt, type Flight } from '../math';
@@ -113,6 +114,8 @@ export function Shots() {
   const ellipse = useRef<ChalkLineHandle | null>(null);
   const labels = useRef<Array<THREE.Group | null>>([]);
   const texts = useRef<Array<HTMLDivElement | null>>([]);
+  /** How much farther on "falls" stands, to clear "straight on" (px). */
+  const clear = useRef(0);
   const traces = useMemo(() => STORY_FLIGHTS.map(trace), []);
   const ellipsePts = useMemo(() => keplerEllipse(STORY_FLIGHTS[SHOT.ellipse]!), []);
   const custom = useRef<{ f: Flight; tr: Trace } | null>(null);
@@ -197,14 +200,22 @@ export function Shots() {
     const q = flightAt(f, t + lead);
     const fell: [number, number, number] = flat(q.x, q.y, 0.004);
     gap.current?.set([ahead, fell], 1, s);
-    labels.current[0]?.position.set(ahead[0] + _v.x * 0.25, ahead[1] + _v.y * 0.25, 0.01);
-    labels.current[1]?.position.set(
-      (ahead[0] + fell[0]) / 2 + _v.x * 0.28,
-      (ahead[1] + fell[1]) / 2 + _v.y * 0.28,
-      0.01,
-    );
-    if (texts.current[0]) texts.current[0].style.opacity = String(s);
-    if (texts.current[1]) texts.current[1].style.opacity = String(s);
+    // Each label carries on past the end of its own line: on along the straight line, in towards the centre past
+    // the fall. So they part however short the fall is drawn.
+    labels.current[0]?.position.set(ahead[0], ahead[1], 0.01);
+    labels.current[1]?.position.set(fell[0], fell[1], 0.01);
+    const [on, fall] = texts.current;
+    if (on && fall) {
+      on.style.opacity = String(s);
+      fall.style.opacity = String(s);
+      beside(on, _v.x, _v.y);
+      // Drawn small (the Lab on a phone), the two lines shrink to a point: "falls" then goes on, clear of the other.
+      if (s > 0.001) {
+        const [a, b] = [on.getBoundingClientRect(), fall.getBoundingClientRect()];
+        clear.current = clearOf(a, b, _c.x, _c.y, clear.current);
+      }
+      beside(fall, _c.x, _c.y, 6 + clear.current);
+    }
 
     // Kepler's ellipse over the fast shot, its focus at the planet's centre (and the empty one below it).
     const k = play ? 0 : clamp01(rig.kepler);

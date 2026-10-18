@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { ChalkLine, type ChalkLineHandle, type Pts } from '../../../engine/lines/ChalkLine';
+import { beside } from '../../../engine/labels/beside';
 import { MathLabel } from '../../../engine/labels/MathLabel';
 import { clamp01, easeOutCubic, staggered } from '../../../engine/ease';
 import { moonTest } from '../math';
@@ -85,24 +86,26 @@ export function Moon() {
     }
     beadMat.opacity = sixty * 0.9;
 
-    // Labels: the Moon, its distance, and the two falls side by side.
+    // Labels: the Moon, its distance, and the two falls. Each sits beside a point on the line out to the Moon,
+    // to its left (n) or right, so none can cover another however small the picture is.
     const nx = -Math.sin(a);
     const ny = Math.cos(a);
-    // Beside the line out to the Moon (n points to its left), clear of the Earth and the Moon.
-    const mx = Math.cos(a) * MOON_ORBIT * 0.5;
-    const my = Math.sin(a) * MOON_ORBIT * 0.5;
-    const at: Array<[number, number]> = [
-      [x + nx * 5, y + ny * 5],
-      [mx + nx * 9, my + ny * 9],
-      [-nx * 13 - Math.cos(a) * 3, -ny * 13 - Math.sin(a) * 3],
-      [x + nx * 11, y + ny * 11],
-      [mx - nx * 14 + Math.cos(a) * 12, my - ny * 14 + Math.sin(a) * 12],
+    const falls = clamp01(rig.falls);
+    const along = (k: number): [number, number] => [x * k, y * k];
+    const place: Array<{ at: [number, number]; side: [number, number]; gap: number; show: number }> = [
+      // The Moon's name, outwards, until its fall names it.
+      { at: [x, y], side: [Math.cos(a), Math.sin(a)], gap: 10, show: on * (1 - falls) },
+      { at: along(0.5), side: [nx, ny], gap: 10, show: sixty },
+      { at: [0, 0], side: [-nx, -ny], gap: 10, show: falls },
+      { at: [x, y], side: [nx, ny], gap: 12, show: falls },
+      { at: along(0.3), side: [-nx, -ny], gap: 10, show: clamp01((rig.falls - 0.5) * 2) },
     ];
-    const show = [on, sixty, clamp01(rig.falls), clamp01(rig.falls), clamp01((rig.falls - 0.5) * 2)];
-    at.forEach(([lx, ly], i) => {
-      labels.current[i]?.position.set(lx, ly, 0);
+    place.forEach((l, i) => {
+      labels.current[i]?.position.set(l.at[0], l.at[1], 0);
       const el = texts.current[i];
-      if (el) el.style.opacity = String(show[i]! * on);
+      if (!el) return;
+      el.style.opacity = String(l.show * on);
+      beside(el, l.side[0], l.side[1], l.gap);
     });
   });
 
@@ -124,9 +127,15 @@ export function Moon() {
       cls: 'math-label math-label--chip',
     },
     {
-      text: `${TEST.appleFall.toFixed(1)} m ÷ ${(TEST.moonFall * 1000).toFixed(2)} mm ≈ ${fmt.format(Math.round(TEST.ratio / 100) * 100)} = 60 × 60`,
+      // On two lines, narrow enough to sit beside the line on a phone.
+      text: (
+        <>
+          {`${TEST.appleFall.toFixed(1)} m ÷ ${(TEST.moonFall * 1000).toFixed(2)} mm ≈ ${fmt.format(Math.round(TEST.ratio / 100) * 100)}`}
+          <br />= 60 × 60
+        </>
+      ),
       color: SYM5.path,
-      cls: 'math-label math-label--chip',
+      cls: 'math-label math-label--chip math-label--stack',
     },
   ];
 

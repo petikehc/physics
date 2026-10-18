@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { ChalkLine, type ChalkLineHandle, type Pts } from '../../../engine/lines/ChalkLine';
+import { beside } from '../../../engine/labels/beside';
 import { MathLabel } from '../../../engine/labels/MathLabel';
 import { clamp01, lerp } from '../../../engine/ease';
 import { fallAt } from '../math';
@@ -98,10 +99,12 @@ export function Strobe() {
     axisT.current?.set(timeAxis, 1, turn * 0.7 * keep);
     axisD.current?.set(fallAxis, 1, turn * 0.7 * keep);
     labels.current[0]?.position.set(N * STROBE.spacing + 0.55, AXIS_Y, 0.02);
-    labels.current[1]?.position.set(-0.12, RADIUS - 0.12, 0.02);
+    // Beside the middle of the fall axis, as a graph's axis is labelled: its foot is down by the caption.
+    labels.current[1]?.position.set(-0.12, STROBE_TOP - STROBE.drop / 2, 0.02);
     texts.current.forEach((el) => {
       if (el) el.style.opacity = String(turn * keep);
     });
+    if (texts.current[1]) beside(texts.current[1], -1, 0, 8);
   });
 
   return (

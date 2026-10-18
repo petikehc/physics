@@ -673,6 +673,11 @@ a {
   border: 1px solid rgba(244, 239, 230, 0.12);
 }
 
+.math-label--stack {
+  line-height: 1.15;
+  text-align: center;
+}
+
 .math-label--small {
   font-family: var(--font-mono);
   font-size: 13px;

@@ -2,6 +2,7 @@ import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { ChalkLine, type ChalkLineHandle } from '../../../engine/lines/ChalkLine';
+import { beside } from '../../../engine/labels/beside';
 import { MathLabel } from '../../../engine/labels/MathLabel';
 import { clamp01, easeOutCubic, lerp, staggered } from '../../../engine/ease';
 import { newtonRig, RADIUS, SHELLS, SYM5 } from '../rig';
@@ -144,9 +145,15 @@ export function Shells() {
       if (f) f.visible = t > 0.001;
       // The same pull through every patch: spread over k² tiles, each one gets 1/k² of it.
       fillMats[i]!.opacity = (t * 0.42) / (k * k);
-      labels.current[i]?.position.set(...patchPoint(SHELLS.r0 * k, 0, (-SHELLS.patch * k) / 2 - 0.45));
+      // Under the first and last patches (the last one's a little to the right), over the middle one: seen from far
+      // off (on a phone), the patches stand closer together on the screen than their labels are wide.
+      const over = k === 2 ? 1 : -1;
+      labels.current[i]?.position.set(...patchPoint(SHELLS.r0 * k, 0, (over * SHELLS.patch * k) / 2));
       const el = texts.current[i];
-      if (el) el.style.opacity = String(t);
+      if (el) {
+        el.style.opacity = String(t);
+        beside(el, k === 3 ? 0.5 : 0, over, 8);
+      }
     });
     // The cone of pull: four lines from the centre through the patches' corners.
     const reach = clamp01(rig.tiles * 1.6);
