@@ -355,8 +355,12 @@ is corrected at beat labels when it exceeds 50 ms.
   the Earth's mi–fa–mi before the formula chord, and the six pillars' chord.
 
 **Chapter 5 (built)**
-- A new station: the small planet of Newton's thought experiment (chapter 4's Earth, drawn with seas and land, a
-  thin shell of air and its own sunlight; chapter 4's Sun goes out behind the flight). The apple flies ahead and
+- A new station: the small planet of Newton's thought experiment (chapter 4's Earth, with a thin shell of air and its
+  own sunlight; chapter 4's Sun goes out behind the flight). Its map is the real Earth, painted: Natural Earth's
+  1:110m coastlines (public domain, `land.ts`, about 20 KB compressed) filled in, seas shading shallow near the
+  coasts, land coloured by latitude, Antarctica and Greenland under ice. The globe is turned so Woolsthorpe is on top,
+  under the apple and the mountain, with the cannon firing east. It is painted over a few frames when the station
+  mounts (a flat two-colour map until then), once per visit. The apple flies ahead and
   falls on it: Woolsthorpe, 1666, and does the same pull reach the Moon? Newton's cannon: a mountain rises, 1,600 km
   tall (far taller than any real one, as in Newton's own figure, so the orbit stands clear of the ground), and three
   level shots (3, 5 and 6.3 km/s) land 19°, 42° and 88° round. At 7.1 km/s the ball falls all the way round (a chase

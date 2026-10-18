@@ -3,81 +3,39 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { clamp01, easeOutCubic } from '../../../engine/ease';
 import { mulberry32 } from '../../../engine/dust/shapes';
+import { placeOnTop, WOOLSTHORPE } from '../earth';
 import { LAUNCH_R } from '../math';
 import { newtonRig, RADIUS, SYM5 } from '../rig';
+import { earthTexture } from './earthTexture';
 
 /** The mountain's peak, just under the cannon. */
 const PEAK = RADIUS * LAUNCH_R - 0.016;
 /** How far its base sinks into the ground, so it meets the curved surface all round. */
 const SUNK = 0.14;
 
-/** A smooth 3D value noise (for the planet's land and seas), from a seeded lattice. */
-function valueNoise(seed: number) {
-  const rng = mulberry32(seed);
-  const table = Float32Array.from({ length: 4096 }, () => rng());
-  const at = (x: number, y: number, z: number) =>
-    table[((x * 73856093) ^ (y * 19349663) ^ (z * 83492791)) & 4095]!;
-  const s = (t: number) => t * t * (3 - 2 * t);
-  return (x: number, y: number, z: number) => {
-    const xi = Math.floor(x);
-    const yi = Math.floor(y);
-    const zi = Math.floor(z);
-    const u = s(x - xi);
-    const v = s(y - yi);
-    const w = s(z - zi);
-    const l = (a: number, b: number, t: number) => a + (b - a) * t;
-    return l(
-      l(l(at(xi, yi, zi), at(xi + 1, yi, zi), u), l(at(xi, yi + 1, zi), at(xi + 1, yi + 1, zi), u), v),
-      l(
-        l(at(xi, yi, zi + 1), at(xi + 1, yi, zi + 1), u),
-        l(at(xi, yi + 1, zi + 1), at(xi + 1, yi + 1, zi + 1), u),
-        v,
-      ),
-      w,
-    );
-  };
-}
-
-/** Seas and soft continents, wrapped round the sphere (sampled in 3D, so there is no seam). */
-function planetTexture() {
-  const W = 512;
-  const H = 256;
-  const noise = valueNoise(7);
-  const fbm = (x: number, y: number, z: number) =>
-    noise(x, y, z) * 0.55 + noise(x * 2.1, y * 2.1, z * 2.1) * 0.28 + noise(x * 4.3, y * 4.3, z * 4.3) * 0.17;
-  const deep = new THREE.Color('#2f6cc0');
-  const sea = new THREE.Color(SYM5.planet);
-  const land = new THREE.Color('#6c9467');
-  const high = new THREE.Color('#a39472');
-  const c = new THREE.Color();
-  const data = new Uint8Array(W * H * 4);
-  for (let j = 0; j < H; j++) {
-    const lat = (0.5 - (j + 0.5) / H) * Math.PI;
-    for (let i = 0; i < W; i++) {
-      const lon = ((i + 0.5) / W) * Math.PI * 2;
-      const x = Math.cos(lat) * Math.cos(lon);
-      const y = Math.sin(lat);
-      const z = Math.cos(lat) * Math.sin(lon);
-      const h = fbm(x * 1.6 + 5, y * 1.6 + 5, z * 1.6 + 5);
-      if (h > 0.53) c.lerpColors(land, high, clamp01((h - 0.6) / 0.15));
-      else c.lerpColors(deep, sea, clamp01((h - 0.3) / 0.23));
-      c.convertLinearToSRGB();
-      const k = (j * W + i) * 4;
-      data[k] = Math.round(c.r * 255);
-      data[k + 1] = Math.round(c.g * 255);
-      data[k + 2] = Math.round(c.b * 255);
-      data[k + 3] = 255;
-    }
-  }
-  const tex = new THREE.DataTexture(data, W, H);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.wrapS = THREE.RepeatWrapping;
-  tex.magFilter = THREE.LinearFilter;
-  tex.minFilter = THREE.LinearMipmapLinearFilter;
-  tex.generateMipmaps = true;
-  tex.needsUpdate = true;
-  return tex;
-}
+/** The globe turned so Woolsthorpe, where the apple fell, is on top, and the cannon fires east. */
+const EARTH_TURN = (() => {
+  const m = placeOnTop(WOOLSTHORPE.lat, WOOLSTHORPE.lon);
+  const r = new THREE.Matrix4().set(
+    m[0]!,
+    m[1]!,
+    m[2]!,
+    0,
+    m[3]!,
+    m[4]!,
+    m[5]!,
+    0,
+    m[6]!,
+    m[7]!,
+    m[8]!,
+    0,
+    0,
+    0,
+    0,
+    1,
+  );
+  return new THREE.Quaternion().setFromRotationMatrix(r);
+})();
 
 /** A rocky peak, snow-capped, rising from the top of the planet (base at y = 0, a small flat top at its height). */
 function mountainGeometry() {
@@ -159,7 +117,7 @@ export function Planet() {
   const planetMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        map: planetTexture(),
+        map: earthTexture(),
         roughness: 0.75,
         emissive: new THREE.Color(SYM5.planet).multiplyScalar(0.12),
         // Always transparent, so it can fade in: three compiles an opaque material with its alpha fixed at 1.
@@ -224,7 +182,7 @@ export function Planet() {
       <primitive object={target} />
       <directionalLight ref={key} position={[-7, 6, 9]} color="#fff3e2" intensity={0} target={target} />
       <directionalLight ref={rim} position={[3, 2, -9]} color="#9fc0ff" intensity={0} target={target} />
-      <mesh ref={planet} material={planetMat} visible={false} rotation={[0.35, -1.1, 0]}>
+      <mesh ref={planet} material={planetMat} visible={false} quaternion={EARTH_TURN}>
         <sphereGeometry args={[RADIUS, 96, 64]} />
       </mesh>
       <mesh ref={air} material={airMat} visible={false} renderOrder={3}>
