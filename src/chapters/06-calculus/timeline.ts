@@ -15,8 +15,8 @@ type V3 = [number, number, number];
  * (low on the left) leaves them clear. The pair is about as tall as it is wide, so a phone steps back only a little.
  */
 const BOTH: { pos: V3; target: V3; portrait: number } = {
-  pos: [2.6, 2.65, 17.7],
-  target: [2.6, 2.35, -1.3],
+  pos: [2.2, 2.65, 17.7],
+  target: [2.2, 2.35, -1.3],
   portrait: 0.35,
 };
 
@@ -287,8 +287,8 @@ export function buildCalculus(j: JourneyBuilder) {
         SLUG,
         // Between the formula over the top of the picture and the player at the foot of it.
         {
-          pos: [3.1, 3.95, 15.6],
-          target: [3.1, 3.8, -1.3],
+          pos: [3.4, 5.1, 17.7],
+          target: [3.4, 4.9, -1.3],
           focus: [3, 3, -1],
           dof: 0,
           shake: 0.3,
@@ -347,7 +347,8 @@ export function buildCalculus(j: JourneyBuilder) {
       body: "One curve's slope always equals its height: eˣ, a thing growing in step with itself. Turn that growth sideways, always at right angles, and it stops growing. It goes round instead.",
     },
     ({ tl, cue }) => {
-      tl.to(rig, { bounds: 0, areaCurve: 0, curve: 0, wallA: 0, duration: 1.2 }, 0);
+      tl.to(rig, { bounds: 0, duration: 0.5 }, 0);
+      tl.to(rig, { areaCurve: 0, curve: 0, wallA: 0, duration: 1.2 }, 0);
       shot(
         tl,
         SLUG,

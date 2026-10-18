@@ -105,7 +105,8 @@ export function AreaCurve() {
       [onF(a, 0, 0.05), 0, -1, bd],
       [onF(b, 0, 0.05), 0, -1, bd],
       [onF(mid, heightAt(c, mid) * 0.45, 0.06), 0, 0, bd],
-      [onA(b, (Aa + Ab) / 2, sa, 0.06), 1, 0, bd],
+      // Up and to the right of the climb, clear of the x axis's name in the wall's corner.
+      [onA(b, (Aa + Ab) / 2, sa, 0.06), 1, 1, bd],
     ];
     place.forEach(([p, dx, dy, show], i) => {
       labels.current[i]?.position.set(...p);
