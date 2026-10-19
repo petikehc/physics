@@ -2,9 +2,10 @@ import { chapterRig } from '../../engine/runtime';
 
 /** Everything chapter 7 animates. Timelines tween these numbers; the station derives all geometry from them. */
 export interface EulerRig {
-  /** The complex plane: its disc of grid, its axes and the circle of radius 1, 0..1; the names 1, i, −1, −i, 0..1. */
+  /** The complex plane: its disc of grid, its axes and the circle of radius 1, 0..1; the names 1, i, −1, −i, 0..1; the axes' names, 0..1. */
   plane: number;
   marks: number;
+  names: number;
   /** The quarter turns: an arrow from 1 turned `quarter` quarter turns (a fraction is part way), shown 0..1. */
   quarter: number;
   quarters: number;
@@ -46,6 +47,7 @@ export interface EulerRig {
 export const EULER_DEFAULTS: EulerRig = {
   plane: 0,
   marks: 0,
+  names: 0,
   quarter: 0,
   quarters: 0,
   point: 0,

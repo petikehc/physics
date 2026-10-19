@@ -37,8 +37,9 @@ export function Triangle() {
     up!.current?.set([f, p], on, on);
     long!.current?.set([o, p], on, on * 0.9);
     // The right angle at the foot, while both legs are long enough to show it.
-    const sx = -Math.sign(c) || -1;
-    const sy = Math.sign(s) || 1;
+    // Which way the legs run (a leg too short to see counts as running right, or up).
+    const sx = c < -0.05 ? 1 : -1;
+    const sy = s < -0.05 ? -1 : 1;
     const room = Math.min(Math.abs(c), Math.abs(s)) > 0.15 ? 1 : 0;
     tick!.current?.set(
       [
@@ -63,8 +64,8 @@ export function Triangle() {
     const place: Array<[V3, number, number, number]> = [
       [mid(o, f), 0, -sy, Math.abs(c) > 0.2 ? on : 0],
       [mid(f, p), -sx, 0, Math.abs(s) > 0.2 ? on : 0],
-      [mid(o, p), n[0], n[1], on],
-      [lift(onPlane(0, 1.95)), 0, 0, on * sq],
+      [mid(o, p), n[0], n[1], Math.min(Math.abs(c), Math.abs(s)) > 0.15 ? on : 0],
+      [lift(onPlane(-1.2, 1.3)), 0, 0, on * sq],
     ];
     place.forEach(([at, dx, dy, show], i) => {
       labels.current[i]?.position.set(...at);

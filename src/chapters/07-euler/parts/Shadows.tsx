@@ -37,7 +37,6 @@ export function Shadows() {
   const rig = eulerRig();
   const panes = useRef<Array<THREE.Mesh | null>>([]);
   const grids = useRef<Array<THREE.LineSegments | null>>([]);
-  const lamps = useRef<Array<THREE.Mesh | null>>([]);
   const probe = useRef<THREE.Mesh>(null);
   const dots = useRef<Array<THREE.Mesh | null>>([]);
   const cosLine = useRef<ChalkLineHandle | null>(null);
@@ -77,7 +76,7 @@ export function Shadows() {
     [0, 1].forEach((i) => {
       glass[i]!.opacity = on * 0.06;
       gridMats[i]!.opacity = on * 0.14;
-      for (const m of [panes.current[i], grids.current[i], lamps.current[i]]) if (m) m.visible = on > 0.001;
+      for (const m of [panes.current[i], grids.current[i]]) if (m) m.visible = on > 0.001;
     });
     mids[0]!.current?.set(
       [
@@ -144,12 +143,6 @@ export function Shadows() {
     });
   });
 
-  const lampAt: Array<[number, number, number]> = [
-    // Overhead, and off to the right, halfway along the helix.
-    [C[0], TOP + 1.9, C[2] - K * 2 * Math.PI],
-    [RIGHT + 2.1, C[1], C[2] - K * 2 * Math.PI],
-  ];
-
   return (
     <group>
       <mesh
@@ -180,12 +173,6 @@ export function Shadows() {
           material={gridMats[i]}
           visible={false}
         />
-      ))}
-      {lampAt.map((p, i) => (
-        <mesh key={i} ref={(el) => void (lamps.current[i] = el)} position={p} visible={false}>
-          <sphereGeometry args={[0.13, 16, 12]} />
-          <meshBasicMaterial color={i === 0 ? SYM7.cos : SYM7.sin} toneMapped={false} />
-        </mesh>
       ))}
       {mids.map((h, i) => (
         <ChalkLine key={i} handle={h} color={i === 0 ? SYM7.cos : SYM7.sin} width={1.2} renderOrder={6} />

@@ -50,12 +50,14 @@ export function Series() {
       );
       if (part > 0) tip = to;
       if (k < NAMES.length) {
-        // Named on the outside of the spiral: to the right of the way the arrow points.
+        // Named on the outside of the spiral: to the right of the way the arrow points. An arrow too short to
+        // hold its name (a small θ) goes without.
         const g = labels.current[k];
         g?.position.set((from[0] + to[0]) / 2, (from[1] + to[1]) / 2, (from[2] + to[2]) / 2);
         const el = texts.current[k];
         if (el) {
-          el.style.opacity = String(on * clamp01((part - 0.5) * 3));
+          const room = clamp01((Math.hypot(t[0], t[1]) * R - 0.5) / 0.3);
+          el.style.opacity = String(on * room * clamp01((part - 0.5) * 3));
           beside(el, t[1], -t[0], 6);
         }
       }

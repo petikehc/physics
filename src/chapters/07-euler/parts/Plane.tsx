@@ -82,12 +82,18 @@ export function Plane() {
 
   useFrame(() => {
     const on = clamp01(rig.plane);
-    const marks = clamp01(rig.marks);
-    grid.uniforms.uOn!.value = on;
+    // Once the helix draws out along time, the plane steps back: it is only where θ = 0 is.
+    const along = clamp01(rig.along);
+    const flat = 1 - 0.7 * along;
+    // The names go altogether: the helix brings its own.
+    const marks = clamp01(rig.marks) * (1 - along);
+    grid.uniforms.uOn!.value = on * flat;
     if (mesh.current) mesh.current.visible = on > 0.001;
     re.current?.set([onPlane(-AXIS, 0), onPlane(AXIS, 0)], on, 0.75 * on);
     im.current?.set([onPlane(0, -AXIS), onPlane(0, AXIS)], on, 0.75 * on);
-    circle.current?.set(ring, on, 0.85 * on);
+    circle.current?.set(ring, on, 0.85 * on * flat);
+    // Where the point is named (e^{iπ} = −1), the mark under it gives way.
+    const named = clamp01(rig.tag) * clamp01(rig.point);
 
     // The four points a quarter turn apart, and the axes' names at their ends.
     const at: Array<[number, number]> = [
@@ -109,15 +115,19 @@ export function Plane() {
       [onPlane(0, 1), 1, 1],
       [onPlane(-1, 0), -1, -1],
       [onPlane(0, -1), 1, -1],
-      // Inside the ends of the axes.
+      // Inside the end of the real axis, and over the top of the imaginary one.
       [onPlane(AXIS, 0), -1, 1],
-      [onPlane(0, AXIS), 1, -1],
+      [onPlane(0, AXIS), 0, 1],
     ];
     place.forEach(([p, dx, dy], i) => {
       labels.current[i]?.position.set(...p);
       const el = texts.current[i];
       if (!el) return;
-      el.style.opacity = String(i < 4 ? marks : marks * 0.85);
+      const off = Math.abs(
+        Math.atan2(Math.sin(rig.theta - (i * Math.PI) / 2), Math.cos(rig.theta - (i * Math.PI) / 2)),
+      );
+      const near = i < 4 ? named * clamp01(1 - off / 0.35) : 0;
+      el.style.opacity = String(i < 4 ? marks * (1 - near) : clamp01(rig.names) * (1 - along) * 0.85);
       beside(el, dx, dy, 6);
     });
   });

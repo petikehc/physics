@@ -21,8 +21,8 @@ const CONSTANTS: Array<{ text: string; color: string; from: V3 }> = [
   { text: 'e', color: SYM7.e, from: [-9, 3.5, -6] },
   { text: 'i', color: SYM7.sin, from: [8, 6.5, -6] },
   { text: 'π', color: SYM7.pi, from: [-7, 8, -9] },
-  { text: '1', color: SYM7.cos, from: [-6, -2.5, -4] },
-  { text: '0', color: SYM7.point, from: [7, -2, -5] },
+  { text: '1', color: SYM7.cos, from: [9, 3, -5] },
+  { text: '0', color: SYM7.point, from: [1, 10, -6] },
 ];
 const ROW_Y = C[1] + R + 1.15;
 const GAP = 0.8;

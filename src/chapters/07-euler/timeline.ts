@@ -15,9 +15,12 @@ type Frame = { pos: V3; target: V3; portrait: number };
  */
 const FACE: Frame = { pos: [-0.6, 2.75, 10], target: [-0.6, 2.3, 0], portrait: 0.6 };
 /** The helix from the front and to the right, above it: the plane in front, time running back, both walls in view. */
-const HELIX: Frame = { pos: [5.6, 5.4, 4.6], target: [-0.4, 2.1, -2.7], portrait: 0.8 };
-/** Wide enough for the series' arrows at θ = π, which swing out to −3.9 and up to 3.1 before they spiral in. */
-const SERIES: Frame = { pos: [-2.9, 3.6, 15.2], target: [-2.9, 3.4, 0], portrait: 0.5 };
+const HELIX: Frame = { pos: [7, 6, 6.8], target: [-0.3, 1.9, -2.6], portrait: 0.8 };
+/**
+ * Wide enough for the series' arrows at θ = π, which swing out to −3.9 and up to 3.1 before they spiral in, and high
+ * enough that they all stay above the caption.
+ */
+const SERIES: Frame = { pos: [-3, 2.2, 19], target: [-3, 2, 0], portrait: 0.55 };
 
 /** How long each of the series' arrows takes to lay down: slow for the big early ones, quick for the small. */
 const TERM_TIMES = [1, 1, 1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.35, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3];
@@ -72,7 +75,7 @@ export function buildEuler(j: JourneyBuilder) {
       // The camera comes round to face the plane, which draws itself in where the helix's circle was…
       shot(tl, SLUG, { ...FACE, focus: C, dof: 0, shake: 0.35 }, 6, 0.4, 'power2.inOut');
       tl.to(rig, { plane: 1, duration: 2.2, ease: 'power1.inOut' }, 1.2);
-      tl.to(rig, { marks: 1, duration: 0.8 }, 3.4);
+      tl.to(rig, { marks: 1, names: 1, duration: 0.8 }, 3.4);
       cue(1.2, 'rise', { gain: 0.4 });
       // …and the helix scatters into the stars around it.
       tl.set(dust, { from: 'helix', to: 'stars', morph: 0 }, 5);
@@ -124,7 +127,8 @@ export function buildEuler(j: JourneyBuilder) {
       body: 'Push the point at right angles to its arrow, [sin:i times] itself, and it never gets further out: it goes round. At time θ it is at e[sup:iθ]; at θ = π, it reaches −1.',
     },
     ({ tl, cue }) => {
-      tl.to(rig, { quarters: 0, duration: 0.6 }, 0);
+      // The arrow's turns, and the axes' names, step aside for the point and its own name.
+      tl.to(rig, { quarters: 0, names: 0, duration: 0.6 }, 0);
       tl.set(rig, { theta: 0, trail: 1 }, 0);
       tl.to(rig, { point: 1, duration: 0.6 }, 0.4);
       tl.to(rig, { tag: 1, duration: 0.6 }, 0.8);
@@ -167,22 +171,18 @@ export function buildEuler(j: JourneyBuilder) {
       tl.set(rig, { voice: 1 }, 2);
       tl.to(rig, { shadows: 1, duration: 8, ease: 'none' }, 2);
       tl.set(rig, { voice: 0 }, 10);
-      // Round, lower, until the floor and the wall face us about equally.
+      // Back and up, until the whole floor and the whole wall are in view and clear of the caption, then a slow
+      // drift round as the shadows draw.
+      const focus: V3 = [0, 2, -2.8];
       shot(
         tl,
         SLUG,
-        {
-          pos: [6.4, 3.3, 3.6],
-          target: [-0.6, 1.9, -2.8],
-          focus: [0, 2, -2.8],
-          dof: 0,
-          shake: 0.3,
-          portrait: 0.8,
-        },
-        9,
-        1,
-        'sine.inOut',
+        { pos: [9.4, 7, 7.6], target: [-0.6, 1.2, -2.8], focus, dof: 0, shake: 0.3, portrait: 0.8 },
+        3.4,
+        0,
+        'power2.inOut',
       );
+      shot(tl, SLUG, { pos: [10, 6.6, 6.8], portrait: 0.8 }, 8, 3.6, 'sine.inOut');
     },
   );
 
@@ -302,6 +302,7 @@ export function buildEuler(j: JourneyBuilder) {
           theta: Math.PI,
           plane: 1,
           marks: 1,
+          names: 0,
           point: 1,
           tag: 1,
           angle: 1,
@@ -318,8 +319,8 @@ export function buildEuler(j: JourneyBuilder) {
         // Left of centre, clear of the panel on a wide screen; on a phone the panel fills the lower half, so the plane
         // steps back to fit above it.
         {
-          pos: [1.5, 2.2, 10.4],
-          target: [1.5, 1.9, 0],
+          pos: [0.9, 2.7, 10.4],
+          target: [0.9, 2.4, 0],
           focus: C,
           fov: 40,
           dof: 0,

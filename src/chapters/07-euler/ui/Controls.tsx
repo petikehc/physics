@@ -34,7 +34,8 @@ export function ThetaControls({ c, idPrefix }: Props) {
           value={c.theta}
           aria-valuetext={`θ = ${thetaText(c.theta)}`}
           onChange={(ev) => {
-            setTheta(+ev.target.value, true, true);
+            // No snapping here: a key press moves θ one step, and snapping would pull it straight back.
+            setTheta(+ev.target.value, false, true);
             c.refresh();
           }}
         />
@@ -62,7 +63,7 @@ export function ThetaControls({ c, idPrefix }: Props) {
   );
 }
 
-const fmt = (v: number) => (Math.abs(v) < 0.005 ? '0.00' : v.toFixed(2));
+const fmt = (v: number) => (Math.abs(v) < 0.005 ? '0.00' : v.toFixed(2).replace('-', '−'));
 const complex = (re: number, im: number) => `${fmt(re)} ${im < -0.005 ? '−' : '+'} ${fmt(Math.abs(im))} i`;
 
 /** e^{iθ} as cos θ + i sin θ, and cos² θ + sin² θ = 1. */
@@ -97,8 +98,7 @@ export function SeriesReadout({ c }: { c: EulerSnapshot }) {
   return (
     <span style={{ fontSize: 14, color: 'var(--chalk-dim)' }}>
       {n} {n === 1 ? 'term lands' : 'terms land'} at {complex(s[0], s[1])}:{' '}
-      {off < 0.0005 ? 'on the point' : `${off < 0.01 ? off.toExponential(1) : off.toFixed(2)} from the point`}
-      .
+      {off < 0.0005 ? 'on the point' : `${off.toFixed(off < 0.01 ? 4 : 2)} from the point`}.
     </span>
   );
 }
