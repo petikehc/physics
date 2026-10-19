@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import gsap from 'gsap';
 import { runtime } from '../../../engine/runtime';
 import { shotVars } from '../../../engine/camera/shots';
 import { station } from '../../../engine/world/stations';
 import { audio } from '../../../audio';
+import { useApp } from '../../../state/store';
 import { setTerms, THETA_MAX_TURN, THETA_MIN } from '../interaction';
 import { eulerRig, EULER_DEFAULTS, TERMS } from '../rig';
 import { PointReadout, SeriesReadout, ThetaControls } from './Controls';
@@ -64,9 +65,25 @@ export function enterEulerLab() {
 
 export function LabPanel() {
   const c = useEuler();
+  const set = useApp((s) => s.set);
   // The count asked for (the arrows take a moment to lay down or lift away).
   const [n, setN] = useState(0);
   const [triangle, setTriangle] = useState(true);
+  const move = useRef<gsap.core.Tween | null>(null);
+
+  useEffect(() => () => void move.current?.kill(), []);
+
+  /** Steps the camera back to make room for the series' arrows, or comes in again without them. */
+  const reframe = (terms: number) => {
+    move.current?.kill();
+    set({ cameraMode: 'directed' });
+    move.current = gsap.to(runtime.camera, {
+      ...shotVars(SLUG, frameFor(terms)),
+      duration: 1.2,
+      ease: 'power2.inOut',
+      onComplete: () => set({ cameraMode: 'interactive' }),
+    });
+  };
 
   /** Once round the circle, from −π to π, singing all the way. */
   const goRound = () => {
@@ -116,15 +133,7 @@ export function LabPanel() {
           aria-valuetext={`${n} terms`}
           onChange={(ev) => {
             const to = +ev.target.value;
-            // The camera steps back to make room for the series' arrows, and comes in again without them.
-            if (to > 0 !== n > 0) {
-              gsap.to(runtime.camera, {
-                ...shotVars(SLUG, frameFor(to)),
-                duration: 1.2,
-                ease: 'power2.inOut',
-                overwrite: 'auto',
-              });
-            }
+            if (to > 0 !== n > 0) reframe(to);
             setN(to);
             setTerms(to);
           }}
