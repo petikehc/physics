@@ -256,6 +256,41 @@ test('chapter 7: Your turn sends the point round, reading off cos θ and sin θ'
   expect(errors).toEqual([]);
 });
 
+test('chapter 8: Your turn builds a wave from circles', async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.goto(`/play/fourier${Q}`);
+  await waitForJourney(page);
+  const pauseAt = await page.evaluate(
+    () => window.__journey!.beats.find((b) => b.key === 'fourier:yourTurn')!.pauseAt!,
+  );
+  await seek(page, pauseAt - 0.4);
+  await page.evaluate(() => window.__journey!.play());
+  const panel = page.getByRole('complementary', { name: 'Your turn' });
+  await expect(panel).toBeVisible({ timeout: 30_000 });
+  // A square wave from four circles: odd speeds, each a smaller fraction.
+  await expect(panel).toContainText('Speeds 1, 3, 5, 7');
+  await expect(panel).toContainText('Sizes 1, 1/3, 1/5, 1/7');
+  await expect(panel).toContainText('still 9% over the square');
+
+  // Two more circles, then a sawtooth: every speed, each 1/n.
+  const circles = panel.getByLabel('Circles');
+  await circles.focus();
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('ArrowRight');
+  await expect(panel).toContainText('Speeds 1, 3, 5, 7, 9, …');
+  await panel.getByRole('button', { name: 'Sawtooth' }).click();
+  await expect(panel).toContainText('Speeds 1, 2, 3, 4, 5, …');
+  await panel.getByRole('button', { name: 'Triangle' }).click();
+  await expect(panel).toContainText('Sizes 1, 1/9, 1/25, 1/49, 1/81, …');
+
+  await panel.getByRole('button', { name: /Continue/ }).click();
+  await expect(panel).toBeHidden();
+  await expect
+    .poll(() => page.evaluate(() => window.__journey!.time()), { timeout: 20_000 })
+    .toBeGreaterThan(pauseAt + 0.2);
+  expect(errors).toEqual([]);
+});
+
 test('jumping ahead loads the chapter the playhead lands in', async ({ page }) => {
   const errors = collectErrors(page);
   // Start at chapter 1, whose neighbours are loaded with it, then jump two chapters on.

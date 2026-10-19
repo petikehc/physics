@@ -15,7 +15,7 @@ type Frame = { pos: V3; target: V3; portrait: number };
  */
 const FRONT: Frame = { pos: [0.45, 1.9, 13], target: [0.45, 1.7, 0], portrait: 0.9 };
 /** Side on, from the right: the rings, slid onto one axis and set back by speed, stand edge on as bars. */
-const SIDE: Frame = { pos: [P[0] + 10, P[1] + 1.8, -1.6], target: [P[0], P[1] - 0.2, -1.6], portrait: 0.8 };
+const SIDE: Frame = { pos: [P[0] + 10, P[1] + 1.8, -2], target: [P[0], P[1] - 0.2, -2], portrait: 1 };
 /** The handoff's drawing, face on. */
 const DRAW: Frame = { pos: [Q[0], 2.4, 10], target: [Q[0], 2.2, 0], portrait: 0.8 };
 
@@ -74,8 +74,8 @@ export function buildFourier(j: JourneyBuilder) {
       body: 'Grenoble, 1807. Working out how heat spreads through a solid, Joseph Fourier makes a startling claim: any repeating shape, however jagged, is a sum of plain waves, circles turning at whole-number speeds.',
       minDuration: 10,
     },
-    ({ tl, cue }) => {
-      // The circles scatter into the stars as the title comes up…
+    ({ tl }) => {
+      // The circles scatter into the stars as the title comes up; the stage is left empty behind it.
       shot(tl, SLUG, { ...FRONT, focus: P, dof: 0, shake: 0.35 }, 6, 0.4, 'power2.inOut');
       tl.set(dust, { from: 'epicycles', to: 'stars', morph: 0 }, 0.4);
       tl.to(dust, { morph: 1, duration: 3.4, ease: 'power2.inOut' }, 0.4);
@@ -97,9 +97,6 @@ export function buildFourier(j: JourneyBuilder) {
         },
         0.4,
       );
-      // …and once they have gone, the chart draws itself in quietly behind it.
-      tl.to(rig, { stage: 1, duration: 2.4, ease: 'power1.inOut' }, 3.6);
-      cue(3.6, 'rise', { gain: 0.35 });
     },
   );
 
@@ -108,9 +105,12 @@ export function buildFourier(j: JourneyBuilder) {
     heading: 'One circle',
     body: "Take chapter VII's turning arrow and watch only its height. Traced out over time, it rises and falls in a sine wave. Played as a sound, that is the purest tone there is.",
   };
-  j.beat(SLUG, one, ({ tl }) => {
+  j.beat(SLUG, one, ({ tl, cue }) => {
     tl.set(rig, { count: 1, shape: 0 }, 0);
-    tl.to(rig, { clockwork: 1, duration: 0.8 }, 0.3);
+    // The chart draws itself in, then the circle appears beside it.
+    tl.to(rig, { stage: 1, duration: 1.4, ease: 'power1.inOut' }, 0);
+    cue(0, 'rise', { gain: 0.35 });
+    tl.to(rig, { clockwork: 1, duration: 0.8 }, 0.6);
     tl.set(rig, { since: T + RATE * 1.2 }, 0);
     tl.to(rig, { trace: 1, duration: 0.4 }, 1.2);
     tl.to(rig, { sing: 0.9, duration: 0.8 }, 1.2);
@@ -266,7 +266,7 @@ export function buildFourier(j: JourneyBuilder) {
           x: o.x + Q[0] + 1.4,
           y: o.y + Q[1] + 0.6,
           z: o.z - 0.6,
-          scale: 1.4,
+          scale: 1,
           size: 0.9,
           spin: 0,
           swirl: 0.6,

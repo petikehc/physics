@@ -66,8 +66,9 @@ export function Clockwork() {
         pts[j]![1] = c[1] + r * Math.sin(a);
         pts[j]![2] = c[2];
       }
-      // The big rings carry the eye; the small ones stay quiet.
-      h.current?.set(pts, 1, on * (0.35 + 0.4 * Math.min(1, hm.a * 1.6)));
+      // The big rings carry the eye; the small ones stay quiet. Side on, the bars take over from them.
+      const quiet = 1 - clamp01(rig.bars);
+      h.current?.set(pts, 1, on * quiet * (0.35 + 0.4 * Math.min(1, hm.a * 1.6)));
     });
     // The arms, centre to centre, out to the tip.
     const n = hs.length;
@@ -120,7 +121,8 @@ export function Clockwork() {
       const c = centre(n - 1);
       label.current?.position.set(c[0], c[1] + last.a * U, c[2]);
       el.style.opacity = String(clamp01(rig.newest) * on * (1 - align));
-      beside(el, 0, 1, 8);
+      // Up and to the right of the ring's top: the clockwork sits at the left of the picture.
+      beside(el, 1, 1, 8);
     }
   });
 

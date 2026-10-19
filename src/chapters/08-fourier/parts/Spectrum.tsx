@@ -5,7 +5,7 @@ import { ChalkLine, type ChalkLineHandle } from '../../../engine/lines/ChalkLine
 import { MathLabel } from '../../../engine/labels/MathLabel';
 import { beside } from '../../../engine/labels/beside';
 import { clamp01 } from '../../../engine/ease';
-import { DZ, fourierRig, MAX_COUNT, N_MAX, P, rigHarmonics, SYM8, U } from '../rig';
+import { DZ, fourierRig, MAX_COUNT, P, rigHarmonics, SYM8, U } from '../rig';
 
 /** Only the first few bars are big enough to name their size. */
 const SIZED = 4;
@@ -27,7 +27,10 @@ export function Spectrum() {
 
   useFrame(() => {
     const on = clamp01(rig.bars);
-    const zEnd = P[2] - DZ * (N_MAX + 1) * clamp01(rig.layers);
+    const hs = rigHarmonics(rig);
+    // The axis runs a little past the fastest circle there is.
+    const fastest = hs[hs.length - 1]?.n ?? 1;
+    const zEnd = P[2] - DZ * (fastest + 1.5) * clamp01(rig.layers);
     axis.current?.set(
       [
         [P[0], P[1], P[2] + 0.3],
@@ -36,7 +39,6 @@ export function Spectrum() {
       on,
       on * 0.7,
     );
-    const hs = rigHarmonics(rig);
     const first = hs[0]?.a ?? 1;
     bars.forEach((b, i) => {
       const h = hs[i];

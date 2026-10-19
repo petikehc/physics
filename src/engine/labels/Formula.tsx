@@ -52,6 +52,24 @@ export function Formula({ source, visible, caption, reduced = false }: Props) {
     return () => ctx.revert();
   }, [visible, html, reduced]);
 
+  // A long formula on a narrow screen shrinks until it fits across it.
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const fit = () => {
+      el.style.fontSize = '';
+      const room = window.innerWidth - 32;
+      const width = el.scrollWidth;
+      if (width > room) {
+        const size = parseFloat(getComputedStyle(el).fontSize);
+        el.style.fontSize = `${Math.floor((size * room) / width)}px`;
+      }
+    };
+    fit();
+    window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, [html]);
+
   return (
     <div className="formula" ref={ref} style={{ visibility: 'hidden' }} aria-hidden={!visible}>
       <div dangerouslySetInnerHTML={{ __html: html }} />

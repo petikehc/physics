@@ -12,8 +12,9 @@ import { D, fourierRig, Q, SYM8 } from '../rig';
 const ORIGIN = station('fourier');
 const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), -(ORIGIN.z + Q[2]));
 const hit = new THREE.Vector3();
-/** The pad's size (world units), and the most points a stroke keeps. */
-const PAD = { w: 9, h: 5 };
+/** The pad's size (world units: wider than any screen shows, so a press anywhere in the picture starts a stroke), and the
+ * most points a stroke keeps. */
+const PAD = { w: 40, h: 30 };
 const MAX = 1200;
 
 /**

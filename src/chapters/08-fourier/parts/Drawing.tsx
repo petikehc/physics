@@ -11,8 +11,8 @@ const RING = 48;
 /** Only the biggest circles are drawn as rings (the rest are too small to see); every arm is drawn. */
 const RINGS = 14;
 const PATH = 720;
-/** How fast the Lab's drawing goes round by itself (radians a second). */
-const SPEED = 0.35;
+/** How fast the Lab's drawing goes round by itself (radians a second): a whole shape in about nine seconds. */
+const SPEED = 0.7;
 
 type V3 = [number, number, number];
 const at = (x: number, y: number, z = 0): V3 => [Q[0] + x * D, Q[1] + y * D, Q[2] + z];
