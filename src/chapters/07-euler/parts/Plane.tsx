@@ -91,7 +91,8 @@ export function Plane() {
     if (mesh.current) mesh.current.visible = on > 0.001;
     re.current?.set([onPlane(-AXIS, 0), onPlane(AXIS, 0)], on, 0.75 * on);
     im.current?.set([onPlane(0, -AXIS), onPlane(0, AXIS)], on, 0.75 * on);
-    circle.current?.set(ring, on, 0.85 * on * flat);
+    // The circle in plain chalk, so cyan keeps to the imaginary and to the way the point has come.
+    circle.current?.set(ring, on, 0.6 * on * flat);
     // Where the point is named (e^{iπ} = −1), the mark under it gives way.
     const named = clamp01(rig.tag) * clamp01(rig.point);
 
@@ -148,7 +149,7 @@ export function Plane() {
       </mesh>
       <ChalkLine handle={re} color={SYM7.cos} width={1.4} renderOrder={6} />
       <ChalkLine handle={im} color={SYM7.sin} width={1.4} renderOrder={6} />
-      <ChalkLine handle={circle} color={SYM7.grid} width={2.4} renderOrder={6} />
+      <ChalkLine handle={circle} color={SYM7.point} width={2.2} renderOrder={6} />
       {[SYM7.cos, SYM7.sin, SYM7.cos, SYM7.sin].map((color, i) => (
         <mesh key={i} ref={(el) => void (dots.current[i] = el)} visible={false} renderOrder={7}>
           <sphereGeometry args={[0.045, 14, 10]} />

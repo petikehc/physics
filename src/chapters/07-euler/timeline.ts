@@ -72,14 +72,10 @@ export function buildEuler(j: JourneyBuilder) {
       minDuration: 10,
     },
     ({ tl, cue }) => {
-      // The camera comes round to face the plane, which draws itself in where the helix's circle was…
+      // The camera comes round to face where the plane will stand, as the helix scatters into the stars around it…
       shot(tl, SLUG, { ...FACE, focus: C, dof: 0, shake: 0.35 }, 6, 0.4, 'power2.inOut');
-      tl.to(rig, { plane: 1, duration: 2.2, ease: 'power1.inOut' }, 1.2);
-      tl.to(rig, { marks: 1, names: 1, duration: 0.8 }, 3.4);
-      cue(1.2, 'rise', { gain: 0.4 });
-      // …and the helix scatters into the stars around it.
-      tl.set(dust, { from: 'helix', to: 'stars', morph: 0 }, 5);
-      tl.to(dust, { morph: 1, duration: 4, ease: 'power2.inOut' }, 5);
+      tl.set(dust, { from: 'helix', to: 'stars', morph: 0 }, 0.4);
+      tl.to(dust, { morph: 1, duration: 3.4, ease: 'power2.inOut' }, 0.4);
       tl.to(
         dust,
         {
@@ -94,11 +90,15 @@ export function buildEuler(j: JourneyBuilder) {
           drift: 0.2,
           colorA: '#f4efe6',
           colorB: '#a8ecf5',
-          duration: 4,
+          duration: 3.4,
           ease: 'power2.inOut',
         },
-        5,
+        0.4,
       );
+      // …and only once it has gone does the plane draw itself, quietly, behind the title. Its names wait for the
+      // beat that explains them.
+      tl.to(rig, { plane: 1, duration: 2.4, ease: 'power1.inOut' }, 3.4);
+      cue(3.4, 'rise', { gain: 0.4 });
     },
   );
 
@@ -110,7 +110,8 @@ export function buildEuler(j: JourneyBuilder) {
       body: 'Numbers can be arrows: [cos:real] ones point left and right, [sin:imaginary] ones up and down. Multiplying by [sin:i] turns an arrow a quarter turn: 1 becomes i, and i becomes −1.',
     },
     ({ tl, cue }) => {
-      tl.to(rig, { quarters: 1, duration: 0.6 }, 0.4);
+      tl.to(rig, { marks: 1, names: 1, duration: 0.8 }, 0);
+      tl.to(rig, { quarters: 1, duration: 0.6 }, 0.6);
       for (let k = 0; k < 4; k++) {
         const at = 2 + k * 1.9;
         tl.to(rig, { quarter: k + 1, duration: 1, ease: 'power2.inOut' }, at);
