@@ -11,6 +11,8 @@ import { YourTurnPanel as NewtonYourTurn } from './05-newton/ui/YourTurnPanel';
 import { LabPanel as NewtonLab, enterNewtonLab } from './05-newton/ui/LabPanel';
 import { YourTurnPanel as CalculusYourTurn } from './06-calculus/ui/YourTurnPanel';
 import { LabPanel as CalculusLab, enterCalculusLab } from './06-calculus/ui/LabPanel';
+import { YourTurnPanel as EulerYourTurn } from './07-euler/ui/YourTurnPanel';
+import { LabPanel as EulerLab, enterEulerLab } from './07-euler/ui/LabPanel';
 
 /** The page-level React side of a chapter: its Your-turn panel, its Lab and its formula. */
 export interface ChapterViews {
@@ -75,6 +77,15 @@ export const VIEWS: Record<string, ChapterViews> = {
     formula: {
       tex: '\\int_a^b \\textcolor{#b69cff}{f(x)}\\,dx = \\textcolor{#f2b04a}{F(b) - F(a)}',
       caption: 'The fundamental theorem of calculus',
+    },
+  },
+  euler: {
+    YourTurn: EulerYourTurn,
+    Lab: EulerLab,
+    enterLab: enterEulerLab,
+    formula: {
+      tex: '\\textcolor{#b69cff}{e}^{\\textcolor{#3fd0e8}{i}\\textcolor{#8fd3ff}{\\pi}} + 1 = 0',
+      caption: "Euler's identity",
     },
   },
 };

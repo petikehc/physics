@@ -16,10 +16,19 @@ export function quarterAt(theta: number): number | null {
 }
 
 let landed: number | null = null;
+let hush = 0;
 
-/** Moves the point to θ (dragged, or from the slider), snapping onto 1, i, −1 and −i with a chime as it lands. */
-export function setTheta(theta: number, snap = true) {
+/**
+ * Moves the point to θ (dragged, or from the slider), snapping onto 1, i, −1 and −i with a chime as it lands. `sing`
+ * lets the point's voice sound for a moment (the slider's way of singing; a drag sings for as long as it lasts).
+ */
+export function setTheta(theta: number, snap = true, sing = false) {
   const rig = eulerRig();
+  if (sing) {
+    rig.voice = 1;
+    window.clearTimeout(hush);
+    hush = window.setTimeout(() => (rig.voice = 0), 300);
+  }
   let t = Math.min(Math.max(theta, THETA_MIN), THETA_MAX_TURN);
   if (snap) {
     const q = Math.round(t / QUARTER) * QUARTER;

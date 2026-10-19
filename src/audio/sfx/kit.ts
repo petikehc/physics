@@ -15,6 +15,8 @@ const PENTA_UP = [
   pyth('G', 6),
   pyth('A', 6),
 ];
+/** The four quarter points, 1, i, −1 and −i, as notes: going round climbs D, E, G, A, and back to D. */
+const QUARTERS = [pyth('D', 5), pyth('E', 5), pyth('G', 5), pyth('A', 5)];
 /** Up the pentatonic and back to where it started: a circle. */
 const CIRCLE_RUN = [...PENTA_UP.slice(0, 6), ...PENTA_UP.slice(0, 5).reverse()];
 
@@ -65,6 +67,8 @@ export class SfxKit {
   /** A planet's song: one soft voice whose pitch follows how fast the planet turns. */
   private voiceOsc: Tone.Oscillator;
   private voiceGain: Tone.Gain;
+  /** Where the voice sits, left to right (chapter 7's point pans as it goes round). */
+  private voicePan: Tone.Panner;
 
   private sources: Array<{ start: (t?: number) => unknown; dispose: () => unknown }> = [];
 
@@ -190,7 +194,8 @@ export class SfxKit {
     );
 
     // The planet's voice: a triangle, softened, with a slow shimmer.
-    this.voiceGain = new Tone.Gain(0).connect(this.verb);
+    this.voicePan = new Tone.Panner(0).connect(this.verb);
+    this.voiceGain = new Tone.Gain(0).connect(this.voicePan);
     const voiceFilter = new Tone.Filter({ type: 'lowpass', frequency: 2200, Q: 0.5 }).connect(this.voiceGain);
     const voiceTrem = new Tone.Tremolo({ frequency: 4.5, depth: 0.18 }).connect(voiceFilter).start();
     this.voiceOsc = new Tone.Oscillator({ type: 'triangle', frequency: 130, volume: -12 }).connect(voiceTrem);
@@ -217,11 +222,12 @@ export class SfxKit {
 
   // ---------- Continuous ----------
 
-  continuous(id: 'chalk' | 'pour' | 'voice', level: number, time = Tone.now(), hz = 0) {
+  continuous(id: 'chalk' | 'pour' | 'voice', level: number, time = Tone.now(), hz = 0, pan = 0) {
     const l = Math.min(Math.max(level, 0), 1);
     if (id === 'chalk') this.chalkGain.gain.setTargetAtTime(l * 0.55, time, 0.03);
     else if (id === 'voice') {
       if (hz > 0) this.voiceOsc.frequency.setTargetAtTime(hz, time, 0.03);
+      this.voicePan.pan.setTargetAtTime(Math.min(Math.max(pan, -1), 1), time, 0.05);
       // Fades in as the planet sets off, and out (a little slower) when it stops.
       this.voiceGain.gain.setTargetAtTime(l * 0.2, time, l > 0 ? 0.15 : 0.35);
     } else {
@@ -303,6 +309,17 @@ export class SfxKit {
         return;
       }
       case 'formula':
+        if (params.chapter === 7) {
+          // Half way round the circle (θ = π), one step home (+ 1), then the open D–A fifths (= 0).
+          [pyth('D', 5), pyth('E', 5), pyth('G', 5), pyth('A', 5), pyth('D', 6)].forEach((f, i) =>
+            this.bell.triggerAttackRelease(f, 1.2, t + i * 0.09, 0.24),
+          );
+          this.bell.triggerAttackRelease(pyth('A', 4), 1.4, t + 0.62, 0.3);
+          [pyth('D', 3), pyth('A', 3), pyth('D', 4), pyth('A', 4)].forEach((f, i) =>
+            this.bell.triggerAttackRelease(f, 3.5, t + 0.95 + i * 0.1, 0.4),
+          );
+          return;
+        }
         if (params.chapter === 6) {
           // Columns adding up: a quick stair of notes climbing, then an open F chord with its seventh.
           PENTA_UP.slice(0, 8).forEach((f, i) => this.bell.triggerAttackRelease(f, 1.2, t + i * 0.08, 0.22));
@@ -507,6 +524,33 @@ export class SfxKit {
         this.mono(this.thump, t, (at) => this.thump.triggerAttackRelease(pyth('G', 2), 0.25, at, 0.4));
         this.mono(this.click, t, (at) => this.click.triggerAttackRelease(0.015, at, 0.3));
         return;
+      case 'quarter': {
+        // A quarter turn landing (× i): the quarter point's note, and under −1 the octave below, as a floor.
+        const k = (((params.k ?? 1) % 4) + 4) % 4;
+        this.bell.triggerAttackRelease(QUARTERS[k]!, 1.6, t, 0.3);
+        this.blip.triggerAttackRelease(QUARTERS[k]! * 2, 0.05, t, 0.3);
+        if (k === 2) this.bell.triggerAttackRelease(pyth('G', 3), 2.2, t + 0.04, 0.3);
+        return;
+      }
+      case 'arrive': {
+        // The dragged point snapping onto 1, i, −1 or −i: lighter than the story's turn; at −1, a little chord.
+        const k = (((params.k ?? 0) % 4) + 4) % 4;
+        this.blip.triggerAttackRelease(QUARTERS[k]!, 0.08, t, 0.5);
+        this.bell.triggerAttackRelease(QUARTERS[k]!, 1, t, 0.16);
+        if (k === 2)
+          [pyth('D', 4), pyth('A', 4), pyth('E', 5)].forEach((f, i) =>
+            this.bell.triggerAttackRelease(f, 1.8, t + 0.05 + i * 0.07, 0.22),
+          );
+        return;
+      }
+      case 'term': {
+        // One of the series' arrows laid down: each a step further round the turn's notes, and quieter, as they shrink.
+        const k = Math.max(0, params.k ?? 0);
+        const f = QUARTERS[k % 4]! * 2 ** Math.min(Math.floor(k / 4), 1);
+        this.blip.triggerAttackRelease(f, 0.06, t, 0.12 + 0.4 * Math.pow(0.82, k));
+        if (k < 4) this.bell.triggerAttackRelease(f, 1.2, t, 0.2);
+        return;
+      }
       case 'uiHover':
         return this.blip.triggerAttackRelease(1800, 0.02, t, 0.12);
       case 'uiClick':

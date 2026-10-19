@@ -122,7 +122,7 @@ export const CHAPTERS: ChapterMeta[] = [
     kind: 'math',
     accent: '#3fd0e8',
     dustIcon: 'helix',
-    status: 'soon',
+    status: 'ready',
   },
   {
     slug: 'fourier',
