@@ -7,16 +7,17 @@ The full research, storyboards and architecture are in [`docs/PLAN.md`](docs/PLA
 
 ## Status
 
-| #      | Chapter                             | Status                                                         |
-| ------ | ----------------------------------- | -------------------------------------------------------------- |
-| I      | The Pythagorean Theorem             | **Playable**: journey, Your turn, Lab, score and sound effects |
-| II     | The Area of a Circle                | **Playable**: journey, Your turn, Lab, score and sound effects |
-| III    | Archimedes' Principle               | **Playable**: journey, Your turn, Lab, score and sound effects |
-| IV     | Kepler's Laws                       | **Playable**: journey, Your turn, Lab, score and sound effects |
-| V      | Universal Gravitation               | **Playable**: journey, Your turn, Lab, score and sound effects |
-| VI     | The Fundamental Theorem of Calculus | **Playable**: journey, Your turn, Lab, score and sound effects |
-| VII    | Euler's Identity                    | **Playable**: journey, Your turn, Lab, score and sound effects |
-| VIII–X | Fourier, Doppler, Energy            | In production                                                  |
+| #    | Chapter                             | Status                                                         |
+| ---- | ----------------------------------- | -------------------------------------------------------------- |
+| I    | The Pythagorean Theorem             | **Playable**: journey, Your turn, Lab, score and sound effects |
+| II   | The Area of a Circle                | **Playable**: journey, Your turn, Lab, score and sound effects |
+| III  | Archimedes' Principle               | **Playable**: journey, Your turn, Lab, score and sound effects |
+| IV   | Kepler's Laws                       | **Playable**: journey, Your turn, Lab, score and sound effects |
+| V    | Universal Gravitation               | **Playable**: journey, Your turn, Lab, score and sound effects |
+| VI   | The Fundamental Theorem of Calculus | **Playable**: journey, Your turn, Lab, score and sound effects |
+| VII  | Euler's Identity                    | **Playable**: journey, Your turn, Lab, score and sound effects |
+| VIII | Fourier Series                      | **Playable**: journey, Your turn, Lab, score and sound effects |
+| IX–X | Doppler, Energy                     | In production                                                  |
 
 ## Running it
 
