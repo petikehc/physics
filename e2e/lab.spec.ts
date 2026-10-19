@@ -155,13 +155,14 @@ test('the euler lab sends the point round and lays the series onto it', async ({
   await page.goto('/lab/euler?quality=low');
   const panel = page.getByRole('complementary', { name: 'Euler lab' });
   await expect(panel).toBeVisible();
-  // A sixth of a turn round, and six of the series' terms: close, but not yet on it.
+  // A sixth of a turn round; six of the series' terms come close, but not yet onto it.
   await expect(panel).toContainText('= 0.50 + 0.87 i');
+  const n = panel.getByLabel('Terms of the series');
+  await n.focus();
+  for (let i = 0; i < 6; i++) await page.keyboard.press('ArrowRight');
   await expect(panel).toContainText('6 terms land at 0.50 + 0.87 i: 0.0018 from the point.');
 
   // Four more terms, and the series lands on the point.
-  const n = panel.getByLabel('Terms of the series');
-  await n.focus();
   for (let i = 0; i < 4; i++) await page.keyboard.press('ArrowRight');
   await expect(panel).toContainText('10 terms land at 0.50 + 0.87 i: on the point.');
 

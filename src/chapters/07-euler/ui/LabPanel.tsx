@@ -12,17 +12,14 @@ import { useEuler } from './useEuler';
 
 const SLUG = 'euler';
 type V3 = [number, number, number];
-/**
- * The panel sits on the right, so the Lab frames the circle left of centre, wide enough for the series' arrows at
- * θ = π (swinging out to the left and up) and at θ = −π (to the left and down).
- */
-const HOME: [V3, V3] = [
-  [0.5, 2.6, 15],
-  [0.5, 2.6, 0],
-];
-const START_TERMS = 6;
+type Frame = { pos: V3; target: V3; portrait: number };
+/** The plane alone, close, left of centre: the panel sits on the right (on a phone, below it). */
+const CLOSE: Frame = { pos: [1.2, 2.6, 8.5], target: [1.2, 2.6, 0], portrait: 0.8 };
+/** With the series: wide enough for its arrows at θ = π (out to the left and up) and at θ = −π (left and down). */
+const WIDE: Frame = { pos: [0.5, 2.6, 15], target: [0.5, 2.6, 0], portrait: 0.5 };
+const frameFor = (terms: number) => (terms > 0 ? WIDE : CLOSE);
 
-/** Lab-mode display: the plane, the point a sixth of a turn round with its triangle, and the series' first terms. */
+/** Lab-mode display: the plane, and the point a sixth of a turn round with its triangle. */
 export function enterEulerLab() {
   runtime.world.space = 1;
   Object.assign(eulerRig(), {
@@ -34,13 +31,11 @@ export function enterEulerLab() {
     theta: Math.PI / 3,
     angle: 1,
     triangle: 1,
-    series: 1,
-    terms: START_TERMS,
     interactive: 1,
     lab: 1,
   });
   Object.assign(runtime.camera, {
-    ...shotVars(SLUG, { pos: HOME[0], target: HOME[1] }),
+    ...shotVars(SLUG, CLOSE),
     fov: 40,
     shake: 0,
     dof: 0,
@@ -70,7 +65,7 @@ export function enterEulerLab() {
 export function LabPanel() {
   const c = useEuler();
   // The count asked for (the arrows take a moment to lay down or lift away).
-  const [n, setN] = useState(START_TERMS);
+  const [n, setN] = useState(0);
   const [triangle, setTriangle] = useState(true);
 
   /** Once round the circle, from −π to π, singing all the way. */
@@ -120,8 +115,18 @@ export function LabPanel() {
           value={n}
           aria-valuetext={`${n} terms`}
           onChange={(ev) => {
-            setN(+ev.target.value);
-            setTerms(+ev.target.value);
+            const to = +ev.target.value;
+            // The camera steps back to make room for the series' arrows, and comes in again without them.
+            if (to > 0 !== n > 0) {
+              gsap.to(runtime.camera, {
+                ...shotVars(SLUG, frameFor(to)),
+                duration: 1.2,
+                ease: 'power2.inOut',
+                overwrite: 'auto',
+              });
+            }
+            setN(to);
+            setTerms(to);
           }}
         />
         <SeriesReadout c={{ ...c, terms: n }} />
