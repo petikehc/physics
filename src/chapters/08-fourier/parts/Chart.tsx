@@ -59,8 +59,10 @@ export function Chart() {
     });
 
     const hs = rigHarmonics(rig);
+    // The wave comes out of the clockwork from the moment it started being traced, and drifts away to the right.
+    const span = Math.min(SPAN, Math.max(rig.t - rig.since, 0));
     for (let i = 0; i <= N; i++) {
-      const back = (i / N) * SPAN;
+      const back = (i / N) * span;
       const t = rig.t - back;
       const x = CHART.x0 + back * CHART.perRadian;
       wavePts[i]![0] = x;
@@ -70,7 +72,7 @@ export function Chart() {
       ghostPts[i]![1] = P[1] + target(rig.shape, t) * U;
       ghostPts[i]![2] = -0.005;
     }
-    wave.current?.set(wavePts, 1, clamp01(rig.trace) * on);
+    wave.current?.set(wavePts, 1, span > 1e-3 ? clamp01(rig.trace) * on : 0);
     ghost.current?.set(ghostPts, 1, clamp01(rig.ghost) * on * 0.35);
 
     labelPlace(label.current, text.current, [x1 + 0.3, P[1], 0], on);

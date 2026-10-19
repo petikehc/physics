@@ -13,6 +13,8 @@ import { YourTurnPanel as CalculusYourTurn } from './06-calculus/ui/YourTurnPane
 import { LabPanel as CalculusLab, enterCalculusLab } from './06-calculus/ui/LabPanel';
 import { YourTurnPanel as EulerYourTurn } from './07-euler/ui/YourTurnPanel';
 import { LabPanel as EulerLab, enterEulerLab } from './07-euler/ui/LabPanel';
+import { YourTurnPanel as FourierYourTurn } from './08-fourier/ui/YourTurnPanel';
+import { LabPanel as FourierLab, enterFourierLab } from './08-fourier/ui/LabPanel';
 
 /** The page-level React side of a chapter: its Your-turn panel, its Lab and its formula. */
 export interface ChapterViews {
@@ -86,6 +88,15 @@ export const VIEWS: Record<string, ChapterViews> = {
     formula: {
       tex: '\\textcolor{#b69cff}{e}^{\\textcolor{#3fd0e8}{i}\\textcolor{#8fd3ff}{\\pi}} + 1 = 0',
       caption: "Euler's identity",
+    },
+  },
+  fourier: {
+    YourTurn: FourierYourTurn,
+    Lab: FourierLab,
+    enterLab: enterFourierLab,
+    formula: {
+      tex: 'f(t) = \\sum_{n} \\textcolor{#e05bb4}{a_n} \\sin(\\textcolor{#e05bb4}{n}\\,\\omega t + \\varphi_n)',
+      caption: 'A Fourier series',
     },
   },
 };

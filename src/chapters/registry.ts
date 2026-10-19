@@ -137,7 +137,7 @@ export const CHAPTERS: ChapterMeta[] = [
     kind: 'math',
     accent: '#e05bb4',
     dustIcon: 'epicycles',
-    status: 'soon',
+    status: 'ready',
   },
   {
     slug: 'doppler',

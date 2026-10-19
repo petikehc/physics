@@ -1,5 +1,6 @@
 import * as Tone from 'tone';
 import { pyth, sideToFrequency, triangleChord } from '../tuning';
+import { HARMONICS } from '../index';
 import type { Triangle } from '../../chapters/01-pythagoras/math';
 
 /** C pentatonic upwards from C5: the pitches pieces and rings land on. */
@@ -69,6 +70,11 @@ export class SfxKit {
   private voiceGain: Tone.Gain;
   /** Where the voice sits, left to right (chapter 7's point pans as it goes round). */
   private voicePan: Tone.Panner;
+  /** Chapter 8's handoff: an ambulance's two-tone siren. */
+  private siren: Tone.Synth;
+  /** Chapter 8's additive voice: a sine for each harmonic over one fundamental, each with its own loudness. */
+  private harmOsc: Tone.Oscillator[];
+  private harmGain: Tone.Gain[];
 
   private sources: Array<{ start: (t?: number) => unknown; dispose: () => unknown }> = [];
 
@@ -200,6 +206,19 @@ export class SfxKit {
     const voiceTrem = new Tone.Tremolo({ frequency: 4.5, depth: 0.18 }).connect(voiceFilter).start();
     this.voiceOsc = new Tone.Oscillator({ type: 'triangle', frequency: 130, volume: -12 }).connect(voiceTrem);
 
+    this.siren = new Tone.Synth({
+      oscillator: { type: 'triangle' },
+      envelope: { attack: 0.02, decay: 0.1, sustain: 0.9, release: 0.4 },
+      volume: -24,
+    }).connect(this.verb);
+
+    // Additive synthesis: sixteen sines at whole-number multiples of one fundamental; their mix is the timbre.
+    const harmOut = new Tone.Filter({ type: 'lowpass', frequency: 5200, Q: 0.4 }).connect(this.verb);
+    this.harmGain = Array.from({ length: HARMONICS }, () => new Tone.Gain(0).connect(harmOut));
+    this.harmOsc = this.harmGain.map((g, i) =>
+      new Tone.Oscillator({ type: 'sine', frequency: 147 * (i + 1), volume: -8 }).connect(g),
+    );
+
     this.sources = [
       this.voiceOsc,
       scrapeNoise,
@@ -211,6 +230,7 @@ export class SfxKit {
       chalkLfo2,
       pourLfo,
       ...this.sideOsc,
+      ...this.harmOsc,
     ];
   }
 
@@ -234,6 +254,15 @@ export class SfxKit {
       this.pourGain.gain.setTargetAtTime(l * 0.9, time, 0.08);
       this.bubbleLevel = l;
     }
+  }
+
+  /** Chapter 8's additive voice: each harmonic's loudness (0..1, fundamental first) over a fundamental of `hz`. */
+  harmonics(amps: readonly number[], time = Tone.now(), hz = 0) {
+    this.harmGain.forEach((g, i) => {
+      const a = Math.min(Math.max(amps[i] ?? 0, 0), 1);
+      if (hz > 0) this.harmOsc[i]!.frequency.setTargetAtTime(hz * (i + 1), time, 0.03);
+      g.gain.setTargetAtTime(a * 0.3, time, a > 0 ? 0.06 : 0.25);
+    });
   }
 
   /** Three soft tones whose pitches follow the side lengths while the viewer drags. */
@@ -309,6 +338,17 @@ export class SfxKit {
         return;
       }
       case 'formula':
+        if (params.chapter === 8) {
+          // The harmonic series climbed (1, 2, 3, 4, 5, 6 times one note), then the first four together.
+          const f = pyth('D', 3);
+          [1, 2, 3, 4, 5, 6].forEach((n, i) =>
+            this.bell.triggerAttackRelease(f * n, 1.4, t + i * 0.11, 0.24),
+          );
+          [1, 2, 3, 4].forEach((n, i) =>
+            this.bell.triggerAttackRelease(f * n, 3.5, t + 0.85 + i * 0.06, 0.38),
+          );
+          return;
+        }
         if (params.chapter === 7) {
           // Half way round the circle (θ = π), one step home (+ 1), then the open D–A fifths (= 0).
           [pyth('D', 5), pyth('E', 5), pyth('G', 5), pyth('A', 5), pyth('D', 6)].forEach((f, i) =>
@@ -551,6 +591,35 @@ export class SfxKit {
         if (k < 4) this.bell.triggerAttackRelease(f, 1.2, t, 0.2);
         return;
       }
+      case 'harmonic': {
+        // A circle arriving: its own harmonic, rung softly, over the clockwork's note.
+        const hz = (params.hz ?? pyth('D', 3)) * (params.n ?? 1);
+        this.bell.triggerAttackRelease(hz, 1.2, t, 0.2);
+        this.blip.triggerAttackRelease(hz * 2, 0.04, t, 0.18);
+        return;
+      }
+      case 'spectrum': {
+        // The bars standing up, one per speed: the square wave's harmonics, 1, 3, 5… played in turn.
+        const hz = params.hz ?? pyth('D', 3);
+        [1, 3, 5, 7, 9, 11, 13, 15].forEach((n, i) =>
+          this.bell.triggerAttackRelease(hz * n, 1.2, t + 0.1 + i * 0.16, 0.22 / Math.sqrt(1 + i * 0.4)),
+        );
+        return;
+      }
+      case 'siren': {
+        // Hi–lo, three times, then the pitch sinks as it goes by: the next chapter's question.
+        const hi = 960;
+        const lo = 770;
+        const f = this.siren.frequency;
+        f.cancelScheduledValues(t);
+        this.siren.triggerAttack(hi, t, 0.55);
+        for (let i = 0; i < 6; i++) f.setValueAtTime(i % 2 === 0 ? hi : lo, t + i * 0.45);
+        const drop = t + 2.7;
+        f.setValueAtTime(hi * 0.97, drop);
+        for (let i = 0; i < 4; i++) f.setValueAtTime((i % 2 === 0 ? lo : hi) * 0.86, drop + 0.2 + i * 0.45);
+        this.siren.triggerRelease(drop + 2.1);
+        return;
+      }
       case 'uiHover':
         return this.blip.triggerAttackRelease(1800, 0.02, t, 0.12);
       case 'uiClick':
@@ -620,6 +689,7 @@ export class SfxKit {
   dispose() {
     for (const d of this.drops) d.synth.dispose();
     for (const s of this.sources) s.dispose();
+    this.siren.dispose();
     this.out.dispose();
   }
 }

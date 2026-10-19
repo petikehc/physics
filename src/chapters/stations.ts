@@ -9,4 +9,5 @@ export const STATION_VIEWS: Record<string, LazyExoticComponent<ComponentType>> =
   newton: lazy(() => import('./05-newton/Station')),
   calculus: lazy(() => import('./06-calculus/Station')),
   euler: lazy(() => import('./07-euler/Station')),
+  fourier: lazy(() => import('./08-fourier/Station')),
 };

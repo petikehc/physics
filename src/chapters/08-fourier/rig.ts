@@ -13,8 +13,9 @@ export interface FourierRig {
   /** The rings and their arrows, 0..1; the newest ring's name, 0..1. */
   clockwork: number;
   newest: number;
-  /** The wave the tip traces on the chart, 0..1; the exact wave, faint, behind it, 0..1. */
+  /** The wave the tip traces on the chart, 0..1, drawn from time `since` on; the exact wave, faint, behind it, 0..1. */
   trace: number;
+  since: number;
   ghost: number;
   /** The side view: the rings drawn apart in depth, one layer per speed, 0..1; slid onto one axis, 0..1; bars, 0..1. */
   layers: number;
@@ -39,6 +40,7 @@ export const FOURIER_DEFAULTS: FourierRig = {
   clockwork: 0,
   newest: 0,
   trace: 0,
+  since: -1e9,
   ghost: 0,
   layers: 0,
   align: 0,

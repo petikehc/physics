@@ -1,4 +1,4 @@
-import { audio } from '../audio';
+import { audio, HARMONICS } from '../audio';
 import { pythagorasMeter, pythagorasSides } from './01-pythagoras/sound';
 import { circleMeter } from './02-circle-area/sound';
 import { archimedesMeter } from './03-archimedes/sound';
@@ -6,6 +6,7 @@ import { keplerMeter } from './04-kepler/sound';
 import { newtonMeter } from './05-newton/sound';
 import { calculusMeter } from './06-calculus/sound';
 import { eulerMeter } from './07-euler/sound';
+import { fourierMeter } from './08-fourier/sound';
 
 /** Levels of the continuous sound layers, 0..1. */
 export interface Levels {
@@ -18,6 +19,9 @@ export interface Levels {
   voice?: number;
   voiceHz?: number;
   voicePan?: number;
+  /** Chapter 8's additive voice: each harmonic's loudness (the fundamental first), over a fundamental in Hz. */
+  harmonics?: number[];
+  harmonicsHz?: number;
 }
 
 /** Called once per frame with the elapsed time; returns the continuous levels since the last call. */
@@ -33,9 +37,19 @@ export function continuousMeter(): Meter {
     newtonMeter(),
     calculusMeter(),
     eulerMeter(),
+    fourierMeter(),
   ];
   return (dt) => {
-    const out: Required<Levels> = { chalk: 0, pour: 0, voice: 0, voiceHz: 0, voicePan: 0 };
+    const out: Required<Levels> = {
+      chalk: 0,
+      pour: 0,
+      voice: 0,
+      voiceHz: 0,
+      voicePan: 0,
+      harmonics: new Array<number>(HARMONICS).fill(0),
+      harmonicsHz: 0,
+    };
+    let loudest = 0;
     for (const m of meters) {
       const l = m(dt);
       out.chalk = Math.max(out.chalk, l.chalk);
@@ -44,6 +58,12 @@ export function continuousMeter(): Meter {
         out.voice = l.voice ?? 0;
         out.voiceHz = l.voiceHz ?? 0;
         out.voicePan = l.voicePan ?? 0;
+      }
+      const sum = (l.harmonics ?? []).reduce((a, b) => a + b, 0);
+      if (sum > loudest) {
+        loudest = sum;
+        out.harmonics = l.harmonics!;
+        out.harmonicsHz = l.harmonicsHz ?? 0;
       }
     }
     return out;
@@ -65,6 +85,7 @@ export function createSoundFrame() {
       hz: l.voiceHz ?? 0,
       pan: l.voicePan ?? 0,
     });
+    audio.harmonics(playing || interactive ? (l.harmonics ?? []) : [], l.harmonicsHz ?? 0);
     pythagorasSides(interactive === 'pythagoras');
   };
 }
