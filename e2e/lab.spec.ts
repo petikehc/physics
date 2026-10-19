@@ -150,7 +150,37 @@ test('the calculus lab reshapes the curve, moves a and b, and fills the area wit
   expect(errors).toEqual([]);
 });
 
-test('labs that are not built yet say so', async ({ page }) => {
+test('the euler lab sends the point round and lays the series onto it', async ({ page }) => {
+  const errors = collectErrors(page);
   await page.goto('/lab/euler?quality=low');
+  const panel = page.getByRole('complementary', { name: 'Euler lab' });
+  await expect(panel).toBeVisible();
+  // A sixth of a turn round; six of the series' terms come close, but not yet onto it.
+  await expect(panel).toContainText('= 0.50 + 0.87 i');
+  const n = panel.getByLabel('Terms of the series');
+  await n.focus();
+  for (let i = 0; i < 6; i++) await page.keyboard.press('ArrowRight');
+  await expect(panel).toContainText('6 terms land at 0.50 + 0.87 i: 0.0018 from the point.');
+
+  // Four more terms, and the series lands on the point.
+  for (let i = 0; i < 4; i++) await page.keyboard.press('ArrowRight');
+  await expect(panel).toContainText('10 terms land at 0.50 + 0.87 i: on the point.');
+
+  // Half a turn: the arrows swing wide first, and ten of them are still a little short of −1.
+  await panel.getByRole('button', { name: 'θ = π', exact: true }).click();
+  await expect(panel).toContainText('= −1.00 + 0.00 i', { timeout: 10_000 });
+  await expect(panel).toContainText('10 terms land at −0.98 + 0.01 i');
+
+  await panel.getByRole('button', { name: 'Hide the triangle' }).click();
+  await expect(panel.getByRole('button', { name: 'Show the triangle' })).toBeVisible();
+  await panel.getByRole('button', { name: 'Go once round' }).click();
+  await page.waitForTimeout(1500);
+  await expectCanvasRendered(page);
+  await page.screenshot({ path: test.info().outputPath('lab-euler.png') });
+  expect(errors).toEqual([]);
+});
+
+test('labs that are not built yet say so', async ({ page }) => {
+  await page.goto('/lab/fourier?quality=low');
   await expect(page.getByText('This Lab is in production.')).toBeVisible();
 });

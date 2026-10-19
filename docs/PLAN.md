@@ -412,6 +412,38 @@ is corrected at beat labels when it exceeds 50 ms.
 - Engine: labels can sit beside their point, offset in pixels (`engine/labels/beside.ts`), so labels on different
   sides of nearby points never overlap however small the scene is drawn.
 
+**Chapter 7 (built)**
+- The station hangs among the stars: the complex plane stands upright, a disc of faint graph paper with the real
+  axis in amber, the imaginary axis in cyan and the circle of radius 1. The time axis runs back from it, away from
+  the viewer, so the circle can be drawn out into a helix.
+- Beats: chapter 6's helix flies in and settles where this chapter's helix will be, then scatters into stars as the
+  plane draws itself (Berlin, 1748). A quarter turn: an arrow from 1 turned × i, four times (1 → i → −1 → −i → 1),
+  and i × i = −1. Pushed sideways: a point pushed at right angles to its arrow goes round, θ round after time θ,
+  e^{iθ}, and lands on −1 at θ = π. Drawn out in time: the circle stretches back into a helix, two turns. Two
+  shadows: a floor and a wall stand up beside the helix, and a point runs along it trailing lines down to each:
+  the floor's shadow swings left and right (cos θ), the wall's rises and falls (sin θ). Pythagoras, all along: back
+  in the plane, a right triangle rides the point, legs cos θ and sin θ, long side 1, so cos² θ + sin² θ = 1 (with
+  live numbers, and chapter 1's 3 : 4 : 5 chime). Why a circle: Euler's series laid head to tail at θ = π, sixteen
+  arrows, real terms amber and imaginary cyan, each a quarter turn on from the last, spiralling in onto −1. Five
+  numbers: one more step of +1 walks the point home to 0, and e, i, π, 1 and 0 fly in and line up over the circle.
+  The formula e^{iπ} + 1 = 0. Handoff: a smaller arrow on the point's tip, turning three times as fast the other
+  way, traces a rounded square; the stars gather into chapter 8's epicycles (Fourier is a "coming soon" stop for
+  now).
+- Shadows are drawn, not shadow-mapped: each is the helix projected straight onto its pane, so it is exact and
+  crisp at any quality tier, and the lines from the running point to each shadow show where the light falls.
+- Maths: complex numbers as pairs; e^{iθ}; the push i·e^{iθ}; the series' terms (iθ)ᵏ/k! and partial sums; the
+  handoff's e^{iθ} + r·e^{i(kθ + φ)} with r = 0.16, k = −3, φ = π, which keeps its sides convex.
+- Your turn / Lab: drag the point round the circle, or set θ (−π to π) by slider or preset; it snaps onto 1, i, −1
+  and −i with a chime, and the scene names it there (e^{iπ/2} = i). The readout gives e^{iθ} as cos θ + i sin θ and
+  cos² θ + sin² θ = 1. The Lab adds the series (0 to 16 terms) with where they land and how far from the point,
+  the triangle, and a button that sends the point once round, singing.
+- Score "Turning": F–C–G–Dm (round by fifths) over a D–A drone, the arpeggio in near-pure sines, each bar starting
+  one note further round. The point has a voice: it sits left or right with cos θ (a panner on the engine's voice)
+  and sings higher or lower with sin θ, so going round it swings across and rises and falls; the shadows sing their
+  running point. SFX: a note for each quarter turn (D, E, G, A), a note per series term, quieter as they shrink, a
+  chime as the dragged point lands, and a half-circle run, a step and an open D–A chord before the formula.
+- Captions gain `cos` and `sin` colours and a raised power, `e[sup:iθ]`.
+
 ---
 
 ## 5. Technical architecture

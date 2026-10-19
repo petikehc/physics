@@ -10,6 +10,7 @@ import { buildArchimedes } from '../chapters/03-archimedes/timeline';
 import { buildKepler } from '../chapters/04-kepler/timeline';
 import { buildNewton } from '../chapters/05-newton/timeline';
 import { buildCalculus } from '../chapters/06-calculus/timeline';
+import { buildEuler } from '../chapters/07-euler/timeline';
 import { JourneyBuilder, type Journey } from './builder';
 
 /**
@@ -69,10 +70,11 @@ export function buildJourney(): Journey {
   buildKepler(j);
   buildNewton(j);
   buildCalculus(j);
+  buildEuler(j);
   buildComingSoon(
     j,
-    'euler',
-    'Euler turns growth into rotation: e to the power iθ goes round a circle, and at θ = π lands on −1. This chapter is in production.',
+    'fourier',
+    'Fourier: every repeating shape and sound is a sum of circles turning at whole-number speeds. This chapter is in production.',
   );
   const journey = j.finish();
   journey.master.progress(0);

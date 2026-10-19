@@ -1,7 +1,7 @@
 import * as Tone from 'tone';
 import { C3, pyth, triangleChord, type Note } from '../tuning';
 
-export type Theme = 'pythagoras' | 'circle' | 'water' | 'spheres' | 'gravity' | 'rising';
+export type Theme = 'pythagoras' | 'circle' | 'water' | 'spheres' | 'gravity' | 'rising' | 'turning';
 
 /** How the score sounds during one beat. Values are targets the score glides to. */
 export interface Layers {
@@ -26,6 +26,7 @@ const WATER: Theme = 'water';
 const SPHERES: Theme = 'spheres';
 const GRAVITY: Theme = 'gravity';
 const RISING: Theme = 'rising';
+const TURNING: Theme = 'turning';
 
 /**
  * Per-beat arrangement. Chapter 1 is "Pythagorean Drone" (C–Am–F–G over a C–G drone); chapter 2 turns to
@@ -33,8 +34,9 @@ const RISING: Theme = 'rising';
  * climbing as the slices multiply); chapter 3, the bath, is "Water" (Dm–F–C–G over a D–A drone, the arpeggio
  * rippling); chapter 4, among the planets, is "Spheres" (Em–Am–C–G over an E–B drone, the arpeggio wheeling
  * slowly); chapter 5, Newton's, is "Falling" (G–Em–Am–C over a G–D drone, the arpeggio falling); chapter 6, in the
- * abstract realm, is "Rising" (F–Am–Dm–G over an F–C drone, the arpeggio climbing like a stair). The drone glides
- * into each new key during the flight.
+ * abstract realm, is "Rising" (F–Am–Dm–G over an F–C drone, the arpeggio climbing like a stair); chapter 7, Euler's,
+ * is "Turning" (F–C–G–Dm, round by fifths, over a D–A drone, the arpeggio in near-pure sines starting each bar one
+ * note further round, like a phase turning). The drone glides into each new key during the flight.
  */
 export const ARRANGEMENT: Record<string, Layers> = {
   teaser: { drone: 0.55, pad: 0.6, cutoff: 700, plucks: 0.14, arp: 0, harmony: 'prog' },
@@ -570,17 +572,143 @@ export const ARRANGEMENT: Record<string, Layers> = {
     plucks: 0.2,
     arp: 0.6,
     harmony: 'prog',
-    theme: RISING,
+    theme: TURNING,
     arpOctave: -1,
   },
-  'euler:soon': {
+  'euler:title': {
+    drone: 0.77,
+    pad: 1.0,
+    cutoff: 700,
+    plucks: 0.12,
+    arp: 0,
+    harmony: 'prog',
+    theme: TURNING,
+  },
+  'euler:quarters': {
+    drone: 0.72,
+    pad: 0.9,
+    cutoff: 1000,
+    plucks: 0.1,
+    arp: 0.3,
+    harmony: 'prog',
+    theme: TURNING,
+    arpOctave: -1,
+  },
+  // The point sings as it goes round, alone over the pad.
+  'euler:circle': {
+    drone: 0.72,
+    pad: 0.9,
+    cutoff: 900,
+    plucks: 0.04,
+    arp: 0,
+    harmony: 'prog',
+    theme: TURNING,
+  },
+  'euler:helix': {
+    drone: 0.77,
+    pad: 1.0,
+    cutoff: 1400,
+    plucks: 0.04,
+    arp: 0.2,
+    harmony: 'prog',
+    theme: TURNING,
+    arpOctave: -1,
+  },
+  'euler:shadows': {
+    drone: 0.72,
+    pad: 0.9,
+    cutoff: 1100,
+    plucks: 0.04,
+    arp: 0.15,
+    harmony: 'prog',
+    theme: TURNING,
+    arpOctave: -1,
+  },
+  'euler:triangle': {
+    drone: 0.72,
+    pad: 0.9,
+    cutoff: 1200,
+    plucks: 0.12,
+    arp: 0.3,
+    harmony: 'prog',
+    theme: TURNING,
+    arpOctave: -1,
+  },
+  'euler:series': {
+    drone: 0.77,
+    pad: 1.0,
+    cutoff: 1800,
+    plucks: 0.06,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: TURNING,
+    arpOctave: -1,
+  },
+  'euler:identity': {
+    drone: 0.72,
+    pad: 0.9,
+    cutoff: 1400,
+    plucks: 0.08,
+    arp: 0.3,
+    harmony: 'prog',
+    theme: TURNING,
+    arpOctave: -1,
+  },
+  'euler:formula': {
+    drone: 0.75,
+    pad: 1,
+    cutoff: 3000,
+    plucks: 0,
+    arp: 0,
+    harmony: 'resolve',
+    theme: TURNING,
+  },
+  'euler:yourTurn': {
+    drone: 0.38,
+    pad: 0.4,
+    cutoff: 700,
+    plucks: 0.06,
+    arp: 0,
+    harmony: 'prog',
+    theme: TURNING,
+  },
+  'euler:handoff': {
+    drone: 0.77,
+    pad: 0.95,
+    cutoff: 1800,
+    plucks: 0.1,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: TURNING,
+    arpOctave: -1,
+  },
+  'euler:lab': {
+    drone: 0.33,
+    pad: 0.35,
+    cutoff: 800,
+    plucks: 0.06,
+    arp: 0,
+    harmony: 'prog',
+    theme: TURNING,
+  },
+  'fourier:flight': {
+    drone: 0.85,
+    pad: 1.1,
+    cutoff: 2600,
+    plucks: 0.2,
+    arp: 0.6,
+    harmony: 'prog',
+    theme: TURNING,
+    arpOctave: -1,
+  },
+  'fourier:soon': {
     drone: 0.42,
     pad: 0.5,
     cutoff: 900,
     plucks: 0.1,
     arp: 0,
     harmony: 'prog',
-    theme: RISING,
+    theme: TURNING,
   },
   lab: { drone: 0.45, pad: 0.4, cutoff: 800, plucks: 0.1, arp: 0, harmony: 'prog' },
 };
@@ -755,6 +883,34 @@ const RISING_CHORDS: Chord[] = [
   ],
 ];
 
+// F – C – G – Dm, each a fifth on from the last, over a D–A drone: chapter 7, going round.
+const TURNING_CHORDS: Chord[] = [
+  [
+    ['F', 2],
+    ['C', 3],
+    ['F', 3],
+    ['A', 3],
+  ],
+  [
+    ['C', 3],
+    ['G', 3],
+    ['C', 4],
+    ['E', 4],
+  ],
+  [
+    ['G', 2],
+    ['D', 3],
+    ['G', 3],
+    ['B', 3],
+  ],
+  [
+    ['D', 2],
+    ['A', 2],
+    ['D', 3],
+    ['F', 3],
+  ],
+];
+
 const THEMES: Record<Theme, { chords: Chord[]; drone: [number, number, number] }> = {
   pythagoras: { chords: PYTHAGORAS_CHORDS, drone: [pyth('C', 2), pyth('G', 2), pyth('C', 3)] },
   circle: { chords: CIRCLE_CHORDS, drone: [pyth('A', 1), pyth('E', 2), pyth('A', 2)] },
@@ -762,6 +918,7 @@ const THEMES: Record<Theme, { chords: Chord[]; drone: [number, number, number] }
   spheres: { chords: SPHERES_CHORDS, drone: [pyth('E', 2), pyth('B', 2), pyth('E', 3)] },
   gravity: { chords: GRAVITY_CHORDS, drone: [pyth('G', 2), pyth('D', 3), pyth('G', 3)] },
   rising: { chords: RISING_CHORDS, drone: [pyth('F', 2), pyth('C', 3), pyth('F', 3)] },
+  turning: { chords: TURNING_CHORDS, drone: [pyth('D', 2), pyth('A', 2), pyth('D', 3)] },
 };
 
 const PENTATONIC: Array<[Note, number]> = [
@@ -782,6 +939,7 @@ function fallback(key: string | null): Layers {
   if (key?.startsWith('kepler')) return ARRANGEMENT['kepler:circle']!;
   if (key?.startsWith('newton')) return ARRANGEMENT['newton:cannon']!;
   if (key?.startsWith('calculus')) return ARRANGEMENT['calculus:speed']!;
+  if (key?.startsWith('euler')) return ARRANGEMENT['euler:quarters']!;
   return QUIET;
 }
 
@@ -896,7 +1054,7 @@ export class PythagoreanScore {
             ? triangleChord(pyth('C', 5))
             : chords[Math.max(this.chord - 1, 0) % chords.length]!.map(([n, o]) => pyth(n, o + up));
         // Up and down (chapter 1), round and round (chapter 2), rippling (chapter 3), wheeling (chapter 4),
-        // falling (chapter 5), climbing a stair of octaves (chapter 6).
+        // falling (chapter 5), climbing a stair of octaves (chapter 6), each bar starting one further round (chapter 7).
         const order =
           this.theme === 'circle'
             ? [0, 1, 2, 3]
@@ -908,7 +1066,9 @@ export class PythagoreanScore {
                   ? [3, 2, 1, 0]
                   : this.theme === 'rising'
                     ? [0, 1, 2, 3, 5, 6, 7]
-                    : [0, 1, 2, 3, 2, 1];
+                    : this.theme === 'turning'
+                      ? [0, 1, 2, 3, 1, 2, 3, 0, 2, 3, 0, 1, 3, 0, 1, 2]
+                      : [0, 1, 2, 3, 2, 1];
         const k = order[step % order.length]!;
         // Past the top of the chord, the stair goes on an octave up.
         const f = chord[k % chord.length]! * (this.theme === 'rising' ? 2 ** Math.floor(k / 4) : 1);
@@ -940,6 +1100,8 @@ export class PythagoreanScore {
       this.theme = theme;
       this.chord = 0;
       THEMES[theme].drone.forEach((f, i) => this.drones[i]!.frequency.setTargetAtTime(f, time, 1.2));
+      // Chapter 7's arpeggio is nearly a pure sine, so the turning of its pattern is what you hear.
+      this.arpSynth.modulationIndex.setTargetAtTime(theme === 'turning' ? 0.6 : 2.5, time, 0.8);
     }
     this.droneGain.gain.setTargetAtTime(l.drone * 0.32, time, glide / 3);
     this.padGain.gain.setTargetAtTime(l.pad, time, glide / 3);

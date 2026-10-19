@@ -102,7 +102,7 @@ export class AudioEngine {
   }
 
   continuous(id: ContinuousId, level: number, params?: Record<string, number>) {
-    this.sfx.continuous(id, level, Tone.now(), params?.hz);
+    this.sfx.continuous(id, level, Tone.now(), params?.hz, params?.pan);
   }
 
   sides(t: Triangle | null, moved: boolean) {

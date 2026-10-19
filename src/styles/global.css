@@ -21,6 +21,8 @@
   --sym-v: #8fd3ff;
   --sym-pull: #e25c56;
   --sym-f: #b69cff;
+  --sym-cos: #ffb35c;
+  --sym-sin: #3fd0e8;
 
   --accent: #e2704f;
 
@@ -584,6 +586,14 @@ a {
   color: var(--sym-f);
 }
 
+.captions__body .sym-cos {
+  color: var(--sym-cos);
+}
+
+.captions__body .sym-sin {
+  color: var(--sym-sin);
+}
+
 .bottom-shade {
   position: absolute;
   left: 0;
@@ -681,6 +691,19 @@ a {
 .math-label--stack {
   line-height: 1.15;
   text-align: center;
+}
+
+.math-label--const {
+  font-size: 40px;
+  text-shadow:
+    0 0 16px currentColor,
+    0 2px 14px rgba(10, 11, 14, 0.9);
+}
+
+.math-label__sub {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--chalk-dim);
 }
 
 .math-label--small {

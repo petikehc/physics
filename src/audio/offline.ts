@@ -6,8 +6,8 @@ export interface AudioPlan {
   duration: number;
   beats: Array<{ key: string; start: number }>;
   cues: Cue[];
-  /** Sampled continuous levels: [time, chalk, pour, voice, voice pitch in Hz]. */
-  continuous: Array<[number, number, number, number, number]>;
+  /** Sampled continuous levels: [time, chalk, pour, voice, voice pitch in Hz, voice pan −1..1]. */
+  continuous: Array<[number, number, number, number, number, number]>;
 }
 
 /** Renders the journey's soundtrack (score + cues + continuous layers) to a buffer, faster than real time. */
@@ -20,11 +20,11 @@ export async function renderPlan(plan: AudioPlan, sampleRate = 44100): Promise<A
       e.setBeat(plan.beats[0]?.key ?? null);
       for (const b of plan.beats) transport.schedule((time) => e.score.apply(b.key, time), b.start);
       for (const c of plan.cues) transport.schedule((time) => e.sfx.cue(c.id, c.params ?? {}, time), c.time);
-      for (const [t, chalk, pour, voice, hz] of plan.continuous) {
+      for (const [t, chalk, pour, voice, hz, pan] of plan.continuous) {
         transport.schedule((time) => {
           e.sfx.continuous('chalk', chalk, time);
           e.sfx.continuous('pour', pour, time);
-          e.sfx.continuous('voice', voice, time, hz);
+          e.sfx.continuous('voice', voice, time, hz, pan);
         }, t);
       }
       // Starts the transport at 0, after everything is scheduled.

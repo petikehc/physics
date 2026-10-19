@@ -5,14 +5,19 @@ import { archimedesMeter } from './03-archimedes/sound';
 import { keplerMeter } from './04-kepler/sound';
 import { newtonMeter } from './05-newton/sound';
 import { calculusMeter } from './06-calculus/sound';
+import { eulerMeter } from './07-euler/sound';
 
 /** Levels of the continuous sound layers, 0..1. */
 export interface Levels {
   chalk: number;
   pour: number;
-  /** A singing planet (chapter 4), a whistling cannonball (chapter 5) or a curve sung (chapter 6): how loud, its pitch. */
+  /**
+   * A singing planet (chapter 4), a whistling cannonball (chapter 5), a curve sung (chapter 6) or a point going
+   * round (chapter 7): how loud, its pitch, and where it sits, left (−1) to right (1).
+   */
   voice?: number;
   voiceHz?: number;
+  voicePan?: number;
 }
 
 /** Called once per frame with the elapsed time; returns the continuous levels since the last call. */
@@ -27,9 +32,10 @@ export function continuousMeter(): Meter {
     keplerMeter(),
     newtonMeter(),
     calculusMeter(),
+    eulerMeter(),
   ];
   return (dt) => {
-    const out: Required<Levels> = { chalk: 0, pour: 0, voice: 0, voiceHz: 0 };
+    const out: Required<Levels> = { chalk: 0, pour: 0, voice: 0, voiceHz: 0, voicePan: 0 };
     for (const m of meters) {
       const l = m(dt);
       out.chalk = Math.max(out.chalk, l.chalk);
@@ -37,6 +43,7 @@ export function continuousMeter(): Meter {
       if ((l.voice ?? 0) > out.voice) {
         out.voice = l.voice ?? 0;
         out.voiceHz = l.voiceHz ?? 0;
+        out.voicePan = l.voicePan ?? 0;
       }
     }
     return out;
@@ -54,7 +61,10 @@ export function createSoundFrame() {
     const l = meter(dt);
     audio.continuous('chalk', l.chalk);
     audio.continuous('pour', l.pour);
-    audio.continuous('voice', playing || interactive ? (l.voice ?? 0) : 0, { hz: l.voiceHz ?? 0 });
+    audio.continuous('voice', playing || interactive ? (l.voice ?? 0) : 0, {
+      hz: l.voiceHz ?? 0,
+      pan: l.voicePan ?? 0,
+    });
     pythagorasSides(interactive === 'pythagoras');
   };
 }
