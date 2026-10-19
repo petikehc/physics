@@ -15,7 +15,7 @@ type Frame = { pos: V3; target: V3; portrait: number };
  */
 const FRONT: Frame = { pos: [0.45, 1.9, 13], target: [0.45, 1.7, 0], portrait: 0.9 };
 /** Side on, from the right: the rings, slid onto one axis and set back by speed, stand edge on as bars. */
-const SIDE: Frame = { pos: [P[0] + 10, P[1] + 1.8, -2], target: [P[0], P[1] - 0.2, -2], portrait: 1 };
+const SIDE: Frame = { pos: [P[0] + 10, P[1] + 1.8, -2.8], target: [P[0], P[1] - 0.2, -2.8], portrait: 1 };
 /** The handoff's drawing, face on. */
 const DRAW: Frame = { pos: [Q[0], 2.4, 10], target: [Q[0], 2.2, 0], portrait: 0.8 };
 

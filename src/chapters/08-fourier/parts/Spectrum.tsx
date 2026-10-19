@@ -7,8 +7,12 @@ import { beside } from '../../../engine/labels/beside';
 import { clamp01 } from '../../../engine/ease';
 import { DZ, fourierRig, MAX_COUNT, P, rigHarmonics, SYM8, U } from '../rig';
 
-/** Only the first few bars are big enough to name their size. */
-const SIZED = 4;
+/**
+ * Only the first few bars are big enough to name their size; on a narrow screen, where the bars stand close, fewer
+ * sizes and only the first and last few speeds are named.
+ */
+const SIZED = { wide: 3, narrow: 2 };
+const NARROW = 600;
 
 /**
  * The side view's spectrum. Each ring, slid onto the axis and set back by its speed, is seen edge on: a bar as tall
@@ -25,8 +29,9 @@ export function Spectrum() {
   const texts = useRef<Array<HTMLDivElement | null>>([]);
   const said = useRef<string[]>([]);
 
-  useFrame(() => {
+  useFrame((state) => {
     const on = clamp01(rig.bars);
+    const narrow = state.size.width < NARROW;
     const hs = rigHarmonics(rig);
     // The axis runs a little past the fastest circle there is.
     const fastest = hs[hs.length - 1]?.n ?? 1;
@@ -64,15 +69,17 @@ export function Spectrum() {
       );
     });
 
-    // Each bar's speed under it; the first few bars' sizes over them; the axis's name at its end.
+    // Each bar's speed under it; the first few bars' sizes over them; the axis's name before its start.
     const words: Array<[string, [number, number, number], number, number, number]> = [];
+    const sized = narrow ? SIZED.narrow : SIZED.wide;
     hs.forEach((h, i) => {
       const z = P[2] - DZ * h.n * clamp01(rig.layers);
-      words.push([String(h.n), [P[0], P[1], z], 0, -1, on]);
+      const named = !narrow || i < 3 || i === hs.length - 1;
+      words.push([String(h.n), [P[0], P[1], z], 0, -1, named ? on : 0]);
       const ratio = Math.round(first / Math.max(h.a, 1e-6));
-      words.push([ratio === 1 ? '1' : `1/${ratio}`, [P[0], P[1] + h.a * U, z], 0, 1, i < SIZED ? on : 0]);
+      words.push([ratio === 1 ? '1' : `1/${ratio}`, [P[0], P[1] + h.a * U, z], 0, 1, i < sized ? on : 0]);
     });
-    words.push(['speed', [P[0], P[1], Math.min(zEnd, P[2] - 1)], 1, 0, on]);
+    words.push(['speed', [P[0], P[1], P[2] + 0.3], -1, 0, on]);
     for (let i = 0; i < MAX_COUNT * 2 + 1; i++) {
       const el = texts.current[i];
       const w = words[i];
