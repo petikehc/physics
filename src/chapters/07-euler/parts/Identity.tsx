@@ -5,8 +5,8 @@ import { MathLabel } from '../../../engine/labels/MathLabel';
 import { beside } from '../../../engine/labels/beside';
 import { clamp01 } from '../../../engine/ease';
 import { C, eulerRig, onPlane, R, SYM7 } from '../rig';
-import { Arrow } from './Arrow';
-import { aim } from './aim';
+import { Arrow } from '../../../engine/lines/Arrow';
+import { aim } from '../../../engine/lines/aim';
 
 type V3 = [number, number, number];
 

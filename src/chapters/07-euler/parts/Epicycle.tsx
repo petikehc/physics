@@ -5,8 +5,8 @@ import { ChalkLine, type ChalkLineHandle, type Pts } from '../../../engine/lines
 import { clamp01 } from '../../../engine/ease';
 import { epicycle } from '../math';
 import { EPI, eulerRig, onPlane, SYM7 } from '../rig';
-import { Arrow } from './Arrow';
-import { aim } from './aim';
+import { Arrow } from '../../../engine/lines/Arrow';
+import { aim } from '../../../engine/lines/aim';
 
 const N = 600;
 const RING = 64;
