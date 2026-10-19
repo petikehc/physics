@@ -683,6 +683,19 @@ a {
   text-align: center;
 }
 
+.math-label--const {
+  font-size: 40px;
+  text-shadow:
+    0 0 16px currentColor,
+    0 2px 14px rgba(10, 11, 14, 0.9);
+}
+
+.math-label__sub {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--chalk-dim);
+}
+
 .math-label--small {
   font-family: var(--font-mono);
   font-size: 13px;
