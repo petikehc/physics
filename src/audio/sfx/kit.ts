@@ -261,7 +261,7 @@ export class SfxKit {
     this.harmGain.forEach((g, i) => {
       const a = Math.min(Math.max(amps[i] ?? 0, 0), 1);
       if (hz > 0) this.harmOsc[i]!.frequency.setTargetAtTime(hz * (i + 1), time, 0.03);
-      g.gain.setTargetAtTime(a * 0.3, time, a > 0 ? 0.06 : 0.25);
+      g.gain.setTargetAtTime(a * 0.12, time, a > 0 ? 0.06 : 0.25);
     });
   }
 
