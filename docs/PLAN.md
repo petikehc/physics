@@ -382,6 +382,36 @@ is corrected at beat labels when it exceeds 50 ms.
   (so an ellipse sounds its equal areas). SFX: the cannon's boom, a distant thud as each ball lands, a strobe tick
   a step lower each flash, and four falling notes, each a little sooner, before the formula chord.
 
+**Chapter 6 (built)**
+- A new station, "the abstract realm": no ground or sky, only a violet grid underfoot fading into the stars, and two
+  glass walls. The curve's wall stands on the floor; the area's wall stands behind it and higher, its x axis level
+  with the first's, so the area at each x sits straight above the curve there. (The storyboard had the second wall
+  at right angles. With a shared corner, the two graphs either read mirror-image or overlap on screen from any one
+  viewpoint, so the walls are stacked instead, which also fits a phone held upright.)
+- Beats: the calculus icon flies in and the walls rise (Cambridge and Paris, 1660s and 1670s). Speed into distance: the
+  falling apple's speed is a straight line, and the area under it a triangle, 4.9 m after a second; cut at each
+  quarter second (chapter 5's flashes) its strips go 1, 3, 5, 7. The line bends into any curve, and columns rise
+  under it, 4, then split in two again and again to 512, their total closing in on the area (Leibniz's ∫ f dx).
+  Eight columns swing up onto the area's wall, each landing on the ones before as a step, a stair whose top is the
+  area so far, A(x). One step picked out: it rises a column's area, f × Δx, over a run of Δx, so its slope is f; the
+  stair smooths into a curve as the columns thin. A probe sweeps along: the curve's height and the area curve's
+  slope, side by side, always equal. The formula ∫ₐᵇ f dx = F(b) − F(a), with the area between a and b shaded and
+  A's climb between them. Handoff: a point pushed outwards by its own size grows as eˣ; turned to push at right
+  angles it stops growing and goes round, and the stars gather into chapter 7's helix around its circle (Euler is a
+  "coming soon" stop for now).
+- Maths: the curve is a monotone cubic (Fritsch–Carlson) through six control points, so it never overshoots them
+  (a curve dragged above the axis stays above it), and A(x) is its exact integral piece by piece. Columns are a
+  midpoint Riemann sum.
+- Your turn / Lab: drag the curve's six points in the scene, or pick a curve (wave, hill, the apple's speed, flat),
+  and move a and b; the readout and the scene both show the area from a to b and A's climb, always equal. The Lab
+  adds the columns (4 to 512) and their total beside the whole area.
+- Score "Rising": F–Am–Dm–G over an F–C drone, the arpeggio climbing like a stair of octaves. A voice sings the
+  curve's height wherever the story points (a split sweeping along it, the probe, a point being dragged), so the
+  area's slope, the same number, is heard too. SFX: a note per rising column, as high as it is tall; a climbing note
+  as each column lands on the stair; a quick stair of notes before the formula chord.
+- Engine: labels can sit beside their point, offset in pixels (`engine/labels/beside.ts`), so labels on different
+  sides of nearby points never overlap however small the scene is drawn.
+
 ---
 
 ## 5. Technical architecture

@@ -123,7 +123,34 @@ test('the Newton lab fires the cannon at any speed and angle, and shows the forc
   expect(errors).toEqual([]);
 });
 
-test('labs that are not built yet say so', async ({ page }) => {
+test('the calculus lab reshapes the curve, moves a and b, and fills the area with columns', async ({
+  page,
+}) => {
+  const errors = collectErrors(page);
   await page.goto('/lab/calculus?quality=low');
+  const panel = page.getByRole('complementary', { name: 'Calculus lab' });
+  await expect(panel).toBeVisible();
+  await expect(panel).toContainText('Area from a to b: 2.37');
+  await expect(panel).toContainText('8 columns add up to 6.06; the whole area is 6.05.');
+
+  // Two steps up the column counts: 32.
+  const n = panel.getByLabel('Columns');
+  await n.focus();
+  await page.keyboard.press('ArrowRight');
+  await page.keyboard.press('ArrowRight');
+  await expect(panel).toContainText('32 columns add up to 6.05');
+
+  await panel.getByRole('button', { name: 'Hill' }).click();
+  await expect(panel).toContainText('Area from a to b: 4.68');
+  await panel.getByRole('button', { name: 'Show the columns' }).click();
+  await expect(panel.getByRole('button', { name: 'Hide the columns' })).toBeVisible();
+  await page.waitForTimeout(1500);
+  await expectCanvasRendered(page);
+  await page.screenshot({ path: test.info().outputPath('lab-calculus.png') });
+  expect(errors).toEqual([]);
+});
+
+test('labs that are not built yet say so', async ({ page }) => {
+  await page.goto('/lab/euler?quality=low');
   await expect(page.getByText('This Lab is in production.')).toBeVisible();
 });

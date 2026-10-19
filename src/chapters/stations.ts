@@ -7,4 +7,5 @@ export const STATION_VIEWS: Record<string, LazyExoticComponent<ComponentType>> =
   archimedes: lazy(() => import('./03-archimedes/Station')),
   kepler: lazy(() => import('./04-kepler/Station')),
   newton: lazy(() => import('./05-newton/Station')),
+  calculus: lazy(() => import('./06-calculus/Station')),
 };

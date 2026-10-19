@@ -9,6 +9,8 @@ import { YourTurnPanel as KeplerYourTurn } from './04-kepler/ui/YourTurnPanel';
 import { LabPanel as KeplerLab, enterKeplerLab } from './04-kepler/ui/LabPanel';
 import { YourTurnPanel as NewtonYourTurn } from './05-newton/ui/YourTurnPanel';
 import { LabPanel as NewtonLab, enterNewtonLab } from './05-newton/ui/LabPanel';
+import { YourTurnPanel as CalculusYourTurn } from './06-calculus/ui/YourTurnPanel';
+import { LabPanel as CalculusLab, enterCalculusLab } from './06-calculus/ui/LabPanel';
 
 /** The page-level React side of a chapter: its Your-turn panel, its Lab and its formula. */
 export interface ChapterViews {
@@ -64,6 +66,15 @@ export const VIEWS: Record<string, ChapterViews> = {
     formula: {
       tex: '\\textcolor{#e25c56}{F} = G\\,\\frac{m_1\\, m_2}{r^2}',
       caption: "Newton's law of universal gravitation",
+    },
+  },
+  calculus: {
+    YourTurn: CalculusYourTurn,
+    Lab: CalculusLab,
+    enterLab: enterCalculusLab,
+    formula: {
+      tex: '\\int_a^b \\textcolor{#b69cff}{f(x)}\\,dx = \\textcolor{#f2b04a}{F(b) - F(a)}',
+      caption: 'The fundamental theorem of calculus',
     },
   },
 };
