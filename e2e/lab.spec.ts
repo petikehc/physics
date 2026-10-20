@@ -220,7 +220,9 @@ test('the fourier lab builds waves, turns them side on, and redraws a shape you 
   expect(errors).toEqual([]);
 });
 
-test('the doppler lab plays an ambulance and a jet to a listener, and red-shifts a galaxy', async ({ page }) => {
+test('the doppler lab plays an ambulance and a jet to a listener, and red-shifts a galaxy', async ({
+  page,
+}) => {
   const errors = collectErrors(page);
   await page.goto('/lab/doppler?quality=low');
   const panel = page.getByRole('complementary', { name: 'Doppler lab' });
