@@ -289,7 +289,7 @@ export class SfxKit {
     } else if (id === 'roar') {
       if (hz > 0) this.roarFilter.frequency.setTargetAtTime(Math.min(hz, 9000), time, 0.05);
       this.roarPan.pan.setTargetAtTime(Math.min(Math.max(pan, -1), 1), time, 0.05);
-      this.roarGain.gain.setTargetAtTime(l * 0.9, time, l > 0 ? 0.05 : 0.3);
+      this.roarGain.gain.setTargetAtTime(l * 0.38, time, l > 0 ? 0.05 : 0.3);
     } else if (id === 'voice') {
       if (hz > 0) this.voiceOsc.frequency.setTargetAtTime(hz, time, 0.03);
       this.voicePan.pan.setTargetAtTime(Math.min(Math.max(pan, -1), 1), time, 0.05);

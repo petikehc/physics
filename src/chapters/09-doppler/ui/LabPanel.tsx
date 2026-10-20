@@ -8,7 +8,7 @@ import { audio } from '../../../audio';
 import { useApp } from '../../../state/store';
 import { chooseSource } from '../interaction';
 import { loopReset } from '../loop';
-import { dopplerRig, DOPPLER_DEFAULTS, type DopplerRig } from '../rig';
+import { dopplerRig, DOPPLER_DEFAULTS, SIREN_NEAR, type DopplerRig } from '../rig';
 import { HearingReadout, LightControls, ListenerControls, SourceControls } from './Controls';
 import { useDoppler } from './useDoppler';
 
@@ -19,8 +19,8 @@ type Mode = 'sound' | 'light';
 
 /** The panel sits on the right (on a phone, below), so each view keeps its subject left of centre. */
 const FRAMES: Record<Mode, Frame> = {
-  sound: { pos: [6, 17, 25], target: [6, 0, -1], portrait: 1 },
-  light: { pos: [3, 86, -82], target: [3, 87.5, -130], portrait: 0.8 },
+  sound: { pos: [8, 26, 36], target: [8, 0, -1], portrait: 1 },
+  light: { pos: [3, 86, -82], target: [3, 92, -130], portrait: 0.8 },
 };
 
 /** What each view shows, and the world it is in (the street at night, or deep space). */
@@ -28,28 +28,25 @@ const SHOWS: Record<Mode, Partial<DopplerRig>> = {
   sound: { street: 1, spheres: 1, rings: 1, you: 1, galaxy: 0, spectra: 0 },
   light: { street: 0, spheres: 0, rings: 0, you: 0, galaxy: 1, spectra: 1 },
 };
-const WORLD: Record<Mode, { night: number; space: number }> = {
-  sound: { night: 1, space: 0 },
-  light: { night: 0, space: 1 },
-};
 
 /** Lab-mode display: the ambulance going round the street at half the speed of sound, a listener ahead. */
 export function enterDopplerLab() {
-  Object.assign(runtime.world, WORLD.sound);
+  Object.assign(runtime.world, { night: 1, space: 0 });
   Object.assign(dopplerRig(), {
     ...DOPPLER_DEFAULTS,
     ...SHOWS.sound,
     mode: 2,
     kind: 0,
     ambulance: 1,
-    siren: 1,
+    siren: SIREN_NEAR,
     sm: 0.5,
-    lx: 12,
+    sandT: 6,
+    lx: 10,
     lz: 5.2,
     interactive: 1,
     lab: 1,
   });
-  loopReset(0.5, 0);
+  loopReset(0.5, 6);
   Object.assign(runtime.camera, {
     ...shotVars(SLUG, FRAMES.sound),
     fov: 40,
@@ -97,11 +94,18 @@ export function LabPanel() {
     // The siren and the roar go quiet up among the galaxies.
     const heard =
       next === 'sound'
-        ? { siren: rig.kind < 0.5 ? 1 : 0, roar: rig.kind > 0.5 ? 1 : 0 }
+        ? { siren: rig.kind < 0.5 ? SIREN_NEAR : 0, roar: rig.kind > 0.5 ? 1 : 0 }
         : { siren: 0, roar: 0 };
     const tl = gsap.timeline({ onComplete: () => set({ cameraMode: 'interactive' }) });
     tl.to(rig, { ...SHOWS[next], ...heard, duration: 1.4, ease: 'power2.inOut' }, 0);
-    tl.to(runtime.world, { ...WORLD[next], duration: 1.8, ease: 'power1.inOut' }, 0);
+    // Between the street and space by way of the night, never back through the dusk beach.
+    if (next === 'light') {
+      tl.to(runtime.world, { space: 1, duration: 0.3, ease: 'none' }, 0);
+      tl.to(runtime.world, { night: 0, duration: 1.6, ease: 'power1.inOut' }, 0.3);
+    } else {
+      tl.to(runtime.world, { night: 1, duration: 1.6, ease: 'power1.inOut' }, 0);
+      tl.to(runtime.world, { space: 0, duration: 0.3, ease: 'none' }, 1.6);
+    }
     tl.to(runtime.camera, { ...shotVars(SLUG, FRAMES[next]), duration: 2, ease: 'power2.inOut' }, 0);
     move.current = tl;
   };

@@ -17,9 +17,9 @@ import { hearing } from './sound';
 const ORIGIN = station('doppler');
 /** Real light from the three streetlights nearest the story (the rest only paint their pools on the road). */
 const LIT: Array<[number, number, number]> = [
-  [-8, 7, HALF_ROAD - 0.7],
-  [8, 7, -HALF_ROAD + 0.7],
-  [24, 7, HALF_ROAD - 0.7],
+  [-12, 7, -HALF_ROAD + 0.7],
+  [4, 7, HALF_ROAD - 0.7],
+  [20, 7, -HALF_ROAD + 0.7],
 ];
 
 /**

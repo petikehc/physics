@@ -22,9 +22,9 @@ export const SPACE = {
 export const NIGHT = {
   zenith: '#04060d',
   mid: '#0a0d19',
-  horizon: '#2a1f22',
+  horizon: '#1d1a22',
   glow: '#000000',
-  fog: '#151318',
+  fog: '#121117',
 };
 
 export type Palette = Record<keyof typeof DUSK, THREE.Color>;

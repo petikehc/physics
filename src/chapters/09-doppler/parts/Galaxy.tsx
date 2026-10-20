@@ -9,7 +9,7 @@ import { BALMER, recession, VISIBLE } from '../math';
 import { dopplerRig, GALAXY, SPECTRA, SYM9 } from '../rig';
 
 const STARS = 6000;
-const RADIUS = 16;
+const RADIUS = 19;
 /** Each spectrum strip's size, and the gap between the two. */
 const STRIP = { w: 18, h: 1.1, gap: 1.5 };
 /** How far the galaxy has drifted away by a red shift of 0.1. */
@@ -57,7 +57,8 @@ function stripMaterial(): THREE.ShaderMaterial {
       ${SPECTRUM_GLSL}
       void main() {
         float nm = mix(uRange.x, uRange.y, vUv.x);
-        vec3 c = spectrum(nm) * 1.25;
+        // Kept below the bloom's threshold, so the colours stay pure rather than washing out to white.
+        vec3 c = spectrum(nm) * 0.62;
         // Hydrogen's dark lines, where its atoms soak up their own colours.
         float dark = 0.0;
         for (int i = 0; i < 4; i++) {
@@ -88,7 +89,7 @@ function galaxyPoints(): THREE.BufferGeometry {
     const r = Math.pow(rand(), 1.6) * RADIUS;
     const twist = 2 * Math.PI * (i % 2) + r * 0.36 + (rand() - 0.5) * (0.5 + 2.4 / (r + 1));
     const a = twist + (i % 2) * Math.PI;
-    const spread = (rand() - 0.5) * (0.4 + r * 0.06);
+    const spread = (rand() - 0.5) * (0.7 + r * 0.16);
     pos[i * 3] = Math.cos(a) * r + spread;
     pos[i * 3 + 1] = (rand() - 0.5) * (1.4 * Math.exp(-r / 3) + 0.3);
     pos[i * 3 + 2] = Math.sin(a) * r + spread;
@@ -186,10 +187,11 @@ export function Galaxy() {
         beside(el, 0, 1, 4);
       }
     });
-    // The strips' names, at their left ends, and how fast the galaxy is going.
+    // The strips' names, inside their dim violet ends so they never run off a narrow screen, and how fast the galaxy
+    // is going.
     const names: Array<[number, [number, number, number]]> = [
-      [4, [x(VISIBLE[0]), top, SPECTRA[2]]],
-      [5, [x(VISIBLE[0]), bottom, SPECTRA[2]]],
+      [4, [x(VISIBLE[0]) + 0.2, top, SPECTRA[2] + 0.02]],
+      [5, [x(VISIBLE[0]) + 0.2, bottom, SPECTRA[2] + 0.02]],
       [6, [SPECTRA[0], bottom - STRIP.h / 2, SPECTRA[2]]],
     ];
     for (const [i, at] of names) {
@@ -197,10 +199,10 @@ export function Galaxy() {
       const el = texts.current[i];
       if (!el) continue;
       el.style.opacity = String(strips);
-      beside(el, i === 6 ? 0 : -1, i === 6 ? -1 : 0, 8);
+      beside(el, i === 6 ? 0 : 1, i === 6 ? -1 : 0, i === 6 ? 8 : 2);
     }
     const speed = recession(z) * 100;
-    const words = `red shift z = ${z.toFixed(2)}: moving away at ${speed.toFixed(1)}% of light's speed`;
+    const words = `z = ${z.toFixed(2)} · moving away at ${speed.toFixed(1)}% of light's speed`;
     if (said.current !== words && texts.current[6]) {
       said.current = words;
       texts.current[6].textContent = words;

@@ -1,7 +1,7 @@
 import gsap from 'gsap';
 import { audio } from '../../audio';
 import { loopReset } from './loop';
-import { dopplerRig, LOOP, PAVEMENT } from './rig';
+import { dopplerRig, LOOP, PAVEMENT, SIREN_NEAR } from './rig';
 
 /** Puts the listener at (x, z) on the street, kept within the loop and the pavements. */
 export function placeListener(x: number, z: number) {
@@ -33,7 +33,7 @@ export function chooseSource(kind: 'ambulance' | 'jet') {
     sm: m,
     cone: jet ? 1 : 0,
   });
-  rig.siren = jet ? 0 : 1;
+  rig.siren = jet ? 0 : SIREN_NEAR;
   rig.roar = jet ? 1 : 0;
   loopReset(m, rig.sandT);
 }

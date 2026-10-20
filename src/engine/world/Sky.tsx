@@ -46,7 +46,7 @@ const fragment = /* glsl */ `
     col += uGlow * pow(sunAmt, 90.0) * 0.22 * (1.0 - uSpace);
 
     // At night in the city, the streetlights light the haze all round the horizon, not just towards a sun.
-    col += uHorizon * exp(-max(h, 0.0) * 7.0) * 0.55 * uNight;
+    col += uHorizon * exp(-max(h, 0.0) * 7.0) * 0.4 * uNight;
 
     // In space, a faint band of the Milky Way across the whole sphere.
     float across = dot(d, normalize(vec3(0.35, 0.82, -0.45)));

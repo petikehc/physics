@@ -28,7 +28,8 @@ function sphereMaterial(): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: false,
-    side: THREE.DoubleSide,
+    // Front faces only: from inside a wave, it is not drawn at all, rather than fogging the whole picture.
+    side: THREE.FrontSide,
     blending: THREE.AdditiveBlending,
     uniforms: { ...colours(), uOpacity: { value: 0 } },
     vertexShader: /* glsl */ `
@@ -55,8 +56,8 @@ function sphereMaterial(): THREE.ShaderMaterial {
       ${STRETCH_GLSL}
       void main() {
         float rim = 1.0 - abs(dot(normalize(vN), normalize(vView)));
-        float a = (0.05 + 0.95 * pow(rim, 3.0)) * vInfo.x * uOpacity;
-        gl_FragColor = vec4(stretchColor(vInfo.y, normalize(vLocal).x) * a * 0.55, 1.0);
+        float a = (0.03 + 0.97 * pow(rim, 4.0)) * vInfo.x * uOpacity;
+        gl_FragColor = vec4(stretchColor(vInfo.y, normalize(vLocal).x) * a * 0.2, 1.0);
       }
     `,
   });
@@ -104,7 +105,7 @@ function ringMaterial(): THREE.ShaderMaterial {
           float cosTheta = (vXZ.x - s.x) / s.y;
           col += stretchColor(s.w, cosTheta) * line * s.z;
         }
-        gl_FragColor = vec4(col * uOpacity, 1.0);
+        gl_FragColor = vec4(col * uOpacity * 0.75, 1.0);
       }
     `,
   });
@@ -121,7 +122,7 @@ export function Shells() {
   const ringMat = useMemo(() => ringMaterial(), []);
   const info = useMemo(() => new THREE.InstancedBufferAttribute(new Float32Array(MAX_SHELLS * 2), 2), []);
   const geometry = useMemo(() => {
-    const g = new THREE.SphereGeometry(1, 48, 32);
+    const g = new THREE.SphereGeometry(1, 40, 24);
     g.setAttribute('aInfo', info);
     return g;
   }, [info]);

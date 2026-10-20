@@ -75,6 +75,7 @@ export function ListenerControls({ c, idPrefix }: Props) {
 /** What the listener hears now, and what anyone straight ahead of the source or straight behind it would. */
 export function HearingReadout({ c }: { c: DopplerSnapshot }) {
   const m = c.sm;
+  const source = c.kind > 0.5 ? "jet's own roar" : 'siren';
   const ahead = m < 1 ? `${(1 / (1 - m)).toFixed(2)} f` : 'nothing until it has passed';
   const behind = `${(1 / (1 + m)).toFixed(2)} f`;
   const now =
@@ -82,9 +83,9 @@ export function HearingReadout({ c }: { c: DopplerSnapshot }) {
       ? 'The listener hears nothing yet: the source is ahead of its own sound.'
       : `The listener hears ${c.ratio.toFixed(2)} f${
           c.ratio > 1.005
-            ? ', higher than the siren'
+            ? `, higher than the ${source}`
             : c.ratio < 0.995
-              ? ', lower than the siren'
+              ? `, lower than the ${source}`
               : ', its true pitch'
         }.`;
   return (

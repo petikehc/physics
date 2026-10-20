@@ -103,8 +103,8 @@ export const JET_H = 9;
 /** Where you stand for the real pass, at the kerb. */
 export const EAR: V3 = [0, 1.6, 5.6];
 /** The two listeners on the pavement, ahead of the ambulance and behind it. */
-export const AHEAD: V3 = [12, KERB, 5.2];
-export const BEHIND: V3 = [-12, KERB, 5.2];
+export const AHEAD: V3 = [10, KERB, 5.2];
+export const BEHIND: V3 = [-10, KERB, 5.2];
 /** Who hears the jet go over. */
 export const UNDER: V3 = [6, KERB, 5.2];
 
@@ -112,14 +112,16 @@ export const UNDER: V3 = [6, KERB, 5.2];
 export const SLOW = 3;
 export const PERIOD = 0.4;
 export const MAX_SHELLS = 40;
-export const MAX_AGE = 5.6;
+export const MAX_AGE = 4.4;
 
 /** The viewer's loop: the source goes round from −LOOP to LOOP along its lane. */
 export const LOOP = 26;
+/** How loud the siren is on the viewer's street: the listener is always close by, so quieter than the pass. */
+export const SIREN_NEAR = 0.6;
 
 /** Up among the galaxies: the galaxy, and the two spectra in front of it. */
-export const GALAXY: V3 = [0, 92, -150];
-export const SPECTRA: V3 = [0, 84, -112];
+export const GALAXY: V3 = [0, 108, -150];
+export const SPECTRA: V3 = [0, 88.5, -112];
 
 export const SYM9 = {
   /** Bunched waves, a higher note, bluer light: the chapter's blue. */

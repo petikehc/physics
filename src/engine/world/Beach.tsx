@@ -119,7 +119,8 @@ export function Beach() {
     fog.far = THREE.MathUtils.lerp(THREE.MathUtils.lerp(FOG.far[0], FOG.far[1], space), NIGHT_FOG[1], night);
     sun.intensity = SUN_LIGHT * (1 - space) * (1 - night);
     if (hemi.current) hemi.current.intensity = HEMI_LIGHT * (1 - 0.85 * space) * (1 - 0.45 * night);
-    if (ground.current) ground.current.visible = space < 0.99 || night > 0.01;
+    // At night the street brings its own ground; the sand would only flicker against it.
+    if (ground.current) ground.current.visible = space < 0.99 && night < 0.5;
   });
 
   return (

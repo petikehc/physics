@@ -108,11 +108,12 @@ function windowMaterial(): THREE.MeshStandardMaterial {
           vec2 cell = vec2(u / 3.1, (vWorld.y - 3.2) / 3.3);
           vec2 f = fract(cell);
           float inside = step(0.22, f.x) * step(f.x, 0.78) * step(0.3, f.y) * step(f.y, 0.82);
-          float h = hash3(vec3(floor(cell), floor(vWorldN.x * 2.0 + vWorldN.z * 3.0)));
-          vec3 warm = vec3(1.0, 0.74, 0.42) * (0.7 + 0.5 * fract(h * 13.0));
-          vec3 cool = vec3(0.55, 0.7, 1.0) * 0.6;
+          // Which wall it is, rounded: the interpolated normal wavers, and a floor would flicker between walls.
+          float h = hash3(vec3(floor(cell), round(vWorldN.x * 2.0 + vWorldN.z * 3.0)));
+          vec3 warm = vec3(1.0, 0.74, 0.42) * (0.34 + 0.26 * fract(h * 13.0));
+          vec3 cool = vec3(0.55, 0.7, 1.0) * 0.3;
           vec3 glass = vec3(0.03, 0.035, 0.05);
-          vec3 lit = h > 0.94 ? cool : h > 0.66 ? warm : glass;
+          vec3 lit = h > 0.95 ? cool : h > 0.74 ? warm : glass;
           totalEmissiveRadiance += lit * inside * uLit;
         }`,
       );
@@ -129,7 +130,8 @@ export function Street() {
   const pool = useMemo(() => poolTexture(), []);
   const lamps = useMemo(() => {
     const out: Array<{ x: number; side: number }> = [];
-    for (let x = STREET[0] + 10; x < STREET[1] - 4; x += LAMP_EVERY) {
+    // Placed so no lamp post stands in front of you at the kerb (x a little below 0).
+    for (let x = STREET[0] + 22; x < STREET[1] - 4; x += LAMP_EVERY) {
       out.push({ x, side: 1 });
       out.push({ x: x + LAMP_EVERY / 2, side: -1 });
     }
@@ -176,7 +178,7 @@ export function Street() {
     for (const inst of [poles, arms, heads, pools])
       if (inst.current) inst.current.instanceMatrix.needsUpdate = true;
     dashes.forEach((x, i) =>
-      lines.current?.setMatrixAt(i, m.compose(p.set(x, 0.012, 0), flat, s.set(3, 0.14, 1))),
+      lines.current?.setMatrixAt(i, m.compose(p.set(x, 0.035, 0), flat, s.set(3, 0.14, 1))),
     );
     if (lines.current) lines.current.instanceMatrix.needsUpdate = true;
     city.forEach((b, i) =>
@@ -199,12 +201,13 @@ export function Street() {
 
   return (
     <group ref={root} visible={false}>
-      {/* Dark ground all round, so the beach's sand never shows through. */}
-      <mesh rotation-x={-Math.PI / 2} position={[MID, 0.004, 0]} receiveShadow>
+      {/* Dark ground all round, in place of the beach's sand (hidden at night). Each layer above it stands a couple of
+          centimetres higher than the last, so none of them flicker into each other from the far shots. */}
+      <mesh rotation-x={-Math.PI / 2} position={[MID, 0, 0]} receiveShadow>
         <planeGeometry args={[LENGTH + 260, 420]} />
         <meshStandardMaterial color="#0d0e12" roughness={1} />
       </mesh>
-      <mesh rotation-x={-Math.PI / 2} position={[MID, 0.008, 0]}>
+      <mesh rotation-x={-Math.PI / 2} position={[MID, 0.02, 0]}>
         <planeGeometry args={[LENGTH, HALF_ROAD * 2]} />
         <meshStandardMaterial color="#1b1c22" roughness={0.82} />
       </mesh>
@@ -219,7 +222,7 @@ export function Street() {
             <meshStandardMaterial color="#4a4b52" roughness={0.9} />
           </mesh>
           {/* The road's edge lines. */}
-          <mesh rotation-x={-Math.PI / 2} position={[MID, 0.012, side * (HALF_ROAD - 0.35)]}>
+          <mesh rotation-x={-Math.PI / 2} position={[MID, 0.035, side * (HALF_ROAD - 0.35)]}>
             <planeGeometry args={[LENGTH, 0.12]} />
             <meshStandardMaterial
               color="#cfc8b4"
