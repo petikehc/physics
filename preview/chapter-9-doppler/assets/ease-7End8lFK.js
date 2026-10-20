@@ -1,1 +1,0 @@
-var e=e=>e<0?0:e>1?1:e,t=(e,t,n)=>e<t?t:e>n?n:e,n=(e,t,n)=>e+(t-e)*n,r=t=>{let n=e(t);return n*n*(3-2*n)},i=t=>1-(1-e(t))**3,a=t=>{let n=e(t);return n<.5?4*n*n*n:1-(-2*n+2)**3/2},o=(t,n,r,i)=>{let a=1-i*(r-1);return e((t-n*i)/a)};export{n as a,i,e as n,r as o,a as r,o as s,t};
