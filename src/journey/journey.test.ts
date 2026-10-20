@@ -13,6 +13,8 @@ import { calculusRig } from '../chapters/06-calculus/rig';
 import { STORY_YS } from '../chapters/06-calculus/math';
 import { eulerRig, TERMS, THETA_MAX } from '../chapters/07-euler/rig';
 import { fourierRig } from '../chapters/08-fourier/rig';
+import { dopplerRig } from '../chapters/09-doppler/rig';
+import { dopplerLevels, SIREN } from '../chapters/09-doppler/sound';
 
 describe('the journey timeline', () => {
   const journey = buildJourney();
@@ -104,7 +106,16 @@ describe('the journey timeline', () => {
       'fourier:yourTurn',
       'fourier:handoff',
       'doppler:flight',
-      'doppler:soon',
+      'doppler:title',
+      'doppler:pass',
+      'doppler:shells',
+      'doppler:formula',
+      'doppler:mach',
+      'doppler:redshift',
+      'doppler:yourTurn',
+      'doppler:handoff',
+      'energy:flight',
+      'energy:soon',
     ]);
     for (const b of journey.beats) expect(journey.master.labels[b.key]).toBeCloseTo(b.start, 6);
   });
@@ -172,6 +183,13 @@ describe('the journey timeline', () => {
     expect(len).toBeLessThan(140);
   });
 
+  it('runs chapter 9 for roughly 100–150 seconds', () => {
+    const ch9 = journey.chapters.find((c) => c.slug === 'doppler')!;
+    const len = ch9.end - ch9.start;
+    expect(len).toBeGreaterThan(100);
+    expect(len).toBeLessThan(150);
+  });
+
   it('pauses once per chapter, inside its Your-turn beat', () => {
     const paused = journey.beats.filter((b) => b.pauseAt !== undefined);
     expect(paused.map((b) => b.key)).toEqual([
@@ -183,6 +201,7 @@ describe('the journey timeline', () => {
       'calculus:yourTurn',
       'euler:yourTurn',
       'fourier:yourTurn',
+      'doppler:yourTurn',
     ]);
     for (const b of paused) {
       expect(b.pauseAt!).toBeGreaterThan(b.start);
@@ -482,6 +501,80 @@ describe('the journey timeline', () => {
     master.seek(0, false);
     master.seek(journey.duration - 0.1, false);
     expect(rig.dt).toBeCloseTo(Math.PI * 2, 6);
+    master.seek(t, false);
+    expect(state()).toBe(snap);
+  });
+
+  it("comes down to chapter 9's street at night, and goes up among the galaxies and back", () => {
+    const { master } = journey;
+    const world = runtime.world;
+    const rig = dopplerRig();
+    const beat = (id: string) => journey.beats.find((b) => b.key === `doppler:${id}`)!;
+    master.seek(beat('title').start + 0.1, false);
+    expect(world.night).toBe(1);
+    expect(world.space).toBe(0);
+    expect(rig.street).toBe(1);
+    master.seek(beat('redshift').end - 0.05, false);
+    expect(world.night).toBe(0);
+    expect(world.space).toBe(1);
+    expect(rig.z).toBeCloseTo(0.1, 6);
+    master.seek(beat('yourTurn').end - 0.05, false);
+    expect(world.night).toBe(1);
+    expect(world.space).toBe(0);
+    // Back to the beach (and the night undone) on a seek to the start.
+    master.seek(0, false);
+    expect(world.night).toBe(0);
+    expect(world.space).toBe(0);
+  });
+
+  it("drops chapter 9's siren as the ambulance goes by, by (1 + M)/(1 − M)", () => {
+    const { master } = journey;
+    const rig = dopplerRig();
+    const pass = journey.beats.find((b) => b.key === 'doppler:pass')!;
+    // Coming: the high tone heard 1/(1 − 0.1) higher; going: 1/(1 + 0.1) lower.
+    master.seek(pass.start + 2, false);
+    const coming = dopplerLevels(rig).sirenHz!;
+    master.seek(pass.start + 9, false);
+    const going = dopplerLevels(rig).sirenHz!;
+    // Which of the siren's two tones was sent (they are a fourth apart; the shift is much less than that).
+    const tone = (hz: number) => (hz > Math.sqrt(SIREN.hi * SIREN.lo) ? SIREN.hi : SIREN.lo);
+    expect(coming / tone(coming)).toBeCloseTo(1 / 0.9, 2);
+    expect(going / tone(going)).toBeCloseTo(1 / 1.1, 2);
+  });
+
+  it("booms when chapter 9's jet's cone reaches the listener under its path, and not before", () => {
+    const { master } = journey;
+    const rig = dopplerRig();
+    const mach = journey.beats.find((b) => b.key === 'doppler:mach')!;
+    const boom = journey.cues.find((c) => c.id === 'boom')!;
+    expect(boom.time).toBeGreaterThan(mach.start);
+    expect(boom.time).toBeLessThan(mach.end);
+    master.seek(boom.time - 0.1, false);
+    expect(dopplerLevels(rig).roar ?? 0).toBe(0);
+    master.seek(boom.time + 0.1, false);
+    expect(dopplerLevels(rig).roar ?? 0).toBeGreaterThan(0);
+    expect(rig.st).toBeGreaterThan(0);
+  });
+
+  it("runs chapter 9's slowed waves deterministically, steadily from beat to beat", () => {
+    const { master } = journey;
+    const rig = dopplerRig();
+    const beat = (id: string) => journey.beats.find((b) => b.key === `doppler:${id}`)!;
+    const state = () => JSON.stringify(rig, (k, v) => (k === '_gsap' ? undefined : v));
+    const rate = (a: number, b: number) => {
+      master.seek(a, false);
+      const t0 = rig.st;
+      master.seek(b, false);
+      return (rig.st - t0) / (b - a);
+    };
+    expect(rate(beat('shells').start + 0.5, beat('shells').end - 0.5)).toBeCloseTo(1, 6);
+    const edge = beat('formula').start;
+    expect(rate(edge + 0.1, edge + 2)).toBeCloseTo(0.3, 6);
+    const t = beat('formula').start + 1;
+    master.seek(t, false);
+    const snap = state();
+    master.seek(0, false);
+    master.seek(journey.duration - 0.1, false);
     master.seek(t, false);
     expect(state()).toBe(snap);
   });

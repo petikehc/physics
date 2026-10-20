@@ -27,6 +27,8 @@ export async function renderPlan(plan: AudioPlan, sampleRate = 44100): Promise<A
           e.sfx.continuous('pour', l.pour, time);
           e.sfx.continuous('voice', l.voice, time, l.voiceHz, l.voicePan);
           e.sfx.harmonics(l.harmonics, time, l.harmonicsHz);
+          e.sfx.continuous('siren', l.siren, time, l.sirenHz, l.sirenPan);
+          e.sfx.continuous('roar', l.roar, time, l.roarHz, l.roarPan);
         }, t);
       }
       // Starts the transport at 0, after everything is scheduled.

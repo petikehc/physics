@@ -18,13 +18,27 @@ export const SPACE = {
   fog: '#03040a',
 };
 
+/** A city street at night (chapter 9): a dark sky, and low haze lit orange by the streetlights. */
+export const NIGHT = {
+  zenith: '#04060d',
+  mid: '#0a0d19',
+  horizon: '#1d1a22',
+  glow: '#000000',
+  fog: '#121117',
+};
+
 export type Palette = Record<keyof typeof DUSK, THREE.Color>;
 const dusk = Object.fromEntries(Object.entries(DUSK).map(([k, v]) => [k, new THREE.Color(v)])) as Palette;
 const deep = Object.fromEntries(Object.entries(SPACE).map(([k, v]) => [k, new THREE.Color(v)])) as Palette;
+const city = Object.fromEntries(Object.entries(NIGHT).map(([k, v]) => [k, new THREE.Color(v)])) as Palette;
 
-/** The sky's colours `space` (0..1) of the way from the dusk beach to deep space, written into `out`. */
-export function skyPalette(space: number, out: Palette): Palette {
-  for (const k of Object.keys(dusk) as Array<keyof Palette>) out[k].lerpColors(dusk[k], deep[k], space);
+/**
+ * The sky's colours `space` (0..1) of the way from the dusk beach to deep space, and then `night` (0..1) of the way
+ * from there to the street at night, written into `out`.
+ */
+export function skyPalette(space: number, out: Palette, night = 0): Palette {
+  for (const k of Object.keys(dusk) as Array<keyof Palette>)
+    out[k].lerpColors(dusk[k], deep[k], space).lerp(city[k], night);
   return out;
 }
 

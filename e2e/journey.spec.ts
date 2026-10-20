@@ -13,18 +13,19 @@ test('the landing teaser renders and offers the journey', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('every beat of the journey renders (desktop and phone)', async ({ page }) => {
-  test.setTimeout(900_000);
-  const errors = collectErrors(page);
-  for (const viewport of [
-    { width: 1440, height: 900, name: 'desktop' },
-    { width: 390, height: 844, name: 'phone' },
-  ]) {
+for (const viewport of [
+  { width: 1440, height: 900, name: 'desktop' },
+  { width: 390, height: 844, name: 'phone' },
+]) {
+  test(`every beat of the journey renders (${viewport.name})`, async ({ page }) => {
+    const errors = collectErrors(page);
     await page.setViewportSize(viewport);
     await page.goto(`/play${Q}`);
     await waitForJourney(page);
     const beats = await page.evaluate(() => window.__journey!.beats);
     expect(beats.length).toBeGreaterThan(20);
+    // Time for every beat, however long the journey grows: a software-rendered seek and screenshot take a few seconds.
+    test.setTimeout(120_000 + beats.length * 8_000);
     for (const b of beats) {
       await seek(page, b.start + Math.min((b.end - b.start) * 0.7, 6));
       await page.waitForTimeout(1500);
@@ -33,9 +34,9 @@ test('every beat of the journey renders (desktop and phone)', async ({ page }) =
       });
     }
     await expectCanvasRendered(page);
-  }
-  expect(errors).toEqual([]);
-});
+    expect(errors).toEqual([]);
+  });
+}
 
 test('Your turn pauses the journey, and Continue resumes it', async ({ page }) => {
   const errors = collectErrors(page);
@@ -282,6 +283,40 @@ test('chapter 8: Your turn builds a wave from circles', async ({ page }) => {
   await expect(panel).toContainText('Speeds 1, 2, 3, 4, 5, …');
   await panel.getByRole('button', { name: 'Triangle' }).click();
   await expect(panel).toContainText('Sizes 1, 1/9, 1/25, 1/49, 1/81, …');
+
+  await panel.getByRole('button', { name: /Continue/ }).click();
+  await expect(panel).toBeHidden();
+  await expect
+    .poll(() => page.evaluate(() => window.__journey!.time()), { timeout: 20_000 })
+    .toBeGreaterThan(pauseAt + 0.2);
+  expect(errors).toEqual([]);
+});
+
+test('chapter 9: Your turn sets the ambulance going for a listener on the street', async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.goto(`/play/doppler${Q}`);
+  await waitForJourney(page);
+  const pauseAt = await page.evaluate(
+    () => window.__journey!.beats.find((b) => b.key === 'doppler:yourTurn')!.pauseAt!,
+  );
+  await seek(page, pauseAt - 0.4);
+  await page.evaluate(() => window.__journey!.play());
+  const panel = page.getByRole('complementary', { name: 'Your turn' });
+  await expect(panel).toBeVisible({ timeout: 30_000 });
+  // Half the speed of sound: twice the pitch straight ahead, two thirds of it behind.
+  await expect(panel).toContainText('0.50 × the speed of sound');
+  await expect(panel).toContainText('Straight ahead: 2.00 f. Straight behind: 0.67 f.');
+
+  // Faster (which also stops the countdown to the story going on).
+  const speed = panel.getByLabel('Ambulance');
+  await speed.focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(panel).toContainText('0.55 × the speed of sound');
+  await expect(panel).toContainText('Straight ahead: 2.22 f');
+
+  // The listener, ahead of the ambulance, hears it higher than its siren, and says so in the street too.
+  await expect(panel).toContainText(/The listener hears \d\.\d\d f, higher than the siren/);
+  await expect(page.getByText(/you hear \d\.\d\d f/)).toBeVisible();
 
   await panel.getByRole('button', { name: /Continue/ }).click();
   await expect(panel).toBeHidden();

@@ -17,6 +17,8 @@ const SHADOW_ELEVATION = (50 * Math.PI) / 180;
 const SUN_LIGHT = 1.7;
 const HEMI_LIGHT = 0.75;
 const FOG: Record<'near' | 'far', [number, number]> = { near: [26, 140], far: [150, 460] };
+/** The street at night: the haze closes in, so the far ends of the street fade into the streetlights' glow. */
+const NIGHT_FOG: [number, number] = [30, 240];
 
 const sand = createSandMaterial();
 sand.uniforms.uZenith.value.set(DUSK.zenith);
@@ -66,10 +68,10 @@ export function Beach() {
     return light;
   }, [quality]);
 
-  // The last `space` the lights and haze were set for (a new sun light starts at full dusk strength).
-  const last = useRef(-1);
+  // The last `space` and `night` the lights and haze were set for (a new sun light starts at full dusk strength).
+  const last = useRef([-1, -1]);
   useEffect(() => {
-    last.current = -1;
+    last.current = [-1, -1];
     return () => sun.dispose();
   }, [sun]);
 
@@ -97,22 +99,28 @@ export function Beach() {
 
   useFrame((state) => {
     beachSand.uTime.value = state.clock.elapsedTime;
-    const space = runtime.world.space;
-    if (space === last.current) return;
-    last.current = space;
+    const { space, night } = runtime.world;
+    if (space === last.current[0] && night === last.current[1]) return;
+    last.current = [space, night];
     // Rising into space: the sun and the sky's glow go out, the haze (and the sand far below, which fades into
-    // it) turns the colour of the night, and the fog draws back so a whole solar system fits in view.
-    skyPalette(space, palette);
+    // it) turns the colour of the night, and the fog draws back so a whole solar system fits in view. Coming down
+    // to the street at night, the ground comes back and the haze closes in again.
+    skyPalette(space, palette, night);
     beachSand.uZenith.value.copy(palette.zenith);
     beachSand.uMid.value.copy(palette.mid);
     beachSand.uHorizon.value.copy(palette.horizon);
     beachSand.uGlow.value.copy(palette.glow);
     fog.color.copy(palette.fog);
-    fog.near = THREE.MathUtils.lerp(FOG.near[0], FOG.near[1], space);
-    fog.far = THREE.MathUtils.lerp(FOG.far[0], FOG.far[1], space);
-    sun.intensity = SUN_LIGHT * (1 - space);
-    if (hemi.current) hemi.current.intensity = HEMI_LIGHT * (1 - 0.85 * space);
-    if (ground.current) ground.current.visible = space < 0.99;
+    fog.near = THREE.MathUtils.lerp(
+      THREE.MathUtils.lerp(FOG.near[0], FOG.near[1], space),
+      NIGHT_FOG[0],
+      night,
+    );
+    fog.far = THREE.MathUtils.lerp(THREE.MathUtils.lerp(FOG.far[0], FOG.far[1], space), NIGHT_FOG[1], night);
+    sun.intensity = SUN_LIGHT * (1 - space) * (1 - night);
+    if (hemi.current) hemi.current.intensity = HEMI_LIGHT * (1 - 0.85 * space) * (1 - 0.45 * night);
+    // At night the street brings its own ground; the sand would only flicker against it.
+    if (ground.current) ground.current.visible = space < 0.99 && night < 0.5;
   });
 
   return (

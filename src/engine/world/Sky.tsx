@@ -23,6 +23,7 @@ const fragment = /* glsl */ `
   uniform float uTime;
   uniform float uStars;
   uniform float uSpace;
+  uniform float uNight;
   varying vec3 vDir;
 
   float hash2(vec2 p) {
@@ -44,10 +45,13 @@ const fragment = /* glsl */ `
     col += uGlow * smoothstep(0.99986, 0.99992, sunAmt) * 1.4 * (1.0 - uSpace);
     col += uGlow * pow(sunAmt, 90.0) * 0.22 * (1.0 - uSpace);
 
+    // At night in the city, the streetlights light the haze all round the horizon, not just towards a sun.
+    col += uHorizon * exp(-max(h, 0.0) * 7.0) * 0.4 * uNight;
+
     // In space, a faint band of the Milky Way across the whole sphere.
     float across = dot(d, normalize(vec3(0.35, 0.82, -0.45)));
     float clouds = 0.6 + 0.4 * sin(d.x * 9.0 + sin(d.z * 7.0) * 2.0) * sin(d.y * 11.0 - d.z * 5.0);
-    col += vec3(0.075, 0.07, 0.11) * exp(-across * across * 26.0) * clouds * uSpace;
+    col += vec3(0.075, 0.07, 0.11) * exp(-across * across * 26.0) * clouds * uSpace * (1.0 - uNight);
 
     // Procedural stars: one candidate per cell of a lat-long grid, drawn as a soft dot.
     vec2 g = vec2(atan(d.z, d.x), asin(clamp(h, -1.0, 1.0))) * 150.0;
@@ -60,7 +64,9 @@ const fragment = /* glsl */ `
     float sky = mix(smoothstep(0.06, 0.45, h), 1.0, uSpace);
     float star = step(0.982 - 0.008 * uSpace, s) * smoothstep(0.2 * bright, 0.0, dist) * sky;
     float tw = 0.65 + 0.35 * sin(uTime * (1.0 + s * 3.0) + s * 40.0);
-    col += vec3(0.95, 0.92, 1.0) * star * tw * uStars * bright * (1.6 + 0.8 * uSpace);
+    // The city's glow drowns all but the brighter stars.
+    float city = 1.0 - uNight * smoothstep(0.5, 0.95, 1.0 - bright * 0.9);
+    col += vec3(0.95, 0.92, 1.0) * star * tw * uStars * bright * (1.6 + 0.8 * uSpace) * city;
 
     gl_FragColor = vec4(col, 1.0);
     #include <colorspace_fragment>
@@ -85,6 +91,7 @@ export function Sky({ stars = 1 }: { stars?: number }) {
           uTime: { value: 0 },
           uStars: { value: stars },
           uSpace: { value: 0 },
+          uNight: { value: 0 },
         },
       }),
     [stars],
@@ -96,10 +103,11 @@ export function Sky({ stars = 1 }: { stars?: number }) {
   useFrame((state) => {
     const u = material.uniforms;
     u.uTime!.value = state.clock.elapsedTime;
-    const space = runtime.world.space;
-    if (u.uSpace!.value !== space) {
+    const { space, night } = runtime.world;
+    if (u.uSpace!.value !== space || u.uNight!.value !== night) {
       u.uSpace!.value = space;
-      skyPalette(space, palette);
+      u.uNight!.value = night;
+      skyPalette(space, palette, night);
       u.uZenith!.value.copy(palette.zenith);
       u.uMid!.value.copy(palette.mid);
       u.uHorizon!.value.copy(palette.horizon);

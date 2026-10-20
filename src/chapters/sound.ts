@@ -7,6 +7,7 @@ import { newtonMeter } from './05-newton/sound';
 import { calculusMeter } from './06-calculus/sound';
 import { eulerMeter } from './07-euler/sound';
 import { fourierMeter } from './08-fourier/sound';
+import { dopplerMeter } from './09-doppler/sound';
 
 /** Levels of the continuous sound layers, 0..1. */
 export interface Levels {
@@ -22,6 +23,14 @@ export interface Levels {
   /** Chapter 8's additive voice: each harmonic's loudness (the fundamental first), over a fundamental in Hz. */
   harmonics?: number[];
   harmonicsHz?: number;
+  /** Chapter 9's ambulance siren as heard: how loud, its pitch, where it sits. */
+  siren?: number;
+  sirenHz?: number;
+  sirenPan?: number;
+  /** Chapter 9's jet as heard: how loud, how bright its roar (Hz), where it sits. */
+  roar?: number;
+  roarHz?: number;
+  roarPan?: number;
 }
 
 /** Called once per frame with the elapsed time; returns the continuous levels since the last call. */
@@ -38,6 +47,7 @@ export function continuousMeter(): Meter {
     calculusMeter(),
     eulerMeter(),
     fourierMeter(),
+    dopplerMeter(),
   ];
   return (dt) => {
     const out: Required<Levels> = {
@@ -48,6 +58,12 @@ export function continuousMeter(): Meter {
       voicePan: 0,
       harmonics: new Array<number>(HARMONICS).fill(0),
       harmonicsHz: 0,
+      siren: 0,
+      sirenHz: 0,
+      sirenPan: 0,
+      roar: 0,
+      roarHz: 0,
+      roarPan: 0,
     };
     let loudest = 0;
     for (const m of meters) {
@@ -58,6 +74,16 @@ export function continuousMeter(): Meter {
         out.voice = l.voice ?? 0;
         out.voiceHz = l.voiceHz ?? 0;
         out.voicePan = l.voicePan ?? 0;
+      }
+      if ((l.siren ?? 0) > out.siren) {
+        out.siren = l.siren ?? 0;
+        out.sirenHz = l.sirenHz ?? 0;
+        out.sirenPan = l.sirenPan ?? 0;
+      }
+      if ((l.roar ?? 0) > out.roar) {
+        out.roar = l.roar ?? 0;
+        out.roarHz = l.roarHz ?? 0;
+        out.roarPan = l.roarPan ?? 0;
       }
       const sum = (l.harmonics ?? []).reduce((a, b) => a + b, 0);
       if (sum > loudest) {
@@ -86,6 +112,14 @@ export function createSoundFrame() {
       pan: l.voicePan ?? 0,
     });
     audio.harmonics(playing || interactive ? (l.harmonics ?? []) : [], l.harmonicsHz ?? 0);
+    audio.continuous('siren', playing || interactive ? (l.siren ?? 0) : 0, {
+      hz: l.sirenHz ?? 0,
+      pan: l.sirenPan ?? 0,
+    });
+    audio.continuous('roar', playing || interactive ? (l.roar ?? 0) : 0, {
+      hz: l.roarHz ?? 0,
+      pan: l.roarPan ?? 0,
+    });
     pythagorasSides(interactive === 'pythagoras');
   };
 }

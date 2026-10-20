@@ -220,7 +220,41 @@ test('the fourier lab builds waves, turns them side on, and redraws a shape you 
   expect(errors).toEqual([]);
 });
 
-test('labs that are not built yet say so', async ({ page }) => {
+test('the doppler lab plays an ambulance and a jet to a listener, and red-shifts a galaxy', async ({
+  page,
+}) => {
+  const errors = collectErrors(page);
   await page.goto('/lab/doppler?quality=low');
+  const panel = page.getByRole('complementary', { name: 'Doppler lab' });
+  await expect(panel).toBeVisible();
+  await expect(panel).toContainText('Straight ahead: 2.00 f');
+  await expect(page.getByText(/you hear/)).toBeVisible({ timeout: 10_000 });
+
+  // The listener walks towards the ambulance's side of the street.
+  const walk = panel.getByLabel('Listener');
+  await walk.focus();
+  await page.keyboard.press('ArrowLeft');
+  await expect(panel).toContainText('0.05 × the speed of sound, to the left');
+
+  // Faster than sound: nothing is heard ahead of the jet until its cone has gone by.
+  await panel.getByRole('button', { name: 'Jet' }).click();
+  await expect(panel.getByRole('button', { name: 'Jet' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(panel).toContainText('1.40 × the speed of sound');
+  await expect(panel).toContainText('Straight ahead: nothing until it has passed.');
+
+  // Light: a red shift of 0.4 stretches every wavelength by 1.4.
+  await panel.getByRole('button', { name: 'Light' }).click();
+  await panel.getByLabel('Red shift z').fill('0.4');
+  await expect(panel).toContainText('Moving away at 32.4% of the speed of light', { timeout: 10_000 });
+  await expect(panel).toContainText('arrives at 681 nm');
+  await page.waitForTimeout(2500);
+  await expect(page.getByText('Hα', { exact: true })).toBeVisible();
+  await expectCanvasRendered(page);
+  await page.screenshot({ path: test.info().outputPath('lab-doppler.png') });
+  expect(errors).toEqual([]);
+});
+
+test('labs that are not built yet say so', async ({ page }) => {
+  await page.goto('/lab/energy?quality=low');
   await expect(page.getByText('This Lab is in production.')).toBeVisible();
 });

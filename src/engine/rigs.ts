@@ -116,10 +116,15 @@ export interface WorldRig {
    * haze have faded away.
    */
   space: number;
+  /**
+   * 0 = as `space` says; 1 = a city street at night (chapter 9): the ground back, a dark sky with a few stars, and
+   * haze lit orange by streetlights.
+   */
+  night: number;
 }
 
 export function createWorldRig(): WorldRig {
-  return { space: 0 };
+  return { space: 0, night: 0 };
 }
 
 /** Copies every own property of `src` onto `dst` (used to reset rigs between modes). */

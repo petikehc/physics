@@ -282,6 +282,12 @@ function exposeTestHook(c: JourneyController) {
             voicePan: l.voicePan ?? 0,
             harmonics: [...(l.harmonics ?? [])],
             harmonicsHz: l.harmonicsHz ?? 0,
+            siren: l.siren ?? 0,
+            sirenHz: l.sirenHz ?? 0,
+            sirenPan: l.sirenPan ?? 0,
+            roar: l.roar ?? 0,
+            roarHz: l.roarHz ?? 0,
+            roarPan: l.roarPan ?? 0,
           },
         });
       }

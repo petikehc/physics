@@ -15,6 +15,8 @@ import { YourTurnPanel as EulerYourTurn } from './07-euler/ui/YourTurnPanel';
 import { LabPanel as EulerLab, enterEulerLab } from './07-euler/ui/LabPanel';
 import { YourTurnPanel as FourierYourTurn } from './08-fourier/ui/YourTurnPanel';
 import { LabPanel as FourierLab, enterFourierLab } from './08-fourier/ui/LabPanel';
+import { YourTurnPanel as DopplerYourTurn } from './09-doppler/ui/YourTurnPanel';
+import { LabPanel as DopplerLab, enterDopplerLab } from './09-doppler/ui/LabPanel';
 
 /** The page-level React side of a chapter: its Your-turn panel, its Lab and its formula. */
 export interface ChapterViews {
@@ -97,6 +99,15 @@ export const VIEWS: Record<string, ChapterViews> = {
     formula: {
       tex: 'f(t) = \\sum_{n} \\textcolor{#e05bb4}{a_n} \\sin(\\textcolor{#e05bb4}{n}\\,\\omega t + \\varphi_n)',
       caption: 'A Fourier series',
+    },
+  },
+  doppler: {
+    YourTurn: DopplerYourTurn,
+    Lab: DopplerLab,
+    enterLab: enterDopplerLab,
+    formula: {
+      tex: "f' = f\\,\\frac{v + \\textcolor{#ffd9a0}{v_o}}{v - \\textcolor{#5b8cff}{v_s}}",
+      caption: 'The Doppler effect',
     },
   },
 };
