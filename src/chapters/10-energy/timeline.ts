@@ -10,6 +10,7 @@ import {
   energyRig,
   STORY_TEST,
   storyRide,
+  TEST_CX,
   storyTestTrack,
   SYM10,
   testRide,
@@ -19,20 +20,17 @@ const SLUG = 'energy';
 type Frame = { pos: V3; target: V3; portrait: number };
 
 /** The fairground from the front and to the left: the coaster's lift hill, its loop, and the wheel behind. */
-const FAIR: Frame = { pos: [-34, 7, 46], target: [10, 12, -6], portrait: 0.6 };
-/** Side on to the loop and the camel-back, the tanks standing on the right. */
-const SIDE: Frame = { pos: [44, 12, 64], target: [44, 9, -2], portrait: 0.8 };
-/** The brake run, the tanks on the left. */
-const BRAKES: Frame = { pos: [80, 9, 58], target: [84, 5, -3], portrait: 0.8 };
-/** The test track, side on, the tanks on its right. */
-const TEST: Frame = { pos: [10, 10, 84], target: [10, 8, 22], portrait: 0.8 };
+const FAIR: Frame = { pos: [-34, 7, 46], target: [12, 12, -6], portrait: 0.6 };
+/** Side on to the loop and the camel-back, a little to their right: the tanks hang on the right of the picture. */
+const SIDE: Frame = { pos: [55, 12, 64], target: [55, 9, -2], portrait: 0.8 };
+/** The brake run, close, from in front and to the left; the tanks hang on the right. */
+const BRAKES: Frame = { pos: [77, 5, 24], target: [93, 2.5, -3], portrait: 0.7 };
+/** The test track, side on, a little to its right: the tanks hang on the right of the picture. */
+const TEST: Frame = { pos: [TEST_CX + 15, 9, 76], target: [TEST_CX + 15, 7, 22], portrait: 0.8 };
 /** As the test track, further back and lower in the picture, leaving room for the formula at the top. */
-const FORMULA: Frame = { pos: [6, 13, 96], target: [6, 11, 22], portrait: 0.8 };
+const FORMULA: Frame = { pos: [TEST_CX + 6, 13, 92], target: [TEST_CX + 6, 11, 22], portrait: 0.8 };
 /** The viewer's test track, a little right of centre so the panel leaves it clear. */
-const PLAY: Frame = { pos: [16, 11, 70], target: [16, 7, 22], portrait: 1 };
-
-/** Where the tanks stand for each scene (x, z). */
-const TANKS_AT = { side: [72, 18], brakes: [58, 20], test: [36, 26] } as const;
+const PLAY: Frame = { pos: [TEST_CX + 16, 11, 70], target: [TEST_CX + 16, 7, 22], portrait: 1 };
 
 /** The camera on a ride in the front car: in its seat, looking along the track ahead. */
 function pov(ride: RideSample[], t0: number, t1: number, at: number, approach: number, step = 0.1) {
@@ -42,15 +40,21 @@ function pov(ride: RideSample[], t0: number, t1: number, at: number, approach: n
   const n = Math.max(1, Math.round((t1 - t0) / step));
   for (let i = 0; i <= n; i++) {
     const s = rideAt(ride, t0 + ((t1 - t0) * i) / n).s;
-    const seat = trackAt(track, s - 0.4);
-    const ahead = trackAt(track, s + 14);
+    // In the front seat (the front car itself is not drawn while it is ridden in).
+    const seat = trackAt(track, s + 0.3);
+    // Looking the way the track runs a few metres ahead: along it, over the crest and down the drop.
+    const along = trackAt(track, s + 5);
+    const ahead: { p: V3; up: V3 } = {
+      p: [seat.p[0] + along.tan[0] * 12, seat.p[1] + along.tan[1] * 12, seat.p[2] + along.tan[2] * 12],
+      up: seat.up,
+    };
     keyframes.push({
-      px: o.x + seat.p[0] + seat.up[0] * 1.7,
-      py: o.y + seat.p[1] + seat.up[1] * 1.7,
-      pz: o.z + seat.p[2] + seat.up[2] * 1.7,
-      tx: o.x + ahead.p[0] + ahead.up[0] * 1.2,
-      ty: o.y + ahead.p[1] + ahead.up[1] * 1.2,
-      tz: o.z + ahead.p[2] + ahead.up[2] * 1.2,
+      px: o.x + seat.p[0] + seat.up[0] * 1.9,
+      py: o.y + seat.p[1] + seat.up[1] * 1.9,
+      pz: o.z + seat.p[2] + seat.up[2] * 1.9,
+      tx: o.x + ahead.p[0] + ahead.up[0] * 0.6,
+      ty: o.y + ahead.p[1] + ahead.up[1] * 0.6,
+      tz: o.z + ahead.p[2] + ahead.up[2] * 0.6,
       fov: 62,
       portrait: 0,
       shake: 0.2,
@@ -71,7 +75,7 @@ export function buildEnergy(j: JourneyBuilder) {
   const opts = coasterRide();
   /** The moments that matter in the story's ride: over the top, at the foot of the loop, into the brakes, stopped. */
   const crest = timeAt(ride, opts.lift!.to)!;
-  const loop = timeAt(ride, sAtX(track, 17))!;
+  const loop = timeAt(ride, sAtX(track, 20))!;
   const brakes = timeAt(ride, opts.brakes!.from)!;
   const stopped = ride.find((r) => r.t > brakes && r.v === 0)?.t ?? brakes + 3;
 
@@ -80,7 +84,7 @@ export function buildEnergy(j: JourneyBuilder) {
     tl.set(rig, { ...ENERGY_DEFAULTS }, 0);
     // On down the street to the fairground at its end, its lights coming on; the coaster's loop flies ahead.
     tl.to(rig, { fair: 1, train: 1, duration: 1.6 }, d * 0.45);
-    tl.to(dust, { x: o.x + 25.5, y: o.y + 10.5, z: o.z - 1.5, duration: d, ease: 'power2.inOut' }, 0);
+    tl.to(dust, { x: o.x + 28.5, y: o.y + 10.5, z: o.z - 1.5, duration: d, ease: 'power2.inOut' }, 0);
     tl.to(dust, { scale: 3.4, spin: 0, size: 0.9, duration: d }, 0);
     shot(tl, SLUG, { ...FAIR, focus: [10, 10, 0], fov: 40, dof: 0, shake: 0.4 }, d, 0, 'power2.inOut');
     tl.to(runtime.camera, { lift: 6, duration: d / 2, ease: 'sine.out' }, 0);
@@ -107,9 +111,9 @@ export function buildEnergy(j: JourneyBuilder) {
         dust,
         {
           x: o.x,
-          y: o.y + 80,
-          z: o.z - 70,
-          scale: 80,
+          y: o.y + 2.6,
+          z: o.z - 20,
+          scale: 4.2,
           size: 0.55,
           spin: 0.001,
           swirl: 0.3,
@@ -150,7 +154,7 @@ export function buildEnergy(j: JourneyBuilder) {
     shot(
       tl,
       SLUG,
-      { ...SIDE, focus: [40, 8, 0], fov: 40, dof: 0, shake: 0.3 },
+      { ...SIDE, focus: [43, 8, 0], fov: 40, dof: 0, shake: 0.3 },
       out,
       settle + loop,
       'power2.inOut',
@@ -164,8 +168,7 @@ export function buildEnergy(j: JourneyBuilder) {
     body: 'Slowed right down, with its energy in tanks: [pe:height]’s part, mgh, and [ke:speed]’s part, ½mv². Down into the loop, height pours into speed; up and round, speed pours back into height. A little leaks away as [heat:heat]. The total never moves.',
   };
   j.beat(SLUG, tanksDef, ({ tl, cue }) => {
-    const [gx, gz] = TANKS_AT.side;
-    tl.set(rig, { gauge: 0, gx, gz, heat: 1 }, 0);
+    tl.set(rig, { gauge: 0, heat: 1 }, 0);
     tl.to(rig, { tanks: 1, duration: 0.8 }, 0.3);
     cue(0.3, 'rise', { gain: 0.3 });
     const len = Math.max(readingTime(tanksDef), 12);
@@ -183,12 +186,8 @@ export function buildEnergy(j: JourneyBuilder) {
     body: 'At the end, the brakes clamp on. The speed doesn’t vanish: it turns into [heat:heat], in the brakes, the wheels, the air. James Joule measured it in the 1840s: so much work, churning water, always made so much warmth.',
   };
   j.beat(SLUG, brakesDef, ({ tl, cue }) => {
-    const [gx, gz] = TANKS_AT.brakes;
-    // The tanks step aside to watch the brakes, as the camera follows the train into them.
-    tl.to(rig, { tanks: 0, duration: 0.4 }, 0);
-    tl.set(rig, { gx, gz }, 0.45);
-    tl.to(rig, { tanks: 1, duration: 0.6 }, 1.3);
-    shot(tl, SLUG, { ...BRAKES, focus: [86, 3, -3], dof: 0, shake: 0.3 }, 1.8, 0, 'power2.inOut');
+    // The camera follows the train into the brakes.
+    shot(tl, SLUG, { ...BRAKES, focus: [89, 3, -3], dof: 0, shake: 0.3 }, 1.8, 0, 'power2.inOut');
     const slow = 1.6;
     const run = (stopped + 0.4 - (brakes - 0.15)) * slow;
     tl.fromTo(
@@ -213,11 +212,10 @@ export function buildEnergy(j: JourneyBuilder) {
     minDuration: 13,
   };
   j.beat(SLUG, rollDef, ({ tl, cue }) => {
-    const [gx, gz] = TANKS_AT.test;
     tl.to(rig, { tanks: 0, duration: 0.4 }, 0);
-    tl.set(rig, { gx, gz, gauge: 1, heat: 0, run: 0, testT: 0, train: 1 }, 0.45);
+    tl.set(rig, { gauge: 1, heat: 0, run: 0, testT: 0, train: 1 }, 0.45);
     tl.to(rig, { test: 1, duration: 0.6 }, 0.6);
-    shot(tl, SLUG, { ...TEST, focus: [0, 6, 22], dof: 0, shake: 0.3 }, 2.2, 0, 'power2.inOut');
+    shot(tl, SLUG, { ...TEST, focus: [TEST_CX, 6, 22], dof: 0, shake: 0.3 }, 2.2, 0, 'power2.inOut');
     tl.to(rig, { tanks: 1, level: 1, duration: 0.8 }, 1.6);
     const len = Math.max(readingTime(rollDef), rollDef.minDuration!) - 2;
     tl.fromTo(rig, { testT: 0 }, { testT: len, duration: len, ease: 'none', immediateRender: false }, 2);
@@ -251,8 +249,9 @@ export function buildEnergy(j: JourneyBuilder) {
   };
   j.beat(SLUG, formula, ({ tl, cue }) => {
     cue(0.35, 'formula', { chapter: 10 });
-    tl.to(rig, { sparks: 0, level: 0, duration: 0.6 }, 0);
-    shot(tl, SLUG, { ...FORMULA, focus: [0, 6, 22], dof: 0, shake: 0.3 }, 3.5, 0, 'power2.inOut');
+    // The tanks step back for the formula (on a phone they would share the top of the picture with it).
+    tl.to(rig, { sparks: 0, level: 0, tanks: 0, duration: 0.6 }, 0);
+    shot(tl, SLUG, { ...FORMULA, focus: [TEST_CX, 6, 22], dof: 0, shake: 0.3 }, 3.5, 0, 'power2.inOut');
   });
 
   j.beat(
@@ -266,7 +265,14 @@ export function buildEnergy(j: JourneyBuilder) {
     ({ tl, pauseHere }) => {
       tl.to(rig, { tanks: 0, duration: 0.5 }, 0);
       tl.set(rig, { h0: STORY_TEST.h0, h4: STORY_TEST.h4, mu: 0, mass: 400, sandT: 0, level: 1, heat: 1 }, 0);
-      shot(tl, SLUG, { ...PLAY, focus: [0, 6, 22], fov: 40, dof: 0, shake: 0.25 }, 2.6, 0, 'power3.inOut');
+      shot(
+        tl,
+        SLUG,
+        { ...PLAY, focus: [TEST_CX, 6, 22], fov: 40, dof: 0, shake: 0.25 },
+        2.6,
+        0,
+        'power3.inOut',
+      );
       tl.set(rig, { interactive: 1 }, 2.6);
       pauseHere(2.7);
       tl.set(rig, { interactive: 0 }, 2.8);
@@ -285,47 +291,73 @@ export function buildEnergy(j: JourneyBuilder) {
     },
     ({ tl, cue }) => {
       tl.to(rig, { test: 0, level: 0, duration: 1 }, 0);
+      // Back to where the train stopped, sparks still rising off its brakes in front of the wheel...
+      const brake = trackAt(track, ride[ride.length - 1]!.s).p;
       shot(
         tl,
         SLUG,
-        { pos: [60, 4, 46], target: [74, 30, -30], focus: [80, 20, -20], dof: 0, shake: 0.3, portrait: 0.6 },
-        6,
-        0.4,
+        { pos: [brake[0] - 30, 6, 44], target: [brake[0], 10, brake[2]], dof: 0, shake: 0.3, portrait: 0.7 },
+        2.4,
+        0,
         'power2.inOut',
       );
-      // Sparks off the brake run, gathering and rising to join the stars.
-      const brake = trackAt(track, ride[ride.length - 1]!.s).p;
+      // ...then tilting up after them as they climb into the night and scatter into stars.
+      shot(
+        tl,
+        SLUG,
+        {
+          pos: [brake[0] - 36, 3, 50],
+          target: [brake[0] - 6, 34, brake[2] - 10],
+          dof: 0,
+          shake: 0.25,
+          portrait: 0.7,
+        },
+        5.6,
+        2.4,
+        'sine.inOut',
+      );
       tl.set(
         dust,
         {
-          from: 'stars',
-          to: 'stars',
+          from: 'embers',
+          to: 'embers',
           morph: 1,
           x: o.x + brake[0],
-          y: o.y + brake[1] + 1,
+          y: o.y + brake[1] + 0.6,
           z: o.z + brake[2],
-          scale: 2,
-          size: 0.8,
-          colorA: '#ffe2c4',
+          rotX: 0,
+          rotY: 0,
+          scale: 4.2,
+          size: 2.4,
+          opacity: 0,
+          spin: 0.15,
+          swirl: 0,
+          drift: 30,
+          colorA: '#ffd2a0',
           colorB: SYM10.pe,
         },
-        0.8,
+        0.3,
       );
+      tl.to(dust, { opacity: 1, duration: 1 }, 0.3);
+      tl.to(dust, { y: o.y + brake[1] + 10, duration: 4.2, ease: 'power1.in' }, 0.5);
+      tl.set(dust, { from: 'embers', to: 'stars', morph: 0 }, 4.6);
+      tl.to(dust, { morph: 1, duration: 4.4, ease: 'power2.inOut' }, 4.6);
       tl.to(
         dust,
         {
           x: o.x + 40,
-          y: o.y + 90,
-          z: o.z - 80,
-          scale: 90,
-          size: 0.55,
-          swirl: 0.6,
+          y: o.y + 2.6,
+          z: o.z - 20,
+          size: 0.6,
+          spin: 0.002,
+          swirl: 1,
+          drift: 0.2,
           colorA: '#f4efe6',
           colorB: '#ffe9d0',
-          duration: 6,
+          duration: 4.4,
           ease: 'power2.inOut',
         },
-        0.9,
+        4.6,
       );
       cue(0.9, 'gather');
       tl.to(rig, { fair: 0.35, duration: 4 }, 3);

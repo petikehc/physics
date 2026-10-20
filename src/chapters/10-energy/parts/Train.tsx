@@ -28,6 +28,8 @@ interface Props {
   /** Where the front car is (metres along) and whether the train shows, read each frame. */
   front: () => number;
   shown: () => boolean;
+  /** Whether the front car is hidden (the camera is riding in it). */
+  riding?: () => boolean;
   cars?: number;
   gap?: number;
 }
@@ -36,10 +38,17 @@ interface Props {
  * A coaster train: open cars in the chapter's orange, each with two benches, riding the track one behind the other;
  * the front car carries a headlight.
  */
-export function Train({ track, front, shown, cars = 1, gap = 2.9 }: Props) {
+export function Train({ track, front, shown, riding, cars = 1, gap = 2.9 }: Props) {
   const groups = useRef<Array<THREE.Group | null>>([]);
   const body = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: SYM10.pe, roughness: 0.4, metalness: 0.25 }),
+    () =>
+      new THREE.MeshStandardMaterial({
+        color: SYM10.pe,
+        roughness: 0.4,
+        metalness: 0.25,
+        emissive: SYM10.pe,
+        emissiveIntensity: 0.3,
+      }),
     [],
   );
   const dark = useMemo(() => new THREE.MeshStandardMaterial({ color: '#1d2028', roughness: 0.8 }), []);
@@ -47,9 +56,10 @@ export function Train({ track, front, shown, cars = 1, gap = 2.9 }: Props) {
   useFrame(() => {
     const on = shown();
     const s = front();
+    const inside = riding?.() ?? false;
     groups.current.forEach((g, k) => {
       if (!g) return;
-      g.visible = on;
+      g.visible = on && !(inside && k === 0);
       if (on) placeOn(g, track, s - k * gap);
     });
   });

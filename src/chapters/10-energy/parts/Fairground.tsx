@@ -4,8 +4,8 @@ import * as THREE from 'three';
 import { clamp01 } from '../../../engine/ease';
 import { energyRig, SYM10 } from '../rig';
 
-/** The Ferris wheel: where it stands (behind the coaster), how big, how many cars, how fast it turns (rad/s). */
-const WHEEL = { x: 18, z: -46, r: 17, cars: 16, speed: 0.06 };
+/** The Ferris wheel: where it stands (behind the brake run, clear of the loop), how big, how many cars, how fast it turns. */
+const WHEEL = { x: 112, z: -40, r: 17, cars: 16, speed: 0.06 };
 /** Lamp posts round the fairground (x, z), each throwing a pool of light. */
 const LAMPS: Array<[number, number]> = [
   [-52, 10],
@@ -14,10 +14,12 @@ const LAMPS: Array<[number, number]> = [
   [14, 12],
   [36, 12],
   [58, 12],
-  [-40, 34],
-  [-10, 34],
-  [20, 34],
-  [50, 34],
+  [80, 12],
+  [104, 12],
+  [128, 12],
+  [150, 4],
+  [172, 12],
+  [194, 12],
 ];
 /** Strings of bulbs, each hung between two posts (x, z), sagging in the middle. */
 const STRINGS: Array<[[number, number], [number, number]]> = [
@@ -42,16 +44,24 @@ const STRINGS: Array<[[number, number], [number, number]]> = [
     [58, 12],
   ],
   [
-    [-40, 34],
-    [-10, 34],
+    [58, 12],
+    [80, 12],
   ],
   [
-    [-10, 34],
-    [20, 34],
+    [80, 12],
+    [104, 12],
   ],
   [
-    [20, 34],
-    [50, 34],
+    [128, 12],
+    [150, 4],
+  ],
+  [
+    [150, 4],
+    [172, 12],
+  ],
+  [
+    [172, 12],
+    [194, 12],
   ],
 ];
 const POST_H = 6;

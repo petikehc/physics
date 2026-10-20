@@ -25,9 +25,6 @@ export interface EnergyRig {
   tanks: number;
   heat: number;
   gauge: number;
-  /** Where the tanks stand (x, z). */
-  gx: number;
-  gz: number;
   /** Sparks where friction works hard, 0..1. */
   sparks: number;
   /** Riding in the front car (the sound is heard from there), 0 or 1. */
@@ -56,8 +53,6 @@ export const ENERGY_DEFAULTS: EnergyRig = {
   tanks: 0,
   heat: 0,
   gauge: 0,
-  gx: 46,
-  gz: 18,
   sparks: 0,
   pov: 0,
   level: 0,
@@ -78,7 +73,7 @@ export function energyRig(): EnergyRig {
 // ---------- Layout (station space, metres) ----------
 
 /** The loop's centre and radius; its exit runs LOOP_SHIFT to the side of its entry, so the track misses itself. */
-const LOOP_C: [number, number] = [25.5, 10.5];
+const LOOP_C: [number, number] = [28.5, 10.5];
 const LOOP_R = 8;
 const LOOP_SHIFT = -3;
 
@@ -92,55 +87,63 @@ export const COASTER_POINTS: V3[] = [
   [-33, 2.6, 0],
   [-26, 9.5, 0],
   [-19, 17, 0],
-  [-13, 24, 0],
-  [-9, 28.6, 0],
-  [-5.5, 30.2, 0],
-  [-2.5, 29.4, 0],
-  [0.5, 25.5, 0],
-  [4, 17, 0],
-  [7, 9, 0],
-  [10, 4, 0],
-  [14, 2.3, 0],
-  [19, 2, 0],
+  [-14, 22.6, 0],
+  // A long, round crest: the train tips over it gently, and the riders see the drop open up ahead.
+  [-10, 26.8, 0],
+  [-6, 29.4, 0],
+  [-2, 30.3, 0],
+  [2, 29.6, 0],
+  [5.5, 27.2, 0],
+  [8.5, 22.5, 0],
+  [11, 16, 0],
+  [13, 9.5, 0],
+  [15.5, 4.5, 0],
+  [18.5, 2.4, 0],
+  [22, 2, 0],
   ...Array.from({ length: 17 }, (_, k): V3 => {
     const a = -Math.PI / 2 + (k / 16) * Math.PI * 2;
     return [LOOP_C[0] + LOOP_R * Math.cos(a), LOOP_C[1] + LOOP_R * Math.sin(a), (LOOP_SHIFT * k) / 16];
   }),
-  [32, 2.3, LOOP_SHIFT],
-  [38, 4, LOOP_SHIFT],
-  [43, 10, LOOP_SHIFT],
-  [48, 15.5, LOOP_SHIFT],
-  [52, 17, LOOP_SHIFT],
-  [56, 15.5, LOOP_SHIFT],
-  [61, 9, LOOP_SHIFT],
-  [66, 3.5, LOOP_SHIFT],
-  [71, 2, LOOP_SHIFT],
-  [80, 2, LOOP_SHIFT],
-  [95, 2, LOOP_SHIFT],
-  [110, 2, LOOP_SHIFT],
+  [35, 2.3, LOOP_SHIFT],
+  [41, 4, LOOP_SHIFT],
+  [46, 10, LOOP_SHIFT],
+  [51, 15.5, LOOP_SHIFT],
+  [55, 17, LOOP_SHIFT],
+  [59, 15.5, LOOP_SHIFT],
+  [64, 9, LOOP_SHIFT],
+  [69, 3.5, LOOP_SHIFT],
+  [74, 2, LOOP_SHIFT],
+  [83, 2, LOOP_SHIFT],
+  [98, 2, LOOP_SHIFT],
+  [113, 2, LOOP_SHIFT],
 ];
 
-/** The test track runs along x in front of the coaster, this far out towards the camera. */
+/**
+ * The test track stands off to the right of the coaster, past the Ferris wheel (with open fairground behind it, not the
+ * coaster), and runs along x, centred at TEST_CX, this far out towards the camera.
+ */
+export const TEST_CX = 150;
 export const TEST_Z = 22;
-/** The test track's ends and the bottom of its valley. */
+/** The test track's half-length and the bottom of its valley. */
 const TEST_X = 24;
 const TEST_LOW = 0.6;
 
 /** A valley between a start at h0 and a far hill at h4: where the test car is let go and what it faces. */
 export function testPoints(h0: number, h4: number): V3[] {
-  return [
-    [-TEST_X, h0, TEST_Z],
-    [-19, h0, TEST_Z],
-    [-10, TEST_LOW + (h0 - TEST_LOW) * 0.42, TEST_Z],
-    [0, TEST_LOW, TEST_Z],
-    [10, TEST_LOW + (h4 - TEST_LOW) * 0.42, TEST_Z],
-    [19, h4, TEST_Z],
-    [TEST_X, h4, TEST_Z],
+  const pts: Array<[number, number]> = [
+    [-TEST_X, h0],
+    [-19, h0],
+    [-10, TEST_LOW + (h0 - TEST_LOW) * 0.42],
+    [0, TEST_LOW],
+    [10, TEST_LOW + (h4 - TEST_LOW) * 0.42],
+    [19, h4],
+    [TEST_X, h4],
   ];
+  return pts.map(([x, y]) => [TEST_CX + x, y, TEST_Z]);
 }
 
 /** Where the test car is let go: at the edge of the start's platform, at its full height. */
-export const testStart = (track: Track) => sAtX(track, -19);
+export const testStart = (track: Track) => sAtX(track, TEST_CX - 19);
 
 /** The coaster train: three cars, this far apart (front to front); the coaster's and the test car's masses (kg). */
 export const CARS = 3;
@@ -171,15 +174,15 @@ export function coasterTrack(): Track {
 /** How the story's coaster ride is run: hauled up the lift at 5 m/s, a little rolling friction, firm brakes at the end. */
 export function coasterRide(): RideOptions {
   const t = coasterTrack();
-  const loopEnd = sAtX(t, 32, sAtX(t, 19));
+  const loopEnd = sAtX(t, 35, sAtX(t, 22));
   return {
     // Out of the station and straight onto the chain.
     s0: sAtX(t, -37),
     v0: 0,
     duration: 34,
     mu: 0.015,
-    lift: { from: sAtX(t, -38), to: sAtX(t, -5.5), speed: 5 },
-    brakes: { from: sAtX(t, 74, loopEnd), mu: 0.9 },
+    lift: { from: sAtX(t, -38), to: sAtX(t, -3), speed: 5 },
+    brakes: { from: sAtX(t, 77, loopEnd), mu: 0.9 },
   };
 }
 

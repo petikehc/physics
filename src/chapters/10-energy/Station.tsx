@@ -9,7 +9,7 @@ import { Tanks } from './parts/Tanks';
 import { TestTrack } from './parts/TestTrack';
 import { TrackModel } from './parts/TrackModel';
 import { Train } from './parts/Train';
-import { CAR_GAP, CARS, coasterTrack, energyRig, storyRide, trainNow } from './rig';
+import { CAR_GAP, CARS, coasterTrack, energyRig, storyRide, TEST_CX, trainNow } from './rig';
 import { live, sandboxRelease, sandboxStep } from './sandbox';
 
 const ORIGIN = station('energy');
@@ -22,7 +22,11 @@ export default function EnergyStation() {
   const rig = energyRig();
   const track = coasterTrack();
   const train = useMemo(
-    () => ({ front: () => trainNow(rig).s, shown: () => clamp01(rig.train) > 0.5 }),
+    () => ({
+      front: () => trainNow(rig).s,
+      shown: () => clamp01(rig.train) > 0.5,
+      riding: () => rig.pov > 0.5,
+    }),
     [rig],
   );
   const wasLive = useRef(false);
@@ -47,7 +51,17 @@ export default function EnergyStation() {
     <group position={[ORIGIN.x, ORIGIN.y, ORIGIN.z]}>
       <Fairground />
       <TrackModel track={track} bulbs lit={() => rig.fair} />
-      <Train track={track} front={train.front} shown={train.shown} cars={CARS} gap={CAR_GAP} />
+      <Train
+        track={track}
+        front={train.front}
+        shown={train.shown}
+        riding={train.riding}
+        cars={CARS}
+        gap={CAR_GAP}
+      />
+      {/* Floodlights over the coaster's loop and over the test track. */}
+      <pointLight position={[25, 26, 18]} color="#ffe6c8" intensity={260} distance={90} decay={2} />
+      <pointLight position={[TEST_CX + 4, 18, 36]} color="#ffe6c8" intensity={160} distance={60} decay={2} />
       <TestTrack />
       <Tanks />
       <Sparks />

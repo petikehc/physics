@@ -6,7 +6,7 @@ import { shotVars } from '../../../engine/camera/shots';
 import { station } from '../../../engine/world/stations';
 import { audio } from '../../../audio';
 import { useApp } from '../../../state/store';
-import { energyRig, ENERGY_DEFAULTS, STORY_TEST, type EnergyRig } from '../rig';
+import { energyRig, ENERGY_DEFAULTS, STORY_TEST, TEST_CX, type EnergyRig } from '../rig';
 import { EnergyReadout, TrackControls } from './Controls';
 import { useEnergy } from './useEnergy';
 
@@ -17,14 +17,14 @@ type Mode = 'test' | 'coaster';
 
 /** The panel sits on the right (on a phone, below), so each view keeps its subject left of centre. */
 const FRAMES: Record<Mode, Frame> = {
-  test: { pos: [16, 11, 70], target: [16, 7, 22], portrait: 1 },
+  test: { pos: [TEST_CX + 16, 11, 70], target: [TEST_CX + 16, 7, 22], portrait: 1 },
   coaster: { pos: [42, 16, 100], target: [42, 12, -2], portrait: 0.9 },
 };
 
 /** What each view shows. */
 const SHOWS: Record<Mode, Partial<EnergyRig>> = {
   test: { test: 1, tanks: 0, gauge: 1, loop: 0, level: 1 },
-  coaster: { test: 0, tanks: 1, gauge: 0, loop: 1, level: 0, gx: 72, gz: 18, heat: 1 },
+  coaster: { test: 0, tanks: 1, gauge: 0, loop: 1, level: 0, heat: 1 },
 };
 
 /** Lab-mode display: the test track, let go from 12 m towards a 16 m hill, at the fairground at night. */
@@ -57,9 +57,9 @@ export function enterEnergyLab() {
     to: 'stars',
     morph: 1,
     x: o.x,
-    y: o.y + 80,
-    z: o.z - 70,
-    scale: 80,
+    y: o.y + 2.6,
+    z: o.z - 20,
+    scale: 4.2,
     size: 0.55,
     spin: 0.001,
     swirl: 0.3,

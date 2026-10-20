@@ -173,23 +173,54 @@ export function TrackModel({
 
   return (
     <group>
+      {/* The steel catches the fairground's lights: drawn a little self-lit, so it reads against the night. */}
       <mesh geometry={geo.left}>
-        <meshStandardMaterial color={color} roughness={0.35} metalness={0.7} />
+        <meshStandardMaterial
+          color={color}
+          roughness={0.35}
+          metalness={0.6}
+          emissive={color}
+          emissiveIntensity={0.32}
+        />
       </mesh>
       <mesh geometry={geo.right}>
-        <meshStandardMaterial color={color} roughness={0.35} metalness={0.7} />
+        <meshStandardMaterial
+          color={color}
+          roughness={0.35}
+          metalness={0.6}
+          emissive={color}
+          emissiveIntensity={0.32}
+        />
       </mesh>
       <mesh geometry={geo.spine}>
-        <meshStandardMaterial color="#3d4250" roughness={0.5} metalness={0.5} />
+        <meshStandardMaterial
+          color="#5a6070"
+          roughness={0.5}
+          metalness={0.5}
+          emissive="#5a6070"
+          emissiveIntensity={0.22}
+        />
       </mesh>
       <instancedMesh ref={ties} args={[undefined, undefined, plan.ties.length]} frustumCulled={false}>
         <boxGeometry args={[0.16, 0.12, GAUGE * 2.3]} />
-        <meshStandardMaterial color="#5a5f6c" roughness={0.6} metalness={0.4} />
+        <meshStandardMaterial
+          color="#6a707e"
+          roughness={0.6}
+          metalness={0.4}
+          emissive="#6a707e"
+          emissiveIntensity={0.18}
+        />
       </instancedMesh>
       {plan.cols.length > 0 ? (
         <instancedMesh ref={cols} args={[undefined, undefined, plan.cols.length]} frustumCulled={false}>
           <cylinderGeometry args={[0.16, 0.22, 1, 8]} />
-          <meshStandardMaterial color="#4a4f5c" roughness={0.6} metalness={0.4} />
+          <meshStandardMaterial
+            color="#5a6070"
+            roughness={0.6}
+            metalness={0.4}
+            emissive="#5a6070"
+            emissiveIntensity={0.15}
+          />
         </instancedMesh>
       ) : null}
       {plan.lamps.length > 0 ? (
