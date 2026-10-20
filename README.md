@@ -17,7 +17,8 @@ The full research, storyboards and architecture are in [`docs/PLAN.md`](docs/PLA
 | VI   | The Fundamental Theorem of Calculus | **Playable**: journey, Your turn, Lab, score and sound effects |
 | VII  | Euler's Identity                    | **Playable**: journey, Your turn, Lab, score and sound effects |
 | VIII | Fourier Series                      | **Playable**: journey, Your turn, Lab, score and sound effects |
-| IX–X | Doppler, Energy                     | In production                                                  |
+| IX   | The Doppler Effect                  | **Playable**: journey, Your turn, Lab, score and sound effects |
+| X    | Conservation of Energy              | In production                                                  |
 
 ## Running it
 

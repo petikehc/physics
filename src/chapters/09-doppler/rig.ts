@@ -119,9 +119,10 @@ export const LOOP = 26;
 /** How loud the siren is on the viewer's street: the listener is always close by, so quieter than the pass. */
 export const SIREN_NEAR = 0.6;
 
-/** Up among the galaxies: the galaxy, and the two spectra in front of it. */
-export const GALAXY: V3 = [0, 108, -150];
-export const SPECTRA: V3 = [0, 88.5, -112];
+/** Up among the galaxies: where it is looked at from, the galaxy, and the two spectra in front of it. */
+export const SKY_VIEW: V3 = [0, 86, -84];
+export const GALAXY: V3 = [0, 110, -150];
+export const SPECTRA: V3 = [0, 89.5, -112];
 
 export const SYM9 = {
   /** Bunched waves, a higher note, bluer light: the chapter's blue. */

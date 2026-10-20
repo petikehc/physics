@@ -14,6 +14,7 @@ import {
   LANE,
   SIREN_H,
   SIREN_NEAR,
+  SKY_VIEW,
   SLOW,
   UNDER,
 } from './rig';
@@ -36,7 +37,7 @@ const FORMULA: Frame = { pos: [1.5, 23, 31], target: [1.5, 2.5, 0], portrait: 1 
 /** Side on to the jet's path, low, so its waves and its cone are seen as circles and a V. */
 const JET: Frame = { pos: [-18, 8, 40], target: [-18, 7.5, 0], portrait: 1 };
 /** Up among the galaxies, the two spectra in front. */
-const SKY: Frame = { pos: [0, 86, -84], target: [0, 93, -130], portrait: 0.8 };
+const SKY: Frame = { pos: SKY_VIEW, target: [0, 93, -130], portrait: 0.8 };
 /** The viewer's street, from above, a little to the right so the panel leaves it clear. */
 const PLAY: Frame = { pos: [8, 26, 36], target: [8, 0, -1], portrait: 1 };
 
@@ -220,7 +221,8 @@ export function buildDoppler(j: JourneyBuilder) {
     );
     tl.to(rig, { roar: 0, duration: 2 }, 0.6 + len - 2);
     tl.to(rig, { spheres: 1, rings: 1, roar: 1, duration: 0.8 }, 0.7);
-    tl.to(rig, { listeners: 1, hears: 1, duration: 0.6 }, 2.5);
+    // The listener under the jet's path, once the camera has come round far enough to see them on a phone too.
+    tl.to(rig, { listeners: 1, hears: 1, duration: 0.6 }, 5.5);
     // Side on, following the jet across.
     shot(tl, SLUG, { ...JET, focus: [-18, 7, 0], dof: 0, shake: 0.3 }, 1.6, 0, 'power2.inOut');
     const at = 0.6 + boom - JET0;

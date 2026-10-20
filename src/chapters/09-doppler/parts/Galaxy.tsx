@@ -6,14 +6,18 @@ import { MathLabel } from '../../../engine/labels/MathLabel';
 import { beside } from '../../../engine/labels/beside';
 import { clamp01 } from '../../../engine/ease';
 import { BALMER, recession, VISIBLE } from '../math';
-import { dopplerRig, GALAXY, SPECTRA, SYM9 } from '../rig';
+import { dopplerRig, GALAXY, SKY_VIEW, SPECTRA, SYM9 } from '../rig';
 
 const STARS = 6000;
 const RADIUS = 19;
 /** Each spectrum strip's size, and the gap between the two. */
-const STRIP = { w: 18, h: 1.1, gap: 1.5 };
+const STRIP = { w: 18, h: 1.4, gap: 2 };
+/** Below this width, only the two best-known lines are named: Hγ and Hδ stand too close together to label. */
+const NARROW = 600;
 /** How far the galaxy has drifted away by a red shift of 0.1. */
-const RECEDE = 60;
+const RECEDE = 40;
+/** Straight away from where it is seen from: it shrinks into the distance without sinking behind the spectra. */
+const AWAY = new THREE.Vector3(...GALAXY).sub(new THREE.Vector3(...SKY_VIEW)).normalize();
 
 /** The visible spectrum, roughly as the eye sees it: the same curve as `wavelengthRGB` in the maths. */
 const SPECTRUM_GLSL = /* glsl */ `
@@ -151,15 +155,20 @@ export function Galaxy() {
   const texts = useRef<Array<HTMLDivElement | null>>([]);
   const said = useRef('');
 
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     const on = clamp01(rig.galaxy);
     const strips = clamp01(rig.spectra);
     if (root.current) root.current.visible = on + strips > 0.001;
-    if (on + strips <= 0.001) return;
+    if (on + strips <= 0.001) {
+      // The labels are page elements: hidden with the rest, or they would stay where they were last shown.
+      for (const el of texts.current) if (el && el.style.opacity !== '0') el.style.opacity = '0';
+      return;
+    }
     const z = rig.z;
+    const narrow = state.size.width < NARROW;
     if (spin.current) {
       spin.current.rotation.y += Math.min(delta, 0.1) * 0.05;
-      spin.current.position.set(GALAXY[0], GALAXY[1], GALAXY[2] - (RECEDE * z) / 0.1);
+      spin.current.position.set(...GALAXY).addScaledVector(AWAY, (RECEDE * z) / 0.1);
     }
     mat.uniforms.uOpacity!.value = on;
     mat.uniforms.uRed!.value = clamp01(z * 4);
@@ -183,8 +192,8 @@ export function Galaxy() {
       labels.current[i]?.position.set(x(l.nm), top + STRIP.h / 2, SPECTRA[2]);
       const el = texts.current[i];
       if (el) {
-        el.style.opacity = String(strips);
-        beside(el, 0, 1, 4);
+        el.style.opacity = String(narrow && i >= 2 ? 0 : strips);
+        beside(el, 0, 1, 8);
       }
     });
     // The strips' names, inside their dim violet ends so they never run off a narrow screen, and how fast the galaxy
@@ -192,17 +201,19 @@ export function Galaxy() {
     const names: Array<[number, [number, number, number]]> = [
       [4, [x(VISIBLE[0]) + 0.2, top, SPECTRA[2] + 0.02]],
       [5, [x(VISIBLE[0]) + 0.2, bottom, SPECTRA[2] + 0.02]],
-      [6, [SPECTRA[0], bottom - STRIP.h / 2, SPECTRA[2]]],
+      // Under the red end, reaching back left, clear of the caption low on the left; on a phone, where the caption is
+      // below the picture, under the middle.
+      [6, [narrow ? SPECTRA[0] : x(VISIBLE[1]), bottom - STRIP.h / 2, SPECTRA[2]]],
     ];
     for (const [i, at] of names) {
       labels.current[i]?.position.set(...at);
       const el = texts.current[i];
       if (!el) continue;
       el.style.opacity = String(strips);
-      beside(el, i === 6 ? 0 : 1, i === 6 ? -1 : 0, i === 6 ? 8 : 2);
+      beside(el, i === 6 ? (narrow ? 0 : -1) : 1, i === 6 ? -1 : 0, i === 6 ? 6 : 2);
     }
     const speed = recession(z) * 100;
-    const words = `z = ${z.toFixed(2)} · moving away at ${speed.toFixed(1)}% of light's speed`;
+    const words = `z = ${z.toFixed(2)} · receding at ${speed.toFixed(1)}% of light speed`;
     if (said.current !== words && texts.current[6]) {
       said.current = words;
       texts.current[6].textContent = words;

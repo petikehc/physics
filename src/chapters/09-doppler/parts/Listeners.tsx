@@ -93,7 +93,9 @@ export function Listeners() {
         el.textContent = words;
       }
       el.style.opacity = String(w === 'you' ? shown[w] : shown[w] * clamp01(rig.hears));
-      beside(el, 0, 1, 4);
+      // The one under the jet's path is first seen at the right edge of the picture: name them up and to the left.
+      if (w === 'under') beside(el, -1, 1, 2);
+      else beside(el, 0, 1, 4);
     });
   });
 

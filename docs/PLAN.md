@@ -476,6 +476,43 @@ is corrected at beat labels when it exceeds 50 ms.
   bars stand up, a hi–lo siren whose pitch drops as it passes, and the harmonic series climbed before the formula.
 - Engine: a formula too wide for the screen shrinks to fit (it mattered first on a phone, for this chapter's).
 
+**Chapter 9 (built)**
+- The station is a city street at night: two lanes of asphalt, kerbs and pavements, sodium streetlights casting pools
+  of orange (three of them real lights, the rest painted on), and blocks of buildings with some windows lit. The world
+  gains a third mood beside the dusk beach and deep space, `night`: a dark sky with fewer stars, haze lit all round
+  the horizon, the beach's sand put away for the street's own ground. The world goes between night and space by way
+  of each other, never back through the dusk beach's orange.
+- Beats: chapter 8's rings of sound fly down to the street and scatter up into the night sky behind the title (Prague,
+  1842: Doppler on the colours of stars; Buys Ballot's horn players on a train near Utrecht, 1845). Going by: at the
+  kerb, an ambulance at a tenth of the speed of sound comes out of the distance and sweeps past, and its two-tone siren
+  drops by (1 + 0.1)/(1 − 0.1), about three and a half semitones. Bunched up, stretched out: time slowed, the camera
+  cranes up over a slowed ambulance (now a third of the speed of sound) as its waves spread as faint spheres and as
+  rings on the street, blue where bunched, red where stretched; a listener ahead and one behind are labelled with
+  what each hears, and each hears it. The formula f' = f(v + v_o)/(v − v_s), as time all but stops. Faster than sound:
+  a jet speeds up to the speed of sound (its waves pile into a wall at its nose, a mist forms round it), holds there,
+  then goes on to 1.5 times it; its waves trail in a Mach cone, and when the cone sweeps over the person under its
+  path, the boom (and a jolt of the camera). Light, stretched: up into space, a spiral galaxy and two spectra,
+  hydrogen's dark lines here and in the galaxy's light, every line shifted the same way towards the red as the red
+  shift grows to 0.1 (Hubble, 1929). Handoff: back on the street, the stars come down into a roller coaster's loop
+  with a whoosh: where does a coaster's speed go on the way up?
+- Maths: Doppler's formula; what a listener hears of a steady source (the retarded-time quadratic, with the sound
+  heard from inside a supersonic source's cone being the more recent of its two arrivals); the same for a source
+  whose speed has changed, found along the path it took; runs as speed knots and their positions; the waves as
+  shells; the Mach angle; the first arrival (the boom); the relativistic red shift and hydrogen's Balmer lines; a
+  wavelength's colour.
+- Your turn: the ambulance going round the street at a speed you set, and a listener you drag anywhere, labelled with
+  what they hear, and heard. Lab, Sound: the ambulance or the jet (to twice the speed of sound, its boom heard as the
+  cone reaches the listener) and the listener walking either way. Lab, Light: the galaxy's red shift up to 0.8, its
+  lines sliding off the red end of the spectrum.
+- Sound: two new continuous layers, the siren as heard (a horn-like square tone whose pitch is the siren's own tone
+  when the heard wave was sent, times the Doppler shift; its loudness falls with distance and it pans with the
+  ambulance) and the jet's roar (noise whose brightness is shifted as a pitch would be). Score "Night":
+  Am–Fmaj7–Dm7–Em7 over an A–E drone, in the key of the siren's falling fourth (D to A), the arpeggio rising and
+  falling back like something going by; it all but stops while the ambulance passes. SFX: a listener's siren heard at
+  their shift, a sonic boom (two cracks and a long roll), a chord and the same chord stretched by 1 + z, and a phrase
+  sung and sung again a step lower before the formula.
+- Captions gain `hi` and `lo` colours, for bunched (higher, bluer) and stretched (lower, redder).
+
 ---
 
 ## 5. Technical architecture
@@ -573,7 +610,7 @@ src/
 **Later sessions**
 3. Ch.2 (built: the slicing and onion proofs, Your turn, Lab and score) and ch.3 (built: the crown, the overflow, the line-up).
 4. Ch.4–6 (space, chase cam, the abstract realm).
-5. Ch.7–9 (helix shadows, clockwork Fourier, Doppler street).
+5. Ch.7–9 (built: helix shadows, clockwork Fourier, Doppler street).
 6. Ch.10, the Constellation finale and index, and the full teaser montage.
 7. Polish: mobile, reduced motion, a performance budget (60 fps on a mid laptop at the default tier, ≤ 200 KB gz of
    initial JS before chapter chunks), posters, transcript, deploy (GitHub Pages or Vercel).
