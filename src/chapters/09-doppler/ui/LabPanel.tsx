@@ -8,7 +8,7 @@ import { audio } from '../../../audio';
 import { useApp } from '../../../state/store';
 import { chooseSource } from '../interaction';
 import { loopReset } from '../loop';
-import { dopplerRig, DOPPLER_DEFAULTS, SIREN_NEAR, type DopplerRig } from '../rig';
+import { dopplerRig, DOPPLER_DEFAULTS, LOOP_START, SIREN_NEAR, type DopplerRig } from '../rig';
 import { HearingReadout, LightControls, ListenerControls, SourceControls } from './Controls';
 import { useDoppler } from './useDoppler';
 
@@ -39,14 +39,14 @@ export function enterDopplerLab() {
     kind: 0,
     ambulance: 1,
     siren: SIREN_NEAR,
-    sm: 0.5,
-    sandT: 6,
-    lx: 10,
-    lz: 5.2,
+    sm: LOOP_START.m,
+    sandT: LOOP_START.t,
+    lx: LOOP_START.lx,
+    lz: LOOP_START.lz,
     interactive: 1,
     lab: 1,
   });
-  loopReset(0.5, 6);
+  loopReset(LOOP_START.m);
   Object.assign(runtime.camera, {
     ...shotVars(SLUG, FRAMES.sound),
     fov: 40,

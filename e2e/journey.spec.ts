@@ -305,15 +305,17 @@ test('chapter 9: Your turn sets the ambulance going for a listener on the street
   // Half the speed of sound: twice the pitch straight ahead, two thirds of it behind.
   await expect(panel).toContainText('0.50 × the speed of sound');
   await expect(panel).toContainText('Straight ahead: 2.00 f. Straight behind: 0.67 f.');
-  // The listener hears the ambulance (it is ahead of it, so higher), and says so in the street too.
-  await expect(panel).toContainText(/The listener hears \d\.\d\d f/, { timeout: 15_000 });
-  await expect(page.getByText(/you hear \d\.\d\d f/)).toBeVisible();
 
+  // Faster (which also stops the countdown to the story going on).
   const speed = panel.getByLabel('Ambulance');
   await speed.focus();
   await page.keyboard.press('ArrowRight');
   await expect(panel).toContainText('0.55 × the speed of sound');
   await expect(panel).toContainText('Straight ahead: 2.22 f');
+
+  // The listener, ahead of the ambulance, hears it higher than its siren, and says so in the street too.
+  await expect(panel).toContainText(/The listener hears \d\.\d\d f, higher than the siren/);
+  await expect(page.getByText(/you hear \d\.\d\d f/)).toBeVisible();
 
   await panel.getByRole('button', { name: /Continue/ }).click();
   await expect(panel).toBeHidden();

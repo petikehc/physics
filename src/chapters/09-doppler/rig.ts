@@ -118,6 +118,11 @@ export const MAX_AGE = 4.4;
 export const LOOP = 26;
 /** How loud the siren is on the viewer's street: the listener is always close by, so quieter than the pass. */
 export const SIREN_NEAR = 0.6;
+/**
+ * Where the viewer's street starts: far enough into the loop's clock that its waves fill the street and already reach
+ * the listener, with the ambulance (at half the speed of sound, from the middle at time 0) 14 m short of them.
+ */
+export const LOOP_START = { t: 32, m: 0.5, lx: 10, lz: 5.2 };
 
 /** Up among the galaxies: where it is looked at from, the galaxy, and the two spectra in front of it. */
 export const SKY_VIEW: V3 = [0, 86, -84];

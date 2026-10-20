@@ -105,7 +105,8 @@ export function HearingReadout({ c }: { c: DopplerSnapshot }) {
 export function LightControls({ c, idPrefix, onZ }: Props & { onZ: (z: number) => void }) {
   // The red shift asked for (the galaxy takes a moment to get there).
   const [asked, setAsked] = useState(() => Math.round(c.z * 100) / 100);
-  const beta = recession(c.z);
+  // The numbers are for the red shift chosen; the galaxy and its lines slide there a moment later.
+  const beta = recession(asked);
   const hb = BALMER[1]!;
   return (
     <>
@@ -134,8 +135,8 @@ export function LightControls({ c, idPrefix, onZ }: Props & { onZ: (z: number) =
           Moving away at {(beta * 100).toFixed(1)}% of the speed of light
         </span>
         <span style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--chalk-dim)' }}>
-          Every wavelength × {(1 + c.z).toFixed(2)}: hydrogen's blue-green {hb.name} line, {hb.nm.toFixed(0)}{' '}
-          nm here, arrives at {(hb.nm * (1 + c.z)).toFixed(0)} nm.
+          Every wavelength × {(1 + asked).toFixed(2)}: hydrogen's blue-green {hb.name} line,{' '}
+          {hb.nm.toFixed(0)} nm here, arrives at {(hb.nm * (1 + asked)).toFixed(0)} nm.
         </span>
       </div>
     </>

@@ -1,4 +1,3 @@
-import gsap from 'gsap';
 import { audio } from '../../audio';
 import { loopReset } from './loop';
 import { dopplerRig, LOOP, PAVEMENT, SIREN_NEAR } from './rig';
@@ -10,9 +9,12 @@ export function placeListener(x: number, z: number) {
   rig.lz = Math.min(Math.max(z, -PAVEMENT + 0.4), PAVEMENT - 0.4);
 }
 
-/** How fast the source goes, as a Mach number (its speed over sound's). */
+/**
+ * How fast the source goes, as a Mach number (its speed over sound's). At once: the loop remembers each speed and
+ * when it was set, so the waves already sent stay where they were sent.
+ */
 export function setSourceSpeed(m: number) {
-  gsap.to(dopplerRig(), { sm: m, duration: 0.35, ease: 'power1.out', overwrite: 'auto' });
+  dopplerRig().sm = m;
 }
 
 /** How fast the listener walks along the street, as a Mach number (negative: the other way). */

@@ -16,7 +16,10 @@ const wrap = (x: number) => ((((x + LOOP) % (2 * LOOP)) + 2 * LOOP) % (2 * LOOP)
  */
 let segments: Segment[] = [{ t: 0, x: 0, m: 0.5 }];
 
-/** Starts the loop afresh: the source at the middle of the street at time `t`, going at Mach `m`. */
+/**
+ * Starts the loop afresh, going at Mach `m`: by default as if it always had, from the middle of the street at time 0
+ * (so the same clock always puts it in the same place); or from the middle of the street at time `t`.
+ */
 export function loopReset(m: number, t = 0) {
   segments = [{ t, x: 0, m }];
 }
@@ -42,7 +45,7 @@ export const loopM = (t: number) => at(t).m;
  */
 export function loopSync(m: number, now: number) {
   const last = segments[segments.length - 1]!;
-  if (now < last.t) loopReset(m, now);
+  if (now < last.t) loopReset(m);
   else if (Math.abs(m - last.m) > 1e-9) {
     segments.push({ t: now, x: loopX(now), m });
     // Stretches that ended before the oldest wave still showing are no longer needed.
