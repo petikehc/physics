@@ -8,6 +8,7 @@ import { calculusMeter } from './06-calculus/sound';
 import { eulerMeter } from './07-euler/sound';
 import { fourierMeter } from './08-fourier/sound';
 import { dopplerMeter } from './09-doppler/sound';
+import { energyMeter } from './10-energy/sound';
 
 /** Levels of the continuous sound layers, 0..1. */
 export interface Levels {
@@ -27,7 +28,7 @@ export interface Levels {
   siren?: number;
   sirenHz?: number;
   sirenPan?: number;
-  /** Chapter 9's jet as heard: how loud, how bright its roar (Hz), where it sits. */
+  /** Chapter 9's jet as heard, or chapter 10's coaster rushing by: how loud, how bright (Hz), where it sits. */
   roar?: number;
   roarHz?: number;
   roarPan?: number;
@@ -48,6 +49,7 @@ export function continuousMeter(): Meter {
     eulerMeter(),
     fourierMeter(),
     dopplerMeter(),
+    energyMeter(),
   ];
   return (dt) => {
     const out: Required<Levels> = {

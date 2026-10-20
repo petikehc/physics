@@ -26,6 +26,9 @@
   --sym-ring: #e05bb4;
   --sym-hi: #7fa6ff;
   --sym-lo: #ff7a66;
+  --sym-pe: #f28a3c;
+  --sym-ke: #4fc8e8;
+  --sym-heat: #ff5d6c;
 
   --accent: #e2704f;
 
@@ -603,6 +606,18 @@ a {
 
 .captions__body .sym-lo {
   color: var(--sym-lo);
+}
+
+.captions__body .sym-pe {
+  color: var(--sym-pe);
+}
+
+.captions__body .sym-ke {
+  color: var(--sym-ke);
+}
+
+.captions__body .sym-heat {
+  color: var(--sym-heat);
 }
 
 .bottom-shade {

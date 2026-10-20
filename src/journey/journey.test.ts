@@ -15,6 +15,9 @@ import { eulerRig, TERMS, THETA_MAX } from '../chapters/07-euler/rig';
 import { fourierRig } from '../chapters/08-fourier/rig';
 import { dopplerRig } from '../chapters/09-doppler/rig';
 import { dopplerLevels, SIREN } from '../chapters/09-doppler/sound';
+import { energyRig, storyTestTrack, STORY_TEST } from '../chapters/10-energy/rig';
+import { readGauge, testNow } from '../chapters/10-energy/sandbox';
+import { heightAt } from '../chapters/10-energy/math';
 
 describe('the journey timeline', () => {
   const journey = buildJourney();
@@ -115,7 +118,15 @@ describe('the journey timeline', () => {
       'doppler:yourTurn',
       'doppler:handoff',
       'energy:flight',
-      'energy:soon',
+      'energy:title',
+      'energy:ride',
+      'energy:tanks',
+      'energy:brakes',
+      'energy:rollback',
+      'energy:friction',
+      'energy:formula',
+      'energy:yourTurn',
+      'energy:handoff',
     ]);
     for (const b of journey.beats) expect(journey.master.labels[b.key]).toBeCloseTo(b.start, 6);
   });
@@ -190,6 +201,13 @@ describe('the journey timeline', () => {
     expect(len).toBeLessThan(150);
   });
 
+  it('runs chapter 10 for roughly 100–170 seconds', () => {
+    const ch10 = journey.chapters.find((c) => c.slug === 'energy')!;
+    const len = ch10.end - ch10.start;
+    expect(len).toBeGreaterThan(100);
+    expect(len).toBeLessThan(170);
+  });
+
   it('pauses once per chapter, inside its Your-turn beat', () => {
     const paused = journey.beats.filter((b) => b.pauseAt !== undefined);
     expect(paused.map((b) => b.key)).toEqual([
@@ -202,6 +220,7 @@ describe('the journey timeline', () => {
       'euler:yourTurn',
       'fourier:yourTurn',
       'doppler:yourTurn',
+      'energy:yourTurn',
     ]);
     for (const b of paused) {
       expect(b.pauseAt!).toBeGreaterThan(b.start);
@@ -571,6 +590,71 @@ describe('the journey timeline', () => {
     const edge = beat('formula').start;
     expect(rate(edge + 0.1, edge + 2)).toBeCloseTo(0.3, 6);
     const t = beat('formula').start + 1;
+    master.seek(t, false);
+    const snap = state();
+    master.seek(0, false);
+    master.seek(journey.duration - 0.1, false);
+    master.seek(t, false);
+    expect(state()).toBe(snap);
+  });
+
+  it("keeps count of chapter 10's coaster's energy: put in by the chain, traded, and all turned to heat", () => {
+    const { master } = journey;
+    const rig = energyRig();
+    const beat = (id: string) => journey.beats.find((b) => b.key === `energy:${id}`)!;
+    const kJ = () => {
+      const r = readGauge(rig);
+      return {
+        total: (r.pe + r.ke + r.heat) / 1000,
+        pe: r.pe / 1000,
+        heat: r.heat / 1000,
+        ke: r.ke / 1000,
+        full: r.full / 1000,
+      };
+    };
+    // Over the top and down, the tanks trade height for speed, and their total stays where the chain left it.
+    const tanks = beat('tanks');
+    const totals: number[] = [];
+    let fastest = 0;
+    for (let t = tanks.start + 0.5; t < tanks.end - 0.2; t += 0.5) {
+      master.seek(t, false);
+      const k = kJ();
+      totals.push(k.total);
+      fastest = Math.max(fastest, k.ke);
+    }
+    expect(Math.max(...totals) - Math.min(...totals)).toBeLessThan(0.002 * totals[0]!);
+    expect(totals[0]!).toBeCloseTo(kJ().full, -1);
+    expect(fastest).toBeGreaterThan(0.8 * totals[0]!);
+    // After the brakes, the train is at rest (still a little above the track's lowest point), all else heat.
+    master.seek(beat('brakes').end - 0.05, false);
+    const end = kJ();
+    expect(end.ke).toBeLessThan(0.01);
+    expect(end.heat).toBeGreaterThan(0.99 * (totals[0]! - end.pe));
+  });
+
+  it("lets chapter 10's test car climb back to the height it started from, and no higher", () => {
+    const { master } = journey;
+    const rig = energyRig();
+    const roll = journey.beats.find((b) => b.key === 'energy:rollback')!;
+    const track = storyTestTrack();
+    let peak = 0;
+    let back = 0;
+    for (let t = roll.start + 2.6; t < roll.end - 0.05; t += 0.1) {
+      master.seek(t, false);
+      const now = testNow(rig);
+      peak = Math.max(peak, heightAt(track, now.sample.s));
+      back = Math.min(back, now.sample.v);
+    }
+    expect(peak).toBeLessThan(STORY_TEST.h0 + 0.05);
+    expect(peak).toBeGreaterThan(STORY_TEST.h0 - 0.3);
+    expect(back).toBeLessThan(-5);
+  });
+
+  it('runs chapter 10 deterministically from beat to beat', () => {
+    const { master } = journey;
+    const rig = energyRig();
+    const state = () => JSON.stringify(rig, (k, v) => (k === '_gsap' ? undefined : v));
+    const t = journey.beats.find((b) => b.key === 'energy:friction')!.start + 3;
     master.seek(t, false);
     const snap = state();
     master.seek(0, false);

@@ -17,6 +17,8 @@ import { fourierRig, FOURIER_DEFAULTS } from './08-fourier/rig';
 import { leaveFourierYourTurn } from './08-fourier/interaction';
 import { dopplerRig, DOPPLER_DEFAULTS } from './09-doppler/rig';
 import { leaveDopplerYourTurn } from './09-doppler/interaction';
+import { energyRig, ENERGY_DEFAULTS } from './10-energy/rig';
+import { leaveEnergyYourTurn } from './10-energy/interaction';
 
 /** What the journey controller needs from a chapter, outside React. */
 export interface ChapterHooks {
@@ -67,6 +69,10 @@ export const HOOKS: Record<string, ChapterHooks> = {
   doppler: {
     reset: () => resetRig(dopplerRig(), { ...DOPPLER_DEFAULTS }),
     leaveYourTurn: leaveDopplerYourTurn,
+  },
+  energy: {
+    reset: () => resetRig(energyRig(), { ...ENERGY_DEFAULTS }),
+    leaveYourTurn: leaveEnergyYourTurn,
   },
 };
 

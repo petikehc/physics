@@ -30,12 +30,18 @@ export interface EnergyRig {
   gz: number;
   /** Sparks where friction works hard, 0..1. */
   sparks: number;
+  /** Riding in the front car (the sound is heard from there), 0 or 1. */
+  pov: number;
+  /** A line across the test track at the height the car was let go from, 0..1. */
+  level: number;
   /** The viewer's test track: start and far hill heights (m), friction, the car's mass (kg), and its clock. */
   h0: number;
   h4: number;
   mu: number;
   mass: number;
   sandT: number;
+  /** Lab: the coaster's ride going round and round by itself, 0 or 1. */
+  loop: number;
   interactive: number;
   lab: number;
 }
@@ -53,11 +59,14 @@ export const ENERGY_DEFAULTS: EnergyRig = {
   gx: 46,
   gz: 18,
   sparks: 0,
+  pov: 0,
+  level: 0,
   h0: 12,
   h4: 16,
   mu: 0,
   mass: 400,
   sandT: 0,
+  loop: 0,
   interactive: 0,
   lab: 0,
 };
@@ -130,8 +139,8 @@ export function testPoints(h0: number, h4: number): V3[] {
   ];
 }
 
-/** Where the test car is let go: just over the edge of the start's platform. */
-export const testStart = (track: Track) => sAtX(track, -18);
+/** Where the test car is let go: at the edge of the start's platform, at its full height. */
+export const testStart = (track: Track) => sAtX(track, -19);
 
 /** The coaster train: three cars, this far apart (front to front); the coaster's and the test car's masses (kg). */
 export const CARS = 3;
@@ -189,12 +198,14 @@ export function storyTestTrack(): Track {
   return storyTest;
 }
 
+/** The friction the test car's second story run has. */
+export const TEST_MU = 0.08;
 const testRuns: Array<RideSample[] | null> = [null, null];
 /** The test car's story runs: without friction (0), and with it (1). */
 export function testRide(run: number): RideSample[] {
   const k = run > 0.5 ? 1 : 0;
   const track = storyTestTrack();
-  testRuns[k] ??= simulate(track, { s0: testStart(track), v0: 0.3, duration: 40, mu: k ? 0.06 : 0 });
+  testRuns[k] ??= simulate(track, { s0: testStart(track), v0: 0.3, duration: 40, mu: k ? TEST_MU : 0 });
   return testRuns[k]!;
 }
 

@@ -6,6 +6,12 @@ import { dopplerRig, HALF_ROAD, KERB, PAVEMENT, STREET, SYM9 } from '../rig';
 
 const LENGTH = STREET[1] - STREET[0];
 const MID = (STREET[0] + STREET[1]) / 2;
+/**
+ * The dark ground: far back past the street's start, but only just past its end, where chapter 10's fairground (with
+ * its own ground) begins; two grounds overlapping would flicker.
+ */
+const GROUND: [number, number] = [STREET[0] - 130, STREET[1] + 5];
+const GROUND_MID = (GROUND[0] + GROUND[1]) / 2;
 /** A streetlight every so many metres along each side, the far side's halfway between the near side's. */
 const LAMP_EVERY = 32;
 const LAMP_H = 7.2;
@@ -203,8 +209,8 @@ export function Street() {
     <group ref={root} visible={false}>
       {/* Dark ground all round, in place of the beach's sand (hidden at night). Each layer above it stands a couple of
           centimetres higher than the last, so none of them flicker into each other from the far shots. */}
-      <mesh rotation-x={-Math.PI / 2} position={[MID, 0, 0]} receiveShadow>
-        <planeGeometry args={[LENGTH + 260, 420]} />
+      <mesh rotation-x={-Math.PI / 2} position={[GROUND_MID, 0, 0]} receiveShadow>
+        <planeGeometry args={[GROUND[1] - GROUND[0], 420]} />
         <meshStandardMaterial color="#0d0e12" roughness={1} />
       </mesh>
       <mesh rotation-x={-Math.PI / 2} position={[MID, 0.02, 0]}>

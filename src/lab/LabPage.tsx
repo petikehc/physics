@@ -74,7 +74,9 @@ export default function LabPage() {
             <span className="eyebrow">Lab</span>
             <h1>{meta ? meta.title : 'Unknown chapter'}</h1>
             <p style={{ color: 'var(--chalk-dim)' }}>
-              This Lab is in production. Chapters I–IX are ready to explore now.
+              {meta
+                ? 'This Lab is in production.'
+                : 'There is no Lab here. All ten chapters have one, ready to explore.'}
             </p>
             <p style={{ marginTop: 24 }}>
               <Link className="btn btn--primary" to="/lab/pythagoras">

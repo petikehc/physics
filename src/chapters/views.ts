@@ -17,6 +17,8 @@ import { YourTurnPanel as FourierYourTurn } from './08-fourier/ui/YourTurnPanel'
 import { LabPanel as FourierLab, enterFourierLab } from './08-fourier/ui/LabPanel';
 import { YourTurnPanel as DopplerYourTurn } from './09-doppler/ui/YourTurnPanel';
 import { LabPanel as DopplerLab, enterDopplerLab } from './09-doppler/ui/LabPanel';
+import { YourTurnPanel as EnergyYourTurn } from './10-energy/ui/YourTurnPanel';
+import { LabPanel as EnergyLab, enterEnergyLab } from './10-energy/ui/LabPanel';
 
 /** The page-level React side of a chapter: its Your-turn panel, its Lab and its formula. */
 export interface ChapterViews {
@@ -108,6 +110,15 @@ export const VIEWS: Record<string, ChapterViews> = {
     formula: {
       tex: "f' = f\\,\\frac{v + \\textcolor{#ffd9a0}{v_o}}{v - \\textcolor{#5b8cff}{v_s}}",
       caption: 'The Doppler effect',
+    },
+  },
+  energy: {
+    YourTurn: EnergyYourTurn,
+    Lab: EnergyLab,
+    enterLab: enterEnergyLab,
+    formula: {
+      tex: '\\tfrac12 m\\textcolor{#4fc8e8}{v}^2 + m g \\textcolor{#f28a3c}{h} = \\text{const}',
+      caption: 'The conservation of energy',
     },
   },
 };

@@ -167,7 +167,7 @@ export const CHAPTERS: ChapterMeta[] = [
     kind: 'physics',
     accent: '#f28a3c',
     dustIcon: 'coaster',
-    status: 'soon',
+    status: 'ready',
   },
 ];
 

@@ -164,7 +164,12 @@ export interface RideState {
  * buffers at either end stopping it dead (its speed into them as heat). Energy is kept account of as it goes, so that
  * height's part + speed's part + heat − work never changes (checked in the tests).
  */
-export function stepRide(track: Track, st: RideState, o: Omit<RideOptions, 's0' | 'v0' | 'duration'>, dt: number) {
+export function stepRide(
+  track: Track,
+  st: RideState,
+  o: Omit<RideOptions, 's0' | 'v0' | 'duration'>,
+  dt: number,
+) {
   const base = lowest(track);
   const muAt = (x: number) => (o.brakes && x >= o.brakes.from ? o.brakes.mu : o.mu);
   const energy = (x: number, u: number) => G * (heightAt(track, x) - base) + 0.5 * u * u;
