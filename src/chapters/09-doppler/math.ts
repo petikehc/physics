@@ -61,37 +61,90 @@ export function heard(s: V3, vs: V3, l: V3, vl: V3, c: number): Heard | null {
 }
 
 /**
- * A source's run along the x axis: it is at `x0` at time 0, and its Mach number (its speed over sound's, `c`) ramps
- * steadily from `m0` to `m1` between times `t0` and `t1`, holding before and after.
+ * What a listener at `l`, walking along x at `vl`, hears now of a source that has moved along `path` (its x at each
+ * time; it keeps to height y and side z) at the Mach numbers `machAt`, sending since `from`. The same as `heard`, but
+ * for a source whose speed has changed: the wave heard now is the one sent most recently among those that have
+ * arrived, found by stepping back from now to the first wave that has, then halving.
+ */
+export function heardAlong(
+  path: (t: number) => number,
+  machAt: (t: number) => number,
+  y: number,
+  z: number,
+  c: number,
+  l: V3,
+  vl: number,
+  from: number,
+  now: number,
+  lookBack = 30,
+): Heard | null {
+  const dist = (tau: number) => Math.hypot(l[0] - path(tau), l[1] - y, l[2] - z);
+  // Positive while the wave sent at tau is still on its way.
+  const late = (tau: number) => tau + dist(tau) / c - now;
+  if (dist(now) < 1e-9) return { delay: 0, distance: 0, ratio: 1, from: [path(now), y, z] };
+  const step = 0.02;
+  const oldest = Math.max(from, now - lookBack);
+  let hi = now;
+  let lo: number;
+  for (;;) {
+    if (hi <= oldest) return null;
+    lo = Math.max(oldest, hi - step);
+    if (late(lo) <= 0) break;
+    hi = lo;
+  }
+  for (let i = 0; i < 40; i++) {
+    const mid = (lo + hi) / 2;
+    if (late(mid) <= 0) lo = mid;
+    else hi = mid;
+  }
+  const tau = lo;
+  const at: V3 = [path(tau), y, z];
+  const d = sub(l, at);
+  const distance = Math.hypot(...d);
+  const ux = d[0] / distance;
+  const vs = machAt(tau) * c;
+  return { delay: now - tau, distance, ratio: (c - ux * vl) / (c - ux * vs), from: at };
+}
+
+/**
+ * A source's run along the x axis: it is at `x0` at time 0, and its Mach number (its speed over sound's, `c`) goes
+ * straight from one knot (time, Mach number) to the next, holding before the first and after the last.
  */
 export interface Run {
   x0: number;
   c: number;
-  m0: number;
-  m1: number;
-  t0: number;
-  t1: number;
+  knots: Array<[number, number]>;
 }
 
 /** The run's Mach number at time t. */
 export function runM(run: Run, t: number): number {
-  const span = run.t1 - run.t0;
-  if (t <= run.t0) return run.m0;
-  if (t >= run.t1 || span <= 0) return run.m1;
-  return run.m0 + ((run.m1 - run.m0) * (t - run.t0)) / span;
+  const k = run.knots;
+  if (t <= k[0]![0]) return k[0]![1];
+  for (let i = 1; i < k.length; i++) {
+    const [t1, m1] = k[i]!;
+    if (t < t1) {
+      const [t0, m0] = k[i - 1]!;
+      return m0 + ((m1 - m0) * (t - t0)) / (t1 - t0);
+    }
+  }
+  return k[k.length - 1]![1];
 }
 
-/** Where the run's source is at time t: the area under its speed. */
+/** Where the run's source is at time t: the area under its speed since time 0. */
 export function runX(run: Run, t: number): number {
-  const { c, m0, m1, t0 } = run;
-  const t1 = Math.max(run.t1, t0);
-  if (t <= t0) return run.x0 + c * m0 * t;
-  const before = m0 * t0;
-  if (t < t1) {
-    const u = t - t0;
-    return run.x0 + c * (before + m0 * u + ((m1 - m0) * u * u) / (2 * (t1 - t0)));
-  }
-  return run.x0 + c * (before + ((m0 + m1) / 2) * (t1 - t0) + m1 * (t - t1));
+  // The area under the Mach number from time 0 to t, a trapezium at a time between the knots.
+  const area = (to: number) => {
+    const pts: Array<[number, number]> = [[0, runM(run, 0)]];
+    for (const [tk] of run.knots) if (tk > 0 && tk < to) pts.push([tk, runM(run, tk)]);
+    pts.push([to, runM(run, to)]);
+    let a = 0;
+    for (let i = 1; i < pts.length; i++)
+      a += ((pts[i]![1] + pts[i - 1]![1]) / 2) * (pts[i]![0] - pts[i - 1]![0]);
+    return a;
+  };
+  if (t >= 0) return run.x0 + run.c * area(t);
+  // Before time 0, back along the first knot's speed (or the speed at time 0).
+  return run.x0 + run.c * runM(run, 0) * t;
 }
 
 export interface Shell {
@@ -102,15 +155,23 @@ export interface Shell {
 }
 
 /**
- * The waves spreading at time t: one sent every `period` (from time `from` on), each a sphere centred where the source
- * was when it sent it, its radius c times its age. Only waves younger than `maxAge` are kept, the newest first.
+ * The waves spreading at time t from a source whose x is `x(t)`: one sent every `period` (from time `from` on), each a
+ * sphere centred where the source was when it sent it, its radius c times its age. Only waves younger than `maxAge`
+ * are kept, the newest first.
  */
-export function shells(run: Run, t: number, period: number, from: number, maxAge: number): Shell[] {
+export function shells(
+  x: (t: number) => number,
+  c: number,
+  t: number,
+  period: number,
+  from: number,
+  maxAge: number,
+): Shell[] {
   const out: Shell[] = [];
   const first = Math.ceil((Math.max(from, t - maxAge) - 1e-9) / period);
   for (let k = Math.floor((t + 1e-9) / period); k >= first; k--) {
     const sent = k * period;
-    out.push({ x: runX(run, sent), sent, r: run.c * (t - sent) });
+    out.push({ x: x(sent), sent, r: c * (t - sent) });
   }
   return out;
 }
@@ -123,6 +184,41 @@ export const stretch = (m: number, cosTheta: number) => 1 - m * cosTheta;
 
 /** The half-angle of the cone a source faster than sound drags behind it: sin μ = 1/M. Null below the speed of sound. */
 export const machAngle = (m: number): number | null => (m >= 1 ? Math.asin(1 / m) : null);
+
+/**
+ * When the sound first reaches the point `l` from a source moving along `path` (its x at each time; it keeps to height
+ * y and side z), sending from time `from` up to `to`. The wave sent at τ arrives at τ + |l − S(τ)| / c, so the first
+ * arrival is the least of those. Slower than sound, that is usually the first wave sent; faster, it is a wave from
+ * the middle of the run, and every wave sent around then arrives at almost the same moment: the boom.
+ */
+export function firstHeard(
+  path: (t: number) => number,
+  y: number,
+  z: number,
+  c: number,
+  l: V3,
+  from: number,
+  to: number,
+): { at: number; sent: number } {
+  const arrive = (tau: number) => tau + Math.hypot(l[0] - path(tau), l[1] - y, l[2] - z) / c;
+  const steps = 400;
+  let best = from;
+  for (let i = 0; i <= steps; i++) {
+    const tau = from + ((to - from) * i) / steps;
+    if (arrive(tau) < arrive(best)) best = tau;
+  }
+  // Narrow in around the best sample.
+  let lo = Math.max(from, best - (to - from) / steps);
+  let hi = Math.min(to, best + (to - from) / steps);
+  for (let i = 0; i < 60; i++) {
+    const a = lo + (hi - lo) / 3;
+    const b = hi - (hi - lo) / 3;
+    if (arrive(a) < arrive(b)) hi = b;
+    else lo = a;
+  }
+  const sent = (lo + hi) / 2;
+  return { at: arrive(sent), sent };
+}
 
 /** Where a wave sent from height h crosses the ground: the radius of the ring it draws there (0 before it lands). */
 export const groundRing = (r: number, h: number) => (r > Math.abs(h) ? Math.sqrt(r * r - h * h) : 0);

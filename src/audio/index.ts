@@ -2,8 +2,11 @@ import type { AudioEngine } from './engine';
 import type { Triangle } from '../chapters/01-pythagoras/math';
 
 export type Scene = 'teaser' | 'journey' | 'lab' | null;
-/** Continuous sound layers: a scratch of chalk, pouring water, and a singing planet (with `hz`). */
-export type ContinuousId = 'chalk' | 'pour' | 'voice';
+/**
+ * Continuous sound layers: a scratch of chalk, pouring water, a singing planet (with `hz`), and chapter 9's siren and
+ * jet as heard (with `hz` and `pan`).
+ */
+export type ContinuousId = 'chalk' | 'pour' | 'voice' | 'siren' | 'roar';
 /** How many harmonics chapter 8's additive voice has (the fundamental and the fifteen above it). */
 export const HARMONICS = 16;
 const SILENT: readonly number[] = new Array<number>(HARMONICS).fill(0);

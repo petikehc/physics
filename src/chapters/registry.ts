@@ -152,7 +152,7 @@ export const CHAPTERS: ChapterMeta[] = [
     kind: 'physics',
     accent: '#5b8cff',
     dustIcon: 'waves',
-    status: 'soon',
+    status: 'ready',
   },
   {
     slug: 'energy',

@@ -2,7 +2,7 @@ import * as Tone from 'tone';
 import { C3, pyth, triangleChord, type Note } from '../tuning';
 
 export type Theme =
-  'pythagoras' | 'circle' | 'water' | 'spheres' | 'gravity' | 'rising' | 'turning' | 'overtones';
+  'pythagoras' | 'circle' | 'water' | 'spheres' | 'gravity' | 'rising' | 'turning' | 'overtones' | 'night';
 
 /** How the score sounds during one beat. Values are targets the score glides to. */
 export interface Layers {
@@ -29,6 +29,7 @@ const GRAVITY: Theme = 'gravity';
 const RISING: Theme = 'rising';
 const TURNING: Theme = 'turning';
 const OVERTONES: Theme = 'overtones';
+const NIGHT: Theme = 'night';
 
 /**
  * Per-beat arrangement. Chapter 1 is "Pythagorean Drone" (C–Am–F–G over a C–G drone); chapter 2 turns to
@@ -39,7 +40,8 @@ const OVERTONES: Theme = 'overtones';
  * abstract realm, is "Rising" (F–Am–Dm–G over an F–C drone, the arpeggio climbing like a stair); chapter 7, Euler's,
  * is "Turning" (F–C–G–Dm, round by fifths, over a D–A drone, the arpeggio in near-pure sines starting each bar one
  * note further round, like a phase turning); chapter 8, Fourier's, is "Overtones" (Dsus2–G–Em7–Asus4 over the same D–A
- * drone, with no F or F♯ to rub against the clockwork's own harmonics of D; the arpeggio climbs the overtones). The
+ * drone, with no F or F♯ to rub against the clockwork's own harmonics of D; the arpeggio climbs the overtones); chapter 9, on the street at night, is "Night" (Am–Fmaj7–Dm7–Em7 over an A–E
+ * drone, in the key of the siren's falling fourth; the arpeggio rises and falls back, like something going by). The
  * drone glides into each new key during the flight.
  */
 export const ARRANGEMENT: Record<string, Layers> = {
@@ -789,23 +791,115 @@ export const ARRANGEMENT: Record<string, Layers> = {
     theme: OVERTONES,
   },
   'doppler:flight': {
-    drone: 0.85,
+    drone: 0.8,
+    pad: 1.0,
+    cutoff: 2200,
+    plucks: 0.12,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: NIGHT,
+  },
+  'doppler:title': {
+    drone: 0.75,
+    pad: 0.95,
+    cutoff: 800,
+    plucks: 0.14,
+    arp: 0,
+    harmony: 'prog',
+    theme: NIGHT,
+  },
+  // The siren goes by: the score all but stops, so the drop in its pitch is heard plainly.
+  'doppler:pass': {
+    drone: 0.25,
+    pad: 0.2,
+    cutoff: 500,
+    plucks: 0,
+    arp: 0,
+    harmony: 'prog',
+    theme: NIGHT,
+  },
+  'doppler:shells': {
+    drone: 0.65,
+    pad: 0.85,
+    cutoff: 1400,
+    plucks: 0.08,
+    arp: 0.45,
+    harmony: 'prog',
+    theme: NIGHT,
+  },
+  'doppler:formula': {
+    drone: 0.75,
+    pad: 1,
+    cutoff: 3000,
+    plucks: 0,
+    arp: 0,
+    harmony: 'resolve',
+    theme: NIGHT,
+  },
+  'doppler:mach': {
+    drone: 0.5,
+    pad: 0.55,
+    cutoff: 900,
+    plucks: 0,
+    arp: 0.3,
+    harmony: 'prog',
+    theme: NIGHT,
+    arpFast: true,
+  },
+  'doppler:redshift': {
+    drone: 0.8,
     pad: 1.1,
     cutoff: 2600,
-    plucks: 0.2,
-    arp: 0.6,
+    plucks: 0.16,
+    arp: 0.4,
     harmony: 'prog',
-    theme: OVERTONES,
-    arpOctave: -1,
+    theme: NIGHT,
+    arpOctave: 1,
   },
-  'doppler:soon': {
+  'doppler:yourTurn': {
+    drone: 0.32,
+    pad: 0.35,
+    cutoff: 700,
+    plucks: 0.04,
+    arp: 0,
+    harmony: 'prog',
+    theme: NIGHT,
+  },
+  'doppler:handoff': {
+    drone: 0.75,
+    pad: 0.95,
+    cutoff: 1800,
+    plucks: 0.1,
+    arp: 0.55,
+    harmony: 'prog',
+    theme: NIGHT,
+  },
+  'doppler:lab': {
+    drone: 0.28,
+    pad: 0.3,
+    cutoff: 700,
+    plucks: 0.04,
+    arp: 0,
+    harmony: 'prog',
+    theme: NIGHT,
+  },
+  'energy:flight': {
+    drone: 0.8,
+    pad: 1.0,
+    cutoff: 2200,
+    plucks: 0.12,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: NIGHT,
+  },
+  'energy:soon': {
     drone: 0.42,
     pad: 0.5,
     cutoff: 900,
     plucks: 0.1,
     arp: 0,
     harmony: 'prog',
-    theme: OVERTONES,
+    theme: NIGHT,
   },
   lab: { drone: 0.45, pad: 0.4, cutoff: 800, plucks: 0.1, arp: 0, harmony: 'prog' },
 };
@@ -1036,6 +1130,34 @@ const OVERTONES_CHORDS: Chord[] = [
   ],
 ];
 
+// Am – Fmaj7 – Dm7 – Em7, over an A–E drone: chapter 9, at night, in the key of the siren's falling fourth (D to A).
+const NIGHT_CHORDS: Chord[] = [
+  [
+    ['A', 2],
+    ['E', 3],
+    ['A', 3],
+    ['C', 4],
+  ],
+  [
+    ['F', 2],
+    ['C', 3],
+    ['E', 3],
+    ['A', 3],
+  ],
+  [
+    ['D', 2],
+    ['A', 2],
+    ['C', 3],
+    ['F', 3],
+  ],
+  [
+    ['E', 2],
+    ['B', 2],
+    ['D', 3],
+    ['G', 3],
+  ],
+];
+
 const THEMES: Record<Theme, { chords: Chord[]; drone: [number, number, number] }> = {
   pythagoras: { chords: PYTHAGORAS_CHORDS, drone: [pyth('C', 2), pyth('G', 2), pyth('C', 3)] },
   circle: { chords: CIRCLE_CHORDS, drone: [pyth('A', 1), pyth('E', 2), pyth('A', 2)] },
@@ -1045,6 +1167,7 @@ const THEMES: Record<Theme, { chords: Chord[]; drone: [number, number, number] }
   rising: { chords: RISING_CHORDS, drone: [pyth('F', 2), pyth('C', 3), pyth('F', 3)] },
   turning: { chords: TURNING_CHORDS, drone: [pyth('D', 2), pyth('A', 2), pyth('D', 3)] },
   overtones: { chords: OVERTONES_CHORDS, drone: [pyth('D', 2), pyth('A', 2), pyth('D', 3)] },
+  night: { chords: NIGHT_CHORDS, drone: [pyth('A', 1), pyth('E', 2), pyth('A', 2)] },
 };
 
 const PENTATONIC: Array<[Note, number]> = [
@@ -1181,7 +1304,8 @@ export class PythagoreanScore {
             ? triangleChord(pyth('C', 5))
             : chords[Math.max(this.chord - 1, 0) % chords.length]!.map(([n, o]) => pyth(n, o + up));
         // Up and down (chapter 1), round and round (chapter 2), rippling (chapter 3), wheeling (chapter 4),
-        // falling (chapter 5), climbing a stair of octaves (chapter 6), each bar starting one further round (chapter 7).
+        // falling (chapter 5), climbing a stair of octaves (chapter 6), each bar starting one further round (chapter 7),
+        // up the overtones (chapter 8), and up and back down again, like something going by (chapter 9).
         const order =
           this.theme === 'circle'
             ? [0, 1, 2, 3]
@@ -1197,12 +1321,16 @@ export class PythagoreanScore {
                       ? [0, 1, 2, 3, 1, 2, 3, 0, 2, 3, 0, 1, 3, 0, 1, 2]
                       : this.theme === 'overtones'
                         ? [0, 1, 2, 3, 4, 5, 6, 7]
-                        : [0, 1, 2, 3, 2, 1];
+                        : this.theme === 'night'
+                          ? [0, 1, 2, 3, 4, 3, 2, 1]
+                          : [0, 1, 2, 3, 2, 1];
         const k = order[step % order.length]!;
         // Past the top of the chord, the stair goes on an octave up.
         const f =
           chord[k % chord.length]! *
-          (this.theme === 'rising' || this.theme === 'overtones' ? 2 ** Math.floor(k / 4) : 1);
+          (this.theme === 'rising' || this.theme === 'overtones' || this.theme === 'night'
+            ? 2 ** Math.floor(k / 4)
+            : 1);
         this.arpSynth.triggerAttackRelease(f, '16n', time, l.arpFast ? 0.38 : 0.5);
         step++;
       }, '16n').start(0),

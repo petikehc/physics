@@ -94,6 +94,8 @@ export class AudioEngine {
     if (!running) {
       this.sfx.continuous('chalk', 0, time);
       this.sfx.continuous('voice', 0, time);
+      this.sfx.continuous('siren', 0, time);
+      this.sfx.continuous('roar', 0, time);
       this.sfx.harmonics([], time);
     }
   }

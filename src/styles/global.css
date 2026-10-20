@@ -24,6 +24,8 @@
   --sym-cos: #ffb35c;
   --sym-sin: #3fd0e8;
   --sym-ring: #e05bb4;
+  --sym-hi: #7fa6ff;
+  --sym-lo: #ff7a66;
 
   --accent: #e2704f;
 
@@ -593,6 +595,14 @@ a {
 
 .captions__body .sym-sin {
   color: var(--sym-sin);
+}
+
+.captions__body .sym-hi {
+  color: var(--sym-hi);
+}
+
+.captions__body .sym-lo {
+  color: var(--sym-lo);
 }
 
 .bottom-shade {

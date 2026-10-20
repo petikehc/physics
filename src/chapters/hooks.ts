@@ -15,6 +15,8 @@ import { eulerRig, EULER_DEFAULTS } from './07-euler/rig';
 import { leaveEulerYourTurn } from './07-euler/interaction';
 import { fourierRig, FOURIER_DEFAULTS } from './08-fourier/rig';
 import { leaveFourierYourTurn } from './08-fourier/interaction';
+import { dopplerRig, DOPPLER_DEFAULTS } from './09-doppler/rig';
+import { leaveDopplerYourTurn } from './09-doppler/interaction';
 
 /** What the journey controller needs from a chapter, outside React. */
 export interface ChapterHooks {
@@ -61,6 +63,10 @@ export const HOOKS: Record<string, ChapterHooks> = {
   fourier: {
     reset: () => resetRig(fourierRig(), { ...FOURIER_DEFAULTS }),
     leaveYourTurn: leaveFourierYourTurn,
+  },
+  doppler: {
+    reset: () => resetRig(dopplerRig(), { ...DOPPLER_DEFAULTS }),
+    leaveYourTurn: leaveDopplerYourTurn,
   },
 };
 

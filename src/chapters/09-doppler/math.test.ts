@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   BALMER,
+  firstHeard,
   groundRing,
   heard,
+  heardAlong,
   machAngle,
   observed,
   recession,
@@ -96,29 +98,46 @@ describe('what a listener hears of a moving source', () => {
 });
 
 describe('a run and its waves', () => {
-  const steady: Run = { x0: -3, c: 3, m0: 0.4, m1: 0.4, t0: 0, t1: 0 };
-  const speeding: Run = { x0: 0, c: 3, m0: 0.5, m1: 1.5, t0: 2, t1: 6 };
+  const steady: Run = { x0: -3, c: 3, knots: [[0, 0.4]] };
+  const speeding: Run = {
+    x0: 0,
+    c: 3,
+    knots: [
+      [2, 0.5],
+      [6, 1.5],
+      [8, 1.5],
+      [9, 2],
+    ],
+  };
 
   it('moves at its Mach number times the speed of sound, smoothly through a change of speed', () => {
     expect(runX(steady, 2)).toBeCloseTo(-3 + 2.4, 12);
-    for (const t of [1, 2, 3.3, 6, 8]) {
+    expect(runM(speeding, 1)).toBe(0.5);
+    expect(runM(speeding, 4)).toBeCloseTo(1, 12);
+    expect(runM(speeding, 7)).toBe(1.5);
+    expect(runM(speeding, 20)).toBe(2);
+    // Steady at first, so 3 m/s × 0.5 for two seconds.
+    expect(runX(speeding, 2)).toBeCloseTo(3, 12);
+    expect(runX(speeding, -1)).toBeCloseTo(-1.5, 12);
+    for (const t of [1, 2, 3.3, 6, 7, 8.5, 10]) {
       const h = 1e-5;
       expect((runX(speeding, t + h) - runX(speeding, t - h)) / (2 * h)).toBeCloseTo(3 * runM(speeding, t), 4);
     }
   });
 
   it('sends a wave every period, each centred where the source was, growing at the speed of sound', () => {
-    const ws = shells(steady, 5, 0.5, 0, 3);
+    const along = (run: Run) => (t: number) => runX(run, t);
+    const ws = shells(along(steady), 3, 5, 0.5, 0, 3);
     expect(ws.map((w) => w.sent)).toEqual([5, 4.5, 4, 3.5, 3, 2.5, 2]);
     for (const w of ws) {
       expect(w.r).toBeCloseTo(3 * (5 - w.sent), 12);
       expect(w.x).toBeCloseTo(runX(steady, w.sent), 12);
     }
-    expect(shells(steady, 1, 0.5, 0.6, 3).map((w) => w.sent)).toEqual([1]);
+    expect(shells(along(steady), 3, 1, 0.5, 0.6, 3).map((w) => w.sent)).toEqual([1]);
   });
 
   it('bunches its waves ahead and stretches them behind by 1 ∓ M', () => {
-    const ws = shells(steady, 6, 0.5, 0, 6);
+    const ws = shells((t) => runX(steady, t), 3, 6, 0.5, 0, 6);
     const lambda = 3 * 0.5;
     for (let i = 0; i + 1 < ws.length; i++) {
       const [a, b] = [ws[i]!, ws[i + 1]!];
@@ -131,15 +150,69 @@ describe('a run and its waves', () => {
     expect(machAngle(0.9)).toBeNull();
     expect(machAngle(1)).toBeCloseTo(Math.PI / 2, 12);
     expect(machAngle(2)).toBeCloseTo(Math.PI / 6, 12);
-    const fast: Run = { x0: 0, c: 3, m0: 2, m1: 2, t0: 0, t1: 0 };
+    const fast: Run = { x0: 0, c: 3, knots: [[0, 2]] };
     const t = 4;
     const tip = runX(fast, t);
     const mu = machAngle(2)!;
     // Every wave just touches the cone from the tip: its centre is r / sin μ behind the tip.
-    for (const w of shells(fast, t, 0.5, 0, 4)) {
+    for (const w of shells((u) => runX(fast, u), 3, t, 0.5, 0, 4)) {
       if (w.r === 0) continue;
       expect(tip - w.x).toBeCloseTo(w.r / Math.sin(mu), 9);
     }
+  });
+
+  it('finds when the sound first reaches a listener: at once below the speed of sound, with a boom above it', () => {
+    const slow: Run = { x0: -10, c: 3, knots: [[0, 0.5]] };
+    const l: V3 = [5, 0, 4];
+    const first = firstHeard((t) => runX(slow, t), 0, 0, 3, l, 0, 20);
+    expect(first.sent).toBeCloseTo(0, 6);
+    expect(first.at).toBeCloseTo(Math.hypot(15, 4) / 3, 6);
+    // Faster than sound: the cone of half-angle 30° sweeps over a listener 4 m to the side when the source is
+    // 4·√3 m past.
+    const fast: Run = { x0: -30, c: 3, knots: [[0, 2]] };
+    const boom = firstHeard((t) => runX(fast, t), 0, 0, 3, l, 0, 20);
+    expect(runX(fast, boom.at) - l[0]).toBeCloseTo(4 * Math.sqrt(3), 4);
+    expect(boom.sent).toBeGreaterThan(0.5);
+  });
+
+  it('hears a source whose speed changed as the waves it sent say, the same as for a steady one when steady', () => {
+    const steady: Run = { x0: -10, c: 3, knots: [[0, 0.5]] };
+    const l: V3 = [6, 1.5, 4];
+    const t = 9;
+    const along = heardAlong(
+      (u) => runX(steady, u),
+      (u) => runM(steady, u),
+      2,
+      1,
+      3,
+      l,
+      0,
+      0,
+      t,
+    )!;
+    const exact = heard([runX(steady, t), 2, 1], [1.5, 0, 0], l, [0, 0, 0], 3)!;
+    expect(along.delay).toBeCloseTo(exact.delay, 6);
+    expect(along.ratio).toBeCloseTo(exact.ratio, 6);
+    // Faster than sound, nothing is heard until the first arrival, and then something is.
+    const speeding: Run = {
+      x0: -30,
+      c: 3,
+      knots: [
+        [0, 0.7],
+        [3, 0.7],
+        [8, 1.6],
+      ],
+    };
+    const path = (u: number) => runX(speeding, u);
+    const mach = (u: number) => runM(speeding, u);
+    const first = firstHeard(path, 9, 0, 3, l, 0, 30).at;
+    expect(heardAlong(path, mach, 9, 0, 3, l, 0, 0, first - 0.05)).toBeNull();
+    const after = heardAlong(path, mach, 9, 0, 3, l, 0, 0, first + 0.05)!;
+    expect(after).not.toBeNull();
+    expect(after.delay + (first + 0.05 - after.delay)).toBeCloseTo(first + 0.05, 9);
+    expect(Math.hypot(l[0] - after.from[0], l[1] - 9, l[2]) / 3).toBeCloseTo(after.delay, 6);
+    // Nothing is heard from before the source started sending.
+    expect(heardAlong(path, mach, 9, 0, 3, [100, 0, 0], 0, 0, 1)).toBeNull();
   });
 
   it('draws a ring on the ground once a wave sent from above reaches it', () => {

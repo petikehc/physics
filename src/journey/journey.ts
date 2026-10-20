@@ -12,6 +12,7 @@ import { buildNewton } from '../chapters/05-newton/timeline';
 import { buildCalculus } from '../chapters/06-calculus/timeline';
 import { buildEuler } from '../chapters/07-euler/timeline';
 import { buildFourier } from '../chapters/08-fourier/timeline';
+import { buildDoppler } from '../chapters/09-doppler/timeline';
 import { JourneyBuilder, type Journey } from './builder';
 
 /**
@@ -73,10 +74,11 @@ export function buildJourney(): Journey {
   buildCalculus(j);
   buildEuler(j);
   buildFourier(j);
+  buildDoppler(j);
   buildComingSoon(
     j,
-    'doppler',
-    'Doppler: a siren sounds higher coming towards you and lower going away, because its waves bunch up ahead of it and stretch out behind. This chapter is in production.',
+    'energy',
+    "Conservation of energy: a coaster's speed is never lost on the way up, only stored as height, and given back on the way down. This chapter is in production.",
   );
   const journey = j.finish();
   journey.master.progress(0);

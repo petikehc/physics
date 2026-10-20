@@ -75,6 +75,14 @@ export class SfxKit {
   /** Chapter 8's additive voice: a sine for each harmonic over one fundamental, each with its own loudness. */
   private harmOsc: Tone.Oscillator[];
   private harmGain: Tone.Gain[];
+  /** Chapter 9's siren as heard: a horn-like square tone whose pitch, loudness and side follow the Doppler shift. */
+  private sirenOsc: Tone.Oscillator;
+  private sirenGain: Tone.Gain;
+  private sirenPan: Tone.Panner;
+  /** Chapter 9's jet as heard: a roar of noise whose brightness is shifted as a pitch would be. */
+  private roarFilter: Tone.Filter;
+  private roarGain: Tone.Gain;
+  private roarPan: Tone.Panner;
 
   private sources: Array<{ start: (t?: number) => unknown; dispose: () => unknown }> = [];
 
@@ -219,7 +227,29 @@ export class SfxKit {
       new Tone.Oscillator({ type: 'sine', frequency: 147 * (i + 1), volume: -8 }).connect(g),
     );
 
+    // The siren: a square tone, its edges rounded off like a horn's, with a little of the street's echo.
+    this.sirenPan = new Tone.Panner(0).connect(this.out);
+    this.sirenGain = new Tone.Gain(0).connect(this.sirenPan);
+    const sirenSend = new Tone.Gain(0.35).connect(this.verb);
+    this.sirenGain.connect(sirenSend);
+    const sirenBody = new Tone.Filter({ type: 'lowpass', frequency: 2600, Q: 0.9 }).connect(this.sirenGain);
+    const sirenHorn = new Tone.Filter({ type: 'peaking', frequency: 1400, Q: 1.2, gain: 5 }).connect(
+      sirenBody,
+    );
+    this.sirenOsc = new Tone.Oscillator({ type: 'square', frequency: 588, volume: -10 }).connect(sirenHorn);
+
+    // The roar: brown noise for the rumble and pink for the hiss, through one filter that the shift slides.
+    this.roarPan = new Tone.Panner(0).connect(this.out);
+    this.roarGain = new Tone.Gain(0).connect(this.roarPan);
+    this.roarFilter = new Tone.Filter({ type: 'lowpass', frequency: 900, Q: 0.6 }).connect(this.roarGain);
+    const roarBrown = new Tone.Noise('brown').connect(this.roarFilter);
+    const roarHiss = new Tone.Gain(0.25).connect(this.roarFilter);
+    const roarPink = new Tone.Noise('pink').connect(roarHiss);
+
     this.sources = [
+      this.sirenOsc,
+      roarBrown,
+      roarPink,
       this.voiceOsc,
       scrapeNoise,
       whooshNoise,
@@ -242,10 +272,25 @@ export class SfxKit {
 
   // ---------- Continuous ----------
 
-  continuous(id: 'chalk' | 'pour' | 'voice', level: number, time = Tone.now(), hz = 0, pan = 0) {
+  continuous(
+    id: 'chalk' | 'pour' | 'voice' | 'siren' | 'roar',
+    level: number,
+    time = Tone.now(),
+    hz = 0,
+    pan = 0,
+  ) {
     const l = Math.min(Math.max(level, 0), 1);
     if (id === 'chalk') this.chalkGain.gain.setTargetAtTime(l * 0.55, time, 0.03);
-    else if (id === 'voice') {
+    else if (id === 'siren') {
+      // Quick to follow: the siren steps between its two tones, and the shift slides them.
+      if (hz > 0) this.sirenOsc.frequency.setTargetAtTime(hz, time, 0.012);
+      this.sirenPan.pan.setTargetAtTime(Math.min(Math.max(pan, -1), 1), time, 0.04);
+      this.sirenGain.gain.setTargetAtTime(l * 0.16, time, 0.04);
+    } else if (id === 'roar') {
+      if (hz > 0) this.roarFilter.frequency.setTargetAtTime(Math.min(hz, 9000), time, 0.05);
+      this.roarPan.pan.setTargetAtTime(Math.min(Math.max(pan, -1), 1), time, 0.05);
+      this.roarGain.gain.setTargetAtTime(l * 0.9, time, l > 0 ? 0.05 : 0.3);
+    } else if (id === 'voice') {
       if (hz > 0) this.voiceOsc.frequency.setTargetAtTime(hz, time, 0.03);
       this.voicePan.pan.setTargetAtTime(Math.min(Math.max(pan, -1), 1), time, 0.05);
       // Fades in as the planet sets off, and out (a little slower) when it stops.
@@ -338,6 +383,16 @@ export class SfxKit {
         return;
       }
       case 'formula':
+        if (params.chapter === 9) {
+          // Coming (higher) and going (lower): a phrase, the same phrase a step down, then the open A chord.
+          const run = [pyth('E', 5), pyth('A', 5), pyth('C', 6)];
+          run.forEach((f, i) => this.bell.triggerAttackRelease(f, 1.2, t + i * 0.12, 0.26));
+          run.forEach((f, i) => this.bell.triggerAttackRelease((f * 8) / 9, 1.2, t + 0.5 + i * 0.12, 0.24));
+          [pyth('A', 3), pyth('E', 4), pyth('C', 5), pyth('E', 5)].forEach((f, i) =>
+            this.bell.triggerAttackRelease(f, 3.5, t + 1.05 + i * 0.1, 0.4),
+          );
+          return;
+        }
         if (params.chapter === 8) {
           // The harmonic series climbed (1, 2, 3, 4, 5, 6 times one note), then the first four together.
           const f = pyth('D', 3);
@@ -618,6 +673,41 @@ export class SfxKit {
         f.setValueAtTime(hi * 0.97, drop);
         for (let i = 0; i < 4; i++) f.setValueAtTime((i % 2 === 0 ? lo : hi) * 0.86, drop + 0.2 + i * 0.45);
         this.siren.triggerRelease(drop + 2.1);
+        return;
+      }
+      case 'hears': {
+        // What one listener hears: the siren's high, low, high, every pitch times their shift.
+        const ratio = params.ratio ?? 1;
+        const hi = (params.hi ?? 588) * ratio;
+        const lo = (params.lo ?? 441) * ratio;
+        const f = this.siren.frequency;
+        f.cancelScheduledValues(t);
+        this.siren.triggerAttack(hi, t, 0.5);
+        f.setValueAtTime(hi, t);
+        f.setValueAtTime(lo, t + 0.4);
+        f.setValueAtTime(hi, t + 0.8);
+        this.siren.triggerRelease(t + 1.15);
+        return;
+      }
+      case 'boom': {
+        // A sonic boom: two sharp cracks, the front and the back of the pressure wave, and a long low roll.
+        const g = params.gain ?? 1;
+        this.mono(this.thump, t, (at) => this.thump.triggerAttackRelease(pyth('E', 1), 0.8, at, 0.95 * g));
+        this.mono(this.clackNoise, t, (at) => this.clackNoise.triggerAttackRelease(0.06, at, 0.95 * g));
+        this.mono(this.click, t, (at) => this.click.triggerAttackRelease(0.03, at, 0.7 * g));
+        this.mono(this.clackNoise, t + 0.14, (at) => this.clackNoise.triggerAttackRelease(0.06, at, 0.8 * g));
+        this.mono(this.thump, t + 0.14, (at) =>
+          this.thump.triggerAttackRelease(pyth('B', 1), 0.6, at, 0.7 * g),
+        );
+        this.rumble(t + 0.05, 2.6, 0.95 * g, 420, 55);
+        return;
+      }
+      case 'shift': {
+        // Light stretched: a chord, then the same chord with every note stretched by 1 + z, lower.
+        const k = 1 / (1 + (params.z ?? 0.1));
+        const chord = [pyth('A', 4), pyth('C', 5), pyth('E', 5), pyth('A', 5)];
+        chord.forEach((f, i) => this.bell.triggerAttackRelease(f, 1.6, t + i * 0.06, 0.24));
+        chord.forEach((f, i) => this.bell.triggerAttackRelease(f * k, 2.4, t + 1.3 + i * 0.06, 0.26));
         return;
       }
       case 'uiHover':
