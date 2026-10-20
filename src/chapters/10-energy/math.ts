@@ -44,6 +44,8 @@ export interface Track {
   up: V3[];
   step: number;
   length: number;
+  /** Its lowest height, which height's part of the energy is counted from. */
+  low: number;
 }
 
 /**
@@ -86,7 +88,7 @@ export function buildTrack(controls: V3[], step = 0.25): Track {
     const d = u[0] * t[0] + u[1] * t[1] + u[2] * t[2];
     return norm(sub(u, scale(t, d)));
   });
-  return { pts, tan, up, step: ds, length };
+  return { pts, tan, up, step: ds, length, low: Math.min(...pts.map((p) => p[1])) };
 }
 
 export interface TrackPoint {
@@ -146,69 +148,87 @@ export interface RideSample {
 }
 
 /** The lowest point of a track, which height's part is counted from. */
-export const lowest = (track: Track) => Math.min(...track.pts.map((p) => p[1]));
+export const lowest = (track: Track) => track.low;
+
+/** A train's state along a track: where it is, how fast it goes, and the heat and work so far (per kilogram). */
+export interface RideState {
+  s: number;
+  v: number;
+  heat: number;
+  work: number;
+}
 
 /**
- * Runs the train along the track: gravity along the slope, friction against the motion, the chain hauling it up the
- * lift and the brakes at the end; buffers stop it dead at either end. Energy is kept account of as it goes, so that
- * pe + ke + heat − work never changes (it is checked in the tests). Samples every 1/60 s.
+ * One step of a ride, `dt` seconds: gravity along the slope, friction against the motion (it can stop the train but
+ * never push it), the chain holding the train at its speed up the lift (its work is whatever that takes) and the
+ * buffers at either end stopping it dead (its speed into them as heat). Energy is kept account of as it goes, so that
+ * height's part + speed's part + heat − work never changes (checked in the tests).
  */
+export function stepRide(track: Track, st: RideState, o: Omit<RideOptions, 's0' | 'v0' | 'duration'>, dt: number) {
+  const base = lowest(track);
+  const muAt = (x: number) => (o.brakes && x >= o.brakes.from ? o.brakes.mu : o.mu);
+  const energy = (x: number, u: number) => G * (heightAt(track, x) - base) + 0.5 * u * u;
+  const lift = o.lift;
+  if (lift && st.s >= lift.from && st.s < lift.to && st.v <= lift.speed) {
+    const before = energy(st.s, st.v);
+    const ds = lift.speed * dt;
+    const friction = o.mu * G * ds;
+    st.s += ds;
+    st.v = lift.speed;
+    st.heat += friction;
+    st.work += energy(st.s, st.v) - before + friction;
+  } else {
+    const mu = muAt(st.s);
+    const pull = -G * slopeAt(track, st.s);
+    const grip = mu * G;
+    if (Math.abs(st.v) < 1e-6 && Math.abs(pull) <= grip) {
+      st.v = 0;
+    } else {
+      const dir = Math.abs(st.v) > 1e-6 ? Math.sign(st.v) : Math.sign(pull);
+      // Half a step of acceleration, a full step of motion, then the other half at the new place (velocity Verlet).
+      const a0 = pull - grip * dir;
+      let vh = st.v + 0.5 * a0 * dt;
+      if (Math.sign(vh) !== dir && Math.abs(st.v) > 1e-6) vh = 0;
+      const s1 = st.s + vh * dt;
+      const a1 = -G * slopeAt(track, s1) - muAt(s1) * G * dir;
+      let v1 = vh + 0.5 * a1 * dt;
+      if (Math.sign(v1) !== dir && v1 !== 0) v1 = 0;
+      // Friction's heat: its force times the distance it acted over.
+      st.heat += 0.5 * (mu + muAt(s1)) * G * Math.abs(s1 - st.s);
+      st.s = s1;
+      st.v = v1;
+    }
+  }
+  if (st.s <= 0 || st.s >= track.length) {
+    st.s = Math.min(Math.max(st.s, 0), track.length);
+    st.heat += 0.5 * st.v * st.v;
+    st.v = 0;
+  }
+}
+
+/** The state as a sample: its energies, at time t. */
+export function sampleOf(track: Track, st: RideState, t: number): RideSample {
+  return {
+    t,
+    s: st.s,
+    v: st.v,
+    pe: G * (heightAt(track, st.s) - lowest(track)),
+    ke: 0.5 * st.v * st.v,
+    heat: st.heat,
+    work: st.work,
+  };
+}
+
+/** Runs the train along the track for `o.duration` seconds, step by step (see `stepRide`). Samples every 1/60 s. */
 export function simulate(track: Track, o: RideOptions): RideSample[] {
   const dt = o.dt ?? 1 / 480;
-  const base = lowest(track);
-  const out: RideSample[] = [];
-  let s = o.s0;
-  let v = o.v0;
-  let heat = 0;
-  let work = 0;
-  const muAt = (x: number) => (o.brakes && x >= o.brakes.from ? o.brakes.mu : o.mu);
-  const inLift = (x: number) => !!o.lift && x >= o.lift.from && x < o.lift.to;
-  const energy = (x: number, u: number) => G * (heightAt(track, x) - base) + 0.5 * u * u;
-  const record = (t: number) =>
-    out.push({ t, s, v, pe: G * (heightAt(track, s) - base), ke: 0.5 * v * v, heat, work });
+  const st: RideState = { s: o.s0, v: o.v0, heat: 0, work: 0 };
+  const out: RideSample[] = [sampleOf(track, st, 0)];
   const every = Math.max(1, Math.round(1 / 60 / dt));
-  record(0);
   const steps = Math.round(o.duration / dt);
   for (let i = 1; i <= steps; i++) {
-    if (inLift(s) && v <= o.lift!.speed) {
-      const before = energy(s, v);
-      // The chain holds it at its speed: the chain's work is whatever that takes, friction's heat included.
-      const ds = o.lift!.speed * dt;
-      const friction = o.mu * G * ds;
-      s += ds;
-      v = o.lift!.speed;
-      heat += friction;
-      work += energy(s, v) - before + friction;
-    } else {
-      // Gravity along the slope, then friction against the motion; friction can stop the train but never push it.
-      const mu = muAt(s);
-      const pull = -G * slopeAt(track, s);
-      const grip = mu * G;
-      if (Math.abs(v) < 1e-6 && Math.abs(pull) <= grip) {
-        v = 0;
-      } else {
-        const dir = Math.abs(v) > 1e-6 ? Math.sign(v) : Math.sign(pull);
-        // Half a step of acceleration, a full step of motion, then the other half at the new place (velocity Verlet).
-        const a0 = pull - grip * dir;
-        let vh = v + 0.5 * a0 * dt;
-        if (Math.sign(vh) !== dir && Math.abs(v) > 1e-6) vh = 0;
-        const s1 = s + vh * dt;
-        const a1 = -G * slopeAt(track, s1) - muAt(s1) * G * dir;
-        let v1 = vh + 0.5 * a1 * dt;
-        if (Math.sign(v1) !== dir && v1 !== 0) v1 = 0;
-        // Friction's heat: its force times the distance it acted over.
-        heat += 0.5 * (mu + muAt(s1)) * G * Math.abs(s1 - s);
-        s = s1;
-        v = v1;
-      }
-    }
-    // The buffers at either end: the train stops dead, and its speed goes into them as heat.
-    if (s <= 0 || s >= track.length) {
-      s = Math.min(Math.max(s, 0), track.length);
-      heat += 0.5 * v * v;
-      v = 0;
-    }
-    if (i % every === 0) record(i * dt);
+    stepRide(track, st, o, dt);
+    if (i % every === 0) out.push(sampleOf(track, st, i * dt));
   }
   return out;
 }
