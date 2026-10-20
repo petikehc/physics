@@ -444,6 +444,38 @@ is corrected at beat labels when it exceeds 50 ms.
   chime as the dragged point lands, and a half-circle run, a step and an open D–A chord before the formula.
 - Captions gain `cos` and `sin` colours and a raised power, `e[sup:iθ]`.
 
+**Chapter 8 (built)**
+- The station hangs among the stars: a clockwork of magenta rings on the left, each turning at a whole-number speed on
+  the tip of the one before, and a chart on the right where the last tip's height is traced as a wave, the newest
+  moment nearest the clockwork and the past drifting away (axis: "earlier"), with the exact wave faint behind it.
+- Beats: chapter 7's circles on circles fly in and scatter into stars behind the title (Grenoble, 1807: Fourier,
+  working on heat). One circle: chapter 7's arrow, its height traced out, a sine wave, heard as a pure tone. Circles on
+  circles: seven more rings grow in on the tip (3×, 5×, 7×… as fast; ⅓, ⅕, ⅐… as big), the trace squares off with
+  the 9% Gibbs overshoot at each jump, and each new ring is heard as its harmonic arriving. Front and side: the rings
+  slide onto one axis and draw apart in depth, one layer per speed; the camera turns side on, and each ring stands as
+  a bar as tall as it is big at its speed: the spectrum (1, ⅓, ⅕…). Any repeating wave: back face on, the same
+  clockwork reshapes into a sawtooth (every speed at 1/n) and a triangle (odd speeds at 1/n²), its sound changing with
+  it. The formula f(t) = Σ aₙ sin(nωt + φₙ). Handoff: a hundred and one arrows turning both ways, biggest first, draw
+  an ambulance (its outline's discrete Fourier transform); its siren sounds and falls in pitch as it passes, and the
+  stars gather into chapter 9's rings of sound (Doppler is a "coming soon" stop for now).
+- The storyboard's "trace extrudes into a 3D ribbon" was left out: the side view already carries the 3D idea, and a
+  ribbon in front of the clockwork hid the chart.
+- Maths: each recipe as signed sine coefficients (square 4/πn on odd n, sawtooth 2/πn alternating, triangle 8/π²n²
+  alternating on odd n), blended coefficient by coefficient so one recipe morphs into the next; the clockwork's
+  joints; a peak finder for the Gibbs overshoot; arc-length resampling of a closed polyline and its DFT, sorted by
+  size, with the k = 0 term (the shape's centre) first.
+- Your turn: a square, sawtooth or triangle from 1 to 16 circles, with each circle's speed and size and the wave's
+  highest point (the square still 9% over at its jumps however many circles). Lab: the same; a side view with the
+  spectrum; and "Draw a shape": draw any closed stroke on the stars and 101 circles redraw it (fewer on the slider),
+  or go back to the ambulance.
+- Sound: the engine gains an additive voice, sixteen sines at whole-number multiples of D3 with a loudness each, fed
+  by the chapter's meter live and in offline renders, so the clockwork is heard as the wave it draws (pure, then
+  reedy as a square, buzzing as a sawtooth, soft as a triangle). Score "Overtones": Dsus2–G–Em7–Asus4 over a D–A
+  drone, with no F or F♯ to rub against the clockwork's harmonics of D, the arpeggio climbing; it steps back while
+  the clockwork sings. SFX: a soft bell on each harmonic as its ring arrives, the square's harmonics in turn as the
+  bars stand up, a hi–lo siren whose pitch drops as it passes, and the harmonic series climbed before the formula.
+- Engine: a formula too wide for the screen shrinks to fit (it mattered first on a phone, for this chapter's).
+
 ---
 
 ## 5. Technical architecture

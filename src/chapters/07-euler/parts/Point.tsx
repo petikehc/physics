@@ -7,8 +7,8 @@ import { beside } from '../../../engine/labels/beside';
 import { clamp01 } from '../../../engine/ease';
 import { thetaText } from '../math';
 import { C, eulerRig, K, onPlane, R, SYM7, THETA_MAX } from '../rig';
-import { Arrow } from './Arrow';
-import { aim } from './aim';
+import { Arrow } from '../../../engine/lines/Arrow';
+import { aim } from '../../../engine/lines/aim';
 
 /** Samples along the way the point has come (two turns' worth at most). */
 const TRAIL = 480;

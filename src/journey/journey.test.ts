@@ -12,6 +12,7 @@ import { newtonRig, SHOT, STORY_FLIGHTS } from '../chapters/05-newton/rig';
 import { calculusRig } from '../chapters/06-calculus/rig';
 import { STORY_YS } from '../chapters/06-calculus/math';
 import { eulerRig, TERMS, THETA_MAX } from '../chapters/07-euler/rig';
+import { fourierRig } from '../chapters/08-fourier/rig';
 
 describe('the journey timeline', () => {
   const journey = buildJourney();
@@ -94,7 +95,16 @@ describe('the journey timeline', () => {
       'euler:yourTurn',
       'euler:handoff',
       'fourier:flight',
-      'fourier:soon',
+      'fourier:title',
+      'fourier:one',
+      'fourier:build',
+      'fourier:spectrum',
+      'fourier:shapes',
+      'fourier:formula',
+      'fourier:yourTurn',
+      'fourier:handoff',
+      'doppler:flight',
+      'doppler:soon',
     ]);
     for (const b of journey.beats) expect(journey.master.labels[b.key]).toBeCloseTo(b.start, 6);
   });
@@ -155,6 +165,13 @@ describe('the journey timeline', () => {
     expect(len).toBeLessThan(145);
   });
 
+  it('runs chapter 8 for roughly 90–140 seconds', () => {
+    const ch8 = journey.chapters.find((c) => c.slug === 'fourier')!;
+    const len = ch8.end - ch8.start;
+    expect(len).toBeGreaterThan(90);
+    expect(len).toBeLessThan(140);
+  });
+
   it('pauses once per chapter, inside its Your-turn beat', () => {
     const paused = journey.beats.filter((b) => b.pauseAt !== undefined);
     expect(paused.map((b) => b.key)).toEqual([
@@ -165,6 +182,7 @@ describe('the journey timeline', () => {
       'newton:yourTurn',
       'calculus:yourTurn',
       'euler:yourTurn',
+      'fourier:yourTurn',
     ]);
     for (const b of paused) {
       expect(b.pauseAt!).toBeGreaterThan(b.start);
@@ -191,6 +209,9 @@ describe('the journey timeline', () => {
     // Chapter 7: four quarter turns and the landing on −1; an arrow laid for each of the series' terms.
     expect(journey.cues.filter((c) => c.id === 'quarter')).toHaveLength(5);
     expect(journey.cues.filter((c) => c.id === 'term')).toHaveLength(TERMS);
+    // Chapter 8: a chime as each of seven circles arrives, and one for each change of recipe.
+    expect(journey.cues.filter((c) => c.id === 'harmonic')).toHaveLength(9);
+    expect(journey.cues.filter((c) => c.id === 'siren')).toHaveLength(1);
   });
 
   it('finds the beat at a time and the cues crossed between two times', () => {
@@ -423,6 +444,44 @@ describe('the journey timeline', () => {
     master.seek(0, false);
     master.seek(journey.duration - 0.1, false);
     expect(rig.from).toBeCloseTo(Math.PI, 5);
+    master.seek(t, false);
+    expect(state()).toBe(snap);
+  });
+
+  it("builds chapter 8's clockwork deterministically, turning steadily from beat to beat", () => {
+    const { master } = journey;
+    const rig = fourierRig();
+    const beat = (id: string) => journey.beats.find((b) => b.key === `fourier:${id}`)!;
+    const state = () => JSON.stringify(rig, (k, v) => (k === '_gsap' ? undefined : v));
+
+    // One circle, then eight; side on; then back to front, reshaped into a triangle.
+    master.seek(beat('build').start, false);
+    expect(rig.count).toBe(1);
+    master.seek(beat('spectrum').start, false);
+    expect(rig.count).toBe(8);
+    master.seek(beat('shapes').start, false);
+    expect(rig.bars).toBe(1);
+    expect(rig.layers).toBe(1);
+    const t = beat('formula').start;
+    master.seek(t, false);
+    expect(rig.shape).toBe(2);
+    expect(rig.bars).toBe(0);
+    // The clockwork never stops or jumps between beats: time runs on at the same rate.
+    const rate = (a: number, b: number) => {
+      master.seek(a, false);
+      const t0 = rig.t;
+      master.seek(b, false);
+      return (rig.t - t0) / (b - a);
+    };
+    const edge = beat('spectrum').start;
+    expect(rate(edge - 0.5, edge + 0.5)).toBeCloseTo(0.9, 6);
+    expect(rate(beat('one').start + 1, beat('formula').end - 0.1)).toBeCloseTo(0.9, 6);
+
+    master.seek(t, false);
+    const snap = state();
+    master.seek(0, false);
+    master.seek(journey.duration - 0.1, false);
+    expect(rig.dt).toBeCloseTo(Math.PI * 2, 6);
     master.seek(t, false);
     expect(state()).toBe(snap);
   });

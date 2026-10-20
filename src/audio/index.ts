@@ -4,6 +4,9 @@ import type { Triangle } from '../chapters/01-pythagoras/math';
 export type Scene = 'teaser' | 'journey' | 'lab' | null;
 /** Continuous sound layers: a scratch of chalk, pouring water, and a singing planet (with `hz`). */
 export type ContinuousId = 'chalk' | 'pour' | 'voice';
+/** How many harmonics chapter 8's additive voice has (the fundamental and the fifteen above it). */
+export const HARMONICS = 16;
+const SILENT: readonly number[] = new Array<number>(HARMONICS).fill(0);
 
 let engine: AudioEngine | null = null;
 let loading: Promise<AudioEngine | null> | null = null;
@@ -91,6 +94,11 @@ export const audio = {
 
   sides(t: Triangle | null, moved: boolean) {
     engine?.sides(state.muted ? null : t, moved);
+  },
+
+  /** Chapter 8's additive voice: how loud each harmonic is (0..1, the fundamental first) over a fundamental of `hz`. */
+  harmonics(amps: readonly number[], hz: number) {
+    engine?.harmonics(state.muted ? SILENT : amps, hz);
   },
 
   setScene(scene: Scene) {

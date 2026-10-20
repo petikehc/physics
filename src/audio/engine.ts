@@ -94,6 +94,7 @@ export class AudioEngine {
     if (!running) {
       this.sfx.continuous('chalk', 0, time);
       this.sfx.continuous('voice', 0, time);
+      this.sfx.harmonics([], time);
     }
   }
 
@@ -107,6 +108,10 @@ export class AudioEngine {
 
   sides(t: Triangle | null, moved: boolean) {
     this.sfx.sides(t, moved);
+  }
+
+  harmonics(amps: readonly number[], hz: number) {
+    this.sfx.harmonics(amps, Tone.now(), hz);
   }
 
   dispose() {

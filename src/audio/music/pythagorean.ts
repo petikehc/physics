@@ -1,7 +1,8 @@
 import * as Tone from 'tone';
 import { C3, pyth, triangleChord, type Note } from '../tuning';
 
-export type Theme = 'pythagoras' | 'circle' | 'water' | 'spheres' | 'gravity' | 'rising' | 'turning';
+export type Theme =
+  'pythagoras' | 'circle' | 'water' | 'spheres' | 'gravity' | 'rising' | 'turning' | 'overtones';
 
 /** How the score sounds during one beat. Values are targets the score glides to. */
 export interface Layers {
@@ -27,6 +28,7 @@ const SPHERES: Theme = 'spheres';
 const GRAVITY: Theme = 'gravity';
 const RISING: Theme = 'rising';
 const TURNING: Theme = 'turning';
+const OVERTONES: Theme = 'overtones';
 
 /**
  * Per-beat arrangement. Chapter 1 is "Pythagorean Drone" (C–Am–F–G over a C–G drone); chapter 2 turns to
@@ -36,7 +38,9 @@ const TURNING: Theme = 'turning';
  * slowly); chapter 5, Newton's, is "Falling" (G–Em–Am–C over a G–D drone, the arpeggio falling); chapter 6, in the
  * abstract realm, is "Rising" (F–Am–Dm–G over an F–C drone, the arpeggio climbing like a stair); chapter 7, Euler's,
  * is "Turning" (F–C–G–Dm, round by fifths, over a D–A drone, the arpeggio in near-pure sines starting each bar one
- * note further round, like a phase turning). The drone glides into each new key during the flight.
+ * note further round, like a phase turning); chapter 8, Fourier's, is "Overtones" (Dsus2–G–Em7–Asus4 over the same D–A
+ * drone, with no F or F♯ to rub against the clockwork's own harmonics of D; the arpeggio climbs the overtones). The
+ * drone glides into each new key during the flight.
  */
 export const ARRANGEMENT: Record<string, Layers> = {
   teaser: { drone: 0.55, pad: 0.6, cutoff: 700, plucks: 0.14, arp: 0, harmony: 'prog' },
@@ -698,17 +702,110 @@ export const ARRANGEMENT: Record<string, Layers> = {
     plucks: 0.2,
     arp: 0.6,
     harmony: 'prog',
-    theme: TURNING,
+    theme: OVERTONES,
     arpOctave: -1,
   },
-  'fourier:soon': {
+  'fourier:title': {
+    drone: 0.77,
+    pad: 1.0,
+    cutoff: 700,
+    plucks: 0.12,
+    arp: 0,
+    harmony: 'prog',
+    theme: OVERTONES,
+  },
+  // The clockwork sings its own harmonics from here on: the score steps back to leave room for them.
+  'fourier:one': {
+    drone: 0.6,
+    pad: 0.75,
+    cutoff: 800,
+    plucks: 0.04,
+    arp: 0,
+    harmony: 'prog',
+    theme: OVERTONES,
+  },
+  'fourier:build': {
+    drone: 0.6,
+    pad: 0.75,
+    cutoff: 900,
+    plucks: 0.03,
+    arp: 0,
+    harmony: 'prog',
+    theme: OVERTONES,
+  },
+  'fourier:spectrum': {
+    drone: 0.6,
+    pad: 0.8,
+    cutoff: 1100,
+    plucks: 0.04,
+    arp: 0,
+    harmony: 'prog',
+    theme: OVERTONES,
+  },
+  'fourier:shapes': {
+    drone: 0.6,
+    pad: 0.75,
+    cutoff: 900,
+    plucks: 0.04,
+    arp: 0,
+    harmony: 'prog',
+    theme: OVERTONES,
+  },
+  'fourier:formula': {
+    drone: 0.75,
+    pad: 1,
+    cutoff: 3000,
+    plucks: 0,
+    arp: 0,
+    harmony: 'resolve',
+    theme: OVERTONES,
+  },
+  'fourier:yourTurn': {
+    drone: 0.32,
+    pad: 0.35,
+    cutoff: 700,
+    plucks: 0.04,
+    arp: 0,
+    harmony: 'prog',
+    theme: OVERTONES,
+  },
+  'fourier:handoff': {
+    drone: 0.77,
+    pad: 0.95,
+    cutoff: 1800,
+    plucks: 0.1,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: OVERTONES,
+    arpOctave: -1,
+  },
+  'fourier:lab': {
+    drone: 0.3,
+    pad: 0.32,
+    cutoff: 800,
+    plucks: 0.04,
+    arp: 0,
+    harmony: 'prog',
+    theme: OVERTONES,
+  },
+  'doppler:flight': {
+    drone: 0.85,
+    pad: 1.1,
+    cutoff: 2600,
+    plucks: 0.2,
+    arp: 0.6,
+    harmony: 'prog',
+    theme: OVERTONES,
+    arpOctave: -1,
+  },
+  'doppler:soon': {
     drone: 0.42,
     pad: 0.5,
     cutoff: 900,
     plucks: 0.1,
     arp: 0,
     harmony: 'prog',
-    theme: TURNING,
+    theme: OVERTONES,
   },
   lab: { drone: 0.45, pad: 0.4, cutoff: 800, plucks: 0.1, arp: 0, harmony: 'prog' },
 };
@@ -911,6 +1008,34 @@ const TURNING_CHORDS: Chord[] = [
   ],
 ];
 
+// Dsus2 – G – Em7 – Asus4, over a D–A drone: chapter 8, with no F or F♯ to clash with the clockwork's harmonics of D.
+const OVERTONES_CHORDS: Chord[] = [
+  [
+    ['D', 2],
+    ['A', 2],
+    ['D', 3],
+    ['E', 3],
+  ],
+  [
+    ['G', 2],
+    ['D', 3],
+    ['G', 3],
+    ['B', 3],
+  ],
+  [
+    ['E', 2],
+    ['B', 2],
+    ['D', 3],
+    ['G', 3],
+  ],
+  [
+    ['A', 2],
+    ['E', 3],
+    ['A', 3],
+    ['D', 4],
+  ],
+];
+
 const THEMES: Record<Theme, { chords: Chord[]; drone: [number, number, number] }> = {
   pythagoras: { chords: PYTHAGORAS_CHORDS, drone: [pyth('C', 2), pyth('G', 2), pyth('C', 3)] },
   circle: { chords: CIRCLE_CHORDS, drone: [pyth('A', 1), pyth('E', 2), pyth('A', 2)] },
@@ -919,6 +1044,7 @@ const THEMES: Record<Theme, { chords: Chord[]; drone: [number, number, number] }
   gravity: { chords: GRAVITY_CHORDS, drone: [pyth('G', 2), pyth('D', 3), pyth('G', 3)] },
   rising: { chords: RISING_CHORDS, drone: [pyth('F', 2), pyth('C', 3), pyth('F', 3)] },
   turning: { chords: TURNING_CHORDS, drone: [pyth('D', 2), pyth('A', 2), pyth('D', 3)] },
+  overtones: { chords: OVERTONES_CHORDS, drone: [pyth('D', 2), pyth('A', 2), pyth('D', 3)] },
 };
 
 const PENTATONIC: Array<[Note, number]> = [
@@ -940,6 +1066,7 @@ function fallback(key: string | null): Layers {
   if (key?.startsWith('newton')) return ARRANGEMENT['newton:cannon']!;
   if (key?.startsWith('calculus')) return ARRANGEMENT['calculus:speed']!;
   if (key?.startsWith('euler')) return ARRANGEMENT['euler:quarters']!;
+  if (key?.startsWith('fourier')) return ARRANGEMENT['fourier:shapes']!;
   return QUIET;
 }
 
@@ -1068,10 +1195,14 @@ export class PythagoreanScore {
                     ? [0, 1, 2, 3, 5, 6, 7]
                     : this.theme === 'turning'
                       ? [0, 1, 2, 3, 1, 2, 3, 0, 2, 3, 0, 1, 3, 0, 1, 2]
-                      : [0, 1, 2, 3, 2, 1];
+                      : this.theme === 'overtones'
+                        ? [0, 1, 2, 3, 4, 5, 6, 7]
+                        : [0, 1, 2, 3, 2, 1];
         const k = order[step % order.length]!;
         // Past the top of the chord, the stair goes on an octave up.
-        const f = chord[k % chord.length]! * (this.theme === 'rising' ? 2 ** Math.floor(k / 4) : 1);
+        const f =
+          chord[k % chord.length]! *
+          (this.theme === 'rising' || this.theme === 'overtones' ? 2 ** Math.floor(k / 4) : 1);
         this.arpSynth.triggerAttackRelease(f, '16n', time, l.arpFast ? 0.38 : 0.5);
         step++;
       }, '16n').start(0),

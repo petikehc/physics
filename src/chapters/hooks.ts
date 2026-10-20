@@ -13,6 +13,8 @@ import { calculusRig, CALCULUS_DEFAULTS } from './06-calculus/rig';
 import { leaveCalculusYourTurn } from './06-calculus/interaction';
 import { eulerRig, EULER_DEFAULTS } from './07-euler/rig';
 import { leaveEulerYourTurn } from './07-euler/interaction';
+import { fourierRig, FOURIER_DEFAULTS } from './08-fourier/rig';
+import { leaveFourierYourTurn } from './08-fourier/interaction';
 
 /** What the journey controller needs from a chapter, outside React. */
 export interface ChapterHooks {
@@ -55,6 +57,10 @@ export const HOOKS: Record<string, ChapterHooks> = {
   euler: {
     reset: () => resetRig(eulerRig(), { ...EULER_DEFAULTS }),
     leaveYourTurn: leaveEulerYourTurn,
+  },
+  fourier: {
+    reset: () => resetRig(fourierRig(), { ...FOURIER_DEFAULTS }),
+    leaveYourTurn: leaveFourierYourTurn,
   },
 };
 

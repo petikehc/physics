@@ -180,7 +180,47 @@ test('the euler lab sends the point round and lays the series onto it', async ({
   expect(errors).toEqual([]);
 });
 
-test('labs that are not built yet say so', async ({ page }) => {
+test('the fourier lab builds waves, turns them side on, and redraws a shape you draw', async ({ page }) => {
+  const errors = collectErrors(page);
   await page.goto('/lab/fourier?quality=low');
+  const panel = page.getByRole('complementary', { name: 'Fourier lab' });
+  await expect(panel).toBeVisible();
+  await expect(panel).toContainText('Speeds 1, 3, 5, 7');
+
+  await panel.getByRole('button', { name: 'Side view' }).click();
+  await expect(panel.getByRole('button', { name: 'Side view' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByText('speed', { exact: true })).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByText('1/3', { exact: true })).toBeVisible();
+
+  // Draw a closed loop on the stars: the circles take it over.
+  await panel.getByRole('button', { name: 'Draw a shape' }).click();
+  await expect(panel).toContainText('The ambulance, from 101 circles.');
+  await page.waitForTimeout(2000);
+  const box = (await page.locator('canvas').boundingBox())!;
+  const cx = box.x + box.width * 0.33;
+  const cy = box.y + box.height * 0.45;
+  await page.mouse.move(cx + 120, cy);
+  await page.mouse.down();
+  for (let i = 1; i <= 48; i++) {
+    const a = (i / 48) * Math.PI * 2;
+    await page.mouse.move(cx + 120 * Math.cos(a), cy + 70 * Math.sin(3 * a) * 0.5 + 60 * Math.sin(a));
+    await page.waitForTimeout(16);
+  }
+  await page.mouse.up();
+  await expect(panel).toContainText('Your shape, from 101 circles.');
+  const fewer = panel.getByLabel('Circles');
+  await fewer.focus();
+  for (let i = 0; i < 5; i++) await page.keyboard.press('ArrowLeft');
+  await expect(panel).toContainText('Your shape, from 96 circles.');
+  await panel.getByRole('button', { name: 'Back to the ambulance' }).click();
+  await expect(panel).toContainText('The ambulance, from 96 circles.');
+  await page.waitForTimeout(1500);
+  await expectCanvasRendered(page);
+  await page.screenshot({ path: test.info().outputPath('lab-fourier.png') });
+  expect(errors).toEqual([]);
+});
+
+test('labs that are not built yet say so', async ({ page }) => {
+  await page.goto('/lab/doppler?quality=low');
   await expect(page.getByText('This Lab is in production.')).toBeVisible();
 });

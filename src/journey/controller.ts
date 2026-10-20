@@ -5,7 +5,7 @@ import { runtime } from '../engine/runtime';
 import { beatAt, cuesBetween, type BeatMarker, type Journey } from './builder';
 import { buildJourney } from './journey';
 import { HOOKS } from '../chapters/hooks';
-import { continuousMeter, createSoundFrame } from '../chapters/sound';
+import { continuousMeter, createSoundFrame, type Levels } from '../chapters/sound';
 
 const EPS = 0.05;
 
@@ -266,13 +266,24 @@ function exposeTestHook(c: JourneyController) {
       c.pause();
       // Sample the continuous layers by stepping the timeline, exactly as playback would.
       const step = 1 / 30;
-      const continuous: Array<[number, number, number, number, number, number]> = [];
+      const continuous: Array<{ t: number; levels: Required<Levels> }> = [];
       j.master.seek(start, false);
       const meter = continuousMeter();
       for (let t = step; t <= duration; t += step) {
         j.master.seek(start + t, false);
         const l = meter(step);
-        continuous.push([t, l.chalk, l.pour, l.voice ?? 0, l.voiceHz ?? 0, l.voicePan ?? 0]);
+        continuous.push({
+          t,
+          levels: {
+            chalk: l.chalk,
+            pour: l.pour,
+            voice: l.voice ?? 0,
+            voiceHz: l.voiceHz ?? 0,
+            voicePan: l.voicePan ?? 0,
+            harmonics: [...(l.harmonics ?? [])],
+            harmonicsHz: l.harmonicsHz ?? 0,
+          },
+        });
       }
       j.master.seek(saved, false);
       // Everything shifted so the render starts at 0, with the score in the beat that `start` falls in.
