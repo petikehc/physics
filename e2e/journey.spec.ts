@@ -13,18 +13,19 @@ test('the landing teaser renders and offers the journey', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('every beat of the journey renders (desktop and phone)', async ({ page }) => {
-  test.setTimeout(900_000);
-  const errors = collectErrors(page);
-  for (const viewport of [
-    { width: 1440, height: 900, name: 'desktop' },
-    { width: 390, height: 844, name: 'phone' },
-  ]) {
+for (const viewport of [
+  { width: 1440, height: 900, name: 'desktop' },
+  { width: 390, height: 844, name: 'phone' },
+]) {
+  test(`every beat of the journey renders (${viewport.name})`, async ({ page }) => {
+    const errors = collectErrors(page);
     await page.setViewportSize(viewport);
     await page.goto(`/play${Q}`);
     await waitForJourney(page);
     const beats = await page.evaluate(() => window.__journey!.beats);
     expect(beats.length).toBeGreaterThan(20);
+    // Time for every beat, however long the journey grows: a software-rendered seek and screenshot take a few seconds.
+    test.setTimeout(120_000 + beats.length * 8_000);
     for (const b of beats) {
       await seek(page, b.start + Math.min((b.end - b.start) * 0.7, 6));
       await page.waitForTimeout(1500);
@@ -33,9 +34,9 @@ test('every beat of the journey renders (desktop and phone)', async ({ page }) =
       });
     }
     await expectCanvasRendered(page);
-  }
-  expect(errors).toEqual([]);
-});
+    expect(errors).toEqual([]);
+  });
+}
 
 test('Your turn pauses the journey, and Continue resumes it', async ({ page }) => {
   const errors = collectErrors(page);
