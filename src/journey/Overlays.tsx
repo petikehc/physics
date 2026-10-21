@@ -5,7 +5,7 @@ import { useApp } from '../state/store';
 import { controller } from './controller';
 import { renderCaption } from '../ui/caption';
 import { Formula } from '../engine/labels/Formula';
-import { chapterBySlug } from '../chapters/registry';
+import { segmentBySlug } from '../chapters/finale/meta';
 import { VIEWS } from '../chapters/views';
 
 function useBeat() {
@@ -72,13 +72,13 @@ export function Captions() {
   );
 }
 
-/** Big title card for a chapter's opening beat. */
+/** Big title card for a chapter's opening beat (and the finale's). */
 export function TitleCard() {
   const beat = useBeat();
   const reduced = useApp((s) => s.reducedMotion);
   const ref = useRef<HTMLDivElement>(null);
   const visible = beat?.kind === 'title';
-  const ch = chapterBySlug(beat?.chapter);
+  const ch = segmentBySlug(beat?.chapter);
 
   useLayoutEffect(() => {
     const el = ref.current;
@@ -115,13 +115,11 @@ export function TitleCard() {
     <div key={beat?.key} className="title-card" ref={ref} style={{ visibility: 'hidden' }}>
       <div>
         <div className="title-card__numeral" style={{ color: ch.accent }}>
-          Chapter {ch.numeral}
+          {ch.eyebrow}
         </div>
         <h1 className="title-card__title">{ch.title}</h1>
         <div className="title-card__meta">
-          <span className="chip">
-            {ch.figure} · {ch.place} · {ch.year}
-          </span>
+          <span className="chip">{ch.chip}</span>
         </div>
         <p className="title-card__body captions__body" style={{ maxWidth: 520, margin: '18px auto 0' }}>
           {renderCaption(beat?.body)}

@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router';
 import { CHAPTERS } from '../chapters/registry';
+import { FINALE } from '../chapters/finale/meta';
 import { CloseIcon } from './Icons';
 
-/** The ten chapters, with Play / Lab links for the ones that are ready. */
+/** The ten chapters, with Play / Lab links for the ones that are ready, and the finale. */
 export function ChaptersMenu({ onClose }: { onClose: () => void }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -58,6 +59,25 @@ export function ChaptersMenu({ onClose }: { onClose: () => void }) {
               )}
             </li>
           ))}
+          <li className="chapter-row">
+            <span className="chapter-row__num" style={{ color: FINALE.accent }}>
+              ✦
+            </span>
+            <div>
+              <div className="chapter-row__title">{FINALE.title}</div>
+              <div className="chapter-row__meta">
+                Finale · the ten stars, and why something always stays the same
+              </div>
+            </div>
+            <div className="chapter-row__actions">
+              <Link className="btn btn--primary" to="/play/finale" onClick={onClose}>
+                Play
+              </Link>
+              <Link className="btn" to="/map" onClick={onClose}>
+                Map
+              </Link>
+            </div>
+          </li>
         </ol>
       </div>
     </div>

@@ -370,6 +370,32 @@ test('chapter 10: Your turn reshapes the test track, and the total energy never 
   expect(errors).toEqual([]);
 });
 
+test('the journey ends at the constellation, which leads back into any chapter', async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.goto(`/play/finale${Q}`);
+  await waitForJourney(page);
+  const duration = await page.evaluate(() => window.__journey!.duration);
+  await seek(page, duration);
+  const panel = page.getByRole('complementary', { name: 'The constellation' });
+  await expect(panel).toBeVisible({ timeout: 20_000 });
+  await expect(panel).toContainText('Ten stars, one thread');
+
+  // Kepler's star: what it kept the same, and the way back into it.
+  await panel.getByRole('button', { name: /^IV · / }).click();
+  await expect(panel).toContainText('Equal areas.');
+  await expect(panel).toContainText('angular momentum');
+  await panel.getByRole('button', { name: 'Play chapter IV' }).click();
+  await expect(panel).toBeHidden();
+  const kepler = await page.evaluate(() => {
+    const beats = window.__journey!.beats.filter((b) => b.key.startsWith('kepler:'));
+    return { start: beats[0]!.start, end: beats[beats.length - 1]!.end };
+  });
+  const t = await page.evaluate(() => window.__journey!.time());
+  expect(t).toBeGreaterThanOrEqual(kepler.start - 0.01);
+  expect(t).toBeLessThan(kepler.end);
+  expect(errors).toEqual([]);
+});
+
 test('jumping ahead loads the chapter the playhead lands in', async ({ page }) => {
   const errors = collectErrors(page);
   // Start at chapter 1, whose neighbours are loaded with it, then jump two chapters on.

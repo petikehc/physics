@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type WorldMode = 'teaser' | 'journey' | 'lab' | 'page';
+export type WorldMode = 'teaser' | 'journey' | 'lab' | 'page' | 'map';
 export type QualityTier = 'low' | 'medium' | 'high';
 export type CameraMode = 'directed' | 'interactive';
 

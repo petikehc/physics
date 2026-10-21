@@ -19,6 +19,7 @@ The full research, storyboards and architecture are in [`docs/PLAN.md`](docs/PLA
 | VIII | Fourier Series                      | **Playable**: journey, Your turn, Lab, score and sound effects |
 | IX   | The Doppler Effect                  | **Playable**: journey, Your turn, Lab, score and sound effects |
 | X    | Conservation of Energy              | **Playable**: journey, Your turn, Lab, score and sound effects |
+| ✦    | Finale: Something Stays the Same    | **Playable**: the constellation, one sweep, and the index      |
 
 ## Running it
 
@@ -78,10 +79,15 @@ pull request.
   note that follows how fast it turns, as Kepler imagined in Harmonices Mundi, in chapter 5 Newton's cannonball
   whistles higher the faster it falls, and in chapter 6 a voice sings a curve's height, which is also the slope of the
   area under it. In chapter 9 the ambulance's siren is worked out from Doppler's formula as you hear it, and in
-  chapter 10 the coaster's rush follows its speed, each turn-back rings a note set by its height, and the journey
-  resolves on the 3:4:5 chord it began with. The same engine renders offline previews.
+  chapter 10 the coaster's rush follows its speed and each turn-back rings a note set by its height. The finale
+  comes home to C: each star rings its own chapter's note, and the journey resolves on the 3:4:5 chord it began
+  with. The same engine renders offline previews.
 - **The world** (`runtime.world`) fades from the dusk beach of the first chapters into deep space (`space` 0 → 1)
   as the journey rises to the planets, and to a night street and fairground (`night`) for the last two chapters.
+
+- **The finale** (`src/chapters/finale`) is a station like the chapters' but not one of them: the night's stars
+  gather into a constellation of ten, one per chapter, and one sweep along them shows what each kept the same,
+  before Noether's theorem says why. At the end of the journey, and at `/map`, the constellation is the index.
 
 ## Adding a chapter
 

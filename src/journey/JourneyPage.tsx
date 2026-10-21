@@ -5,6 +5,7 @@ import { controller } from './controller';
 import { audio } from '../audio';
 import { runtime } from '../engine/runtime';
 import { chapterBySlug } from '../chapters/registry';
+import { FINALE, segmentBySlug } from '../chapters/finale/meta';
 import { TopBar } from '../ui/TopBar';
 import { ChaptersMenu } from '../ui/ChaptersMenu';
 import { PlayerBar } from './PlayerBar';
@@ -27,21 +28,23 @@ export default function JourneyPage() {
   const veil = useRef<HTMLDivElement>(null);
 
   const meta = chapterBySlug(slug);
+  // A chapter that is ready, or the finale.
+  const known = !!slug && (meta?.status === 'ready' || slug === FINALE.slug);
   useEffect(() => {
-    if (slug && meta?.status !== 'ready') navigate('/', { replace: true });
-  }, [slug, meta, navigate]);
+    if (slug && !known) navigate('/', { replace: true });
+  }, [slug, known, navigate]);
 
   useEffect(() => {
-    set({ mode: 'journey', chapterSlug: slug && meta?.status === 'ready' ? slug : 'pythagoras' });
+    set({ mode: 'journey', chapterSlug: known ? slug! : 'pythagoras' });
     audio.setScene('journey');
-    controller.start(slug && meta?.status === 'ready' ? slug : undefined);
+    controller.start(known ? slug : undefined);
     controller.play();
     return () => {
       controller.dispose();
       audio.setScene(null);
       set({ playing: false, beatKey: null, yourTurn: false, ended: false, cameraMode: 'directed' });
     };
-  }, [set, slug, meta]);
+  }, [set, slug, known]);
 
   // Keyboard, wheel and swipe all step one beat at a time.
   useEffect(() => {
@@ -109,6 +112,7 @@ export default function JourneyPage() {
 
   const onContinue = useCallback(() => controller.continueFromYourTurn(), []);
   const chapter = chapterBySlug(beatKey?.split(':')[0]);
+  const segment = segmentBySlug(beatKey?.split(':')[0]);
   const YourTurn = chapter ? VIEWS[chapter.slug]?.YourTurn : undefined;
 
   return (
@@ -125,7 +129,7 @@ export default function JourneyPage() {
         </>
       ) : null}
       <TopBar
-        chapterLabel={chapter ? `${chapter.numeral} · ${chapter.short} · ${chapter.year}` : undefined}
+        chapterLabel={chapter ? `${chapter.numeral} · ${chapter.short} · ${chapter.year}` : segment?.short}
         onChapters={() => setMenu(true)}
       />
       {menu ? <ChaptersMenu onClose={() => setMenu(false)} /> : null}

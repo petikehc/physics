@@ -434,6 +434,12 @@ export const ICON_ORDER = [
 
 const cache = new Map<string, Float32Array>();
 
+/** Adds a shape from outside the engine (a chapter's own point cloud), replacing any of the same name. */
+export function registerShape(key: string, gen: (n: number) => Float32Array) {
+  SHAPES[key] = gen;
+  for (const id of [...cache.keys()]) if (id.startsWith(`${key}:`)) cache.delete(id);
+}
+
 export function getShape(key: string, n: number): Float32Array {
   const id = `${key}:${n}`;
   let arr = cache.get(id);

@@ -12,4 +12,5 @@ export const STATION_VIEWS: Record<string, LazyExoticComponent<ComponentType>> =
   fourier: lazy(() => import('./08-fourier/Station')),
   doppler: lazy(() => import('./09-doppler/Station')),
   energy: lazy(() => import('./10-energy/Station')),
+  finale: lazy(() => import('./finale/Station')),
 };
