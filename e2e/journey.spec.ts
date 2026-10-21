@@ -3,6 +3,14 @@ import { collectErrors, expectCanvasRendered, seek, waitForJourney } from './hel
 
 const Q = '?quality=low';
 
+// The tests work each Your-turn panel themselves. Left on, its 14 s countdown can run out while a slow,
+// software-rendered run is still checking the panel, and the journey moves on underneath the test.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() =>
+    window.localStorage.setItem('sand-to-stars:prefs', JSON.stringify({ autoContinue: false })),
+  );
+});
+
 test('the landing teaser renders and offers the journey', async ({ page }) => {
   const errors = collectErrors(page);
   await page.goto(`/${Q}`);
