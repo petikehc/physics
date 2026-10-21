@@ -19,7 +19,7 @@ The full research, storyboards and architecture are in [`docs/PLAN.md`](docs/PLA
 | VIII | Fourier Series                      | **Playable**: journey, Your turn, Lab, score and sound effects |
 | IX   | The Doppler Effect                  | **Playable**: journey, Your turn, Lab, score and sound effects |
 | X    | Conservation of Energy              | **Playable**: journey, Your turn, Lab, score and sound effects |
-| ✦    | Finale: Something Stays the Same    | **Playable**: the constellation, the epilogue, and the index   |
+| ✦    | Finale: Something Stays the Same    | **Playable**: the constellation, one sweep, and the index      |
 
 ## Running it
 
@@ -86,7 +86,7 @@ pull request.
   as the journey rises to the planets, and to a night street and fairground (`night`) for the last two chapters.
 
 - **The finale** (`src/chapters/finale`) is a station like the chapters' but not one of them: the night's stars
-  gather into a constellation of ten, one per chapter, and the epilogue visits each to say what it kept the same,
+  gather into a constellation of ten, one per chapter, and one sweep along them shows what each kept the same,
   before Noether's theorem says why. At the end of the journey, and at `/map`, the constellation is the index.
 
 ## Adding a chapter

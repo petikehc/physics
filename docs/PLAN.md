@@ -548,21 +548,24 @@ is corrected at beat labels when it exceeds 50 ms.
 - Not an eleventh chapter but a station of its own, high in the night sky over the fairground: ten stars, one for
   each chapter, joined in the order the story told them by a thread that rises from the beach chapters low on the
   left to the fairground high on the right.
-- Beats: up from the fairground after the sparks (a flight); the title, "Something Stays the Same", as the night's
-  stars (the Dust) gather into the ten and light one by one, each ringing its chapter's key note, and the thread
-  draws through them. Then one beat per chapter: the camera visits its star, which takes the chapter's colour and
-  shows its formula, while the Dust re-forms the chapter's icon beside it (the triangle's squares, the disc, the
-  crown, the orbit and so on) and the caption says what that chapter kept the same: area; area again; weight; equal
-  areas (angular momentum); one law of gravity on Earth and in the sky; the total change, however finely sliced;
-  length one (cos²θ + sin²θ = 1); the same wave, however told; the speed of sound, whoever moves; energy. Then
-  Noether (1918): each kept quantity comes from a symmetry (time: energy; direction: angular momentum; place:
+- Beats, about 50 s in all: up from the fairground after the sparks (a flight, 4 s); the title, "Something Stays
+  the Same": "It began as a triangle scratched in the sand. The same grains have come all this way, and are stars
+  now: one for each idea", as the night's stars (the Dust, which was the sand of chapter 1) gather into the ten. Then
+  one sweep, about 21 s, the camera gliding along the thread: each star in turn takes its chapter's colour, rings its
+  chapter's key note and shows in a word or two what it kept the same (area; area; weight; angular momentum; one law;
+  the total change; length one; the same wave; the speed of sound; energy), while the Dust re-forms the chapter's
+  icon beside it and the thread draws on behind. Then Noether (1918), in three short lines: each continuous symmetry
+  of the laws keeps something (the same at every moment: energy; in every direction: angular momentum; everywhere:
   momentum), as every star lights in its colour and the camera turns the constellation. Last, the music resolves on
   the 3:4:5 chord and the constellation is left as the index.
+- A first cut stopped at each star for a paragraph and ran 137 s; it was too slow, so the sentences moved into the
+  index panel and the stops became the sweep.
 - The index: at the end of the journey a panel beside the constellation lists the ten stars; choose one there or in
   the sky to read what it kept the same, and play it again or open its Lab. `/map` is the same constellation. The
   chapters menu ends with the finale.
-- Icons form on the outside of the thread's bend at each star, numerals the same way and formulas above or below,
-  so nothing lands on a neighbouring star; a test keeps every icon clear of every other star.
+- Icons form on the outside of the thread's bend at each star, numerals the same way and tags the other way (on a
+  backed chip, so the thread passes behind them), so nothing lands on a neighbouring star; a test keeps every icon
+  clear of every other star.
 - Sound: a bell per star on its chapter's key note (C, A, D, E, G, F, D, D, A, C), the score in chapter 1's key, and
   a closing roll of the 3:4:5 chord over a low C.
 - Engine: `registerShape` (a chapter's own Dust shape), and a `map` world mode that mounts the finale alone.
