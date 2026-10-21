@@ -17,6 +17,8 @@ export const orbitLimits = {
 
 const _cart = new THREE.Vector3();
 const _orbit = new THREE.Vector3();
+const _side = new THREE.Vector3();
+const UP = new THREE.Vector3(0, 1, 0);
 
 export function directedPose(rig: CameraRig, outPos: THREE.Vector3, outTarget: THREE.Vector3) {
   _cart.set(rig.px, rig.py, rig.pz);
@@ -77,6 +79,7 @@ export function CameraDirector() {
     };
   }, [cameraMode, camera]);
 
+  // Before everything else each frame (orbit controls run at -1), so all that follows sees this frame's camera.
   useFrame((state) => {
     // The lens shift: a view window moved down the full picture lifts everything in it.
     const { width, height } = state.size;
@@ -94,6 +97,19 @@ export function CameraDirector() {
     }
     const rig = runtime.camera;
     directedPose(rig, pos.current, target.current);
+    // On a wide screen, slide the shot sideways (leaving room beside the subject); fade that out on a tall one.
+    const aspect = state.size.width / Math.max(state.size.height, 1);
+    const wide = Math.min(Math.max((aspect - 0.8) / 0.4, 0), 1);
+    if (rig.side !== 0 && wide > 0) {
+      _side
+        .subVectors(target.current, pos.current)
+        .cross(UP)
+        .setY(0)
+        .normalize()
+        .multiplyScalar(rig.side * wide);
+      pos.current.add(_side);
+      target.current.add(_side);
+    }
     // A portrait screen steps back and widens the lens, as much as the shot allows.
     const full = portraitFit(state.size.width / Math.max(state.size.height, 1));
     const k = Math.min(Math.max(rig.portrait, 0), 1);
@@ -127,7 +143,7 @@ export function CameraDirector() {
       camera.fov = fov;
       camera.updateProjectionMatrix();
     }
-  });
+  }, -2);
 
   if (cameraMode !== 'interactive') return null;
   return (

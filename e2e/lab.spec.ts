@@ -254,7 +254,42 @@ test('the doppler lab plays an ambulance and a jet to a listener, and red-shifts
   expect(errors).toEqual([]);
 });
 
-test('labs that are not built yet say so', async ({ page }) => {
+test('the energy lab lets a car go on a valley you shape, and runs the coaster with its tanks', async ({
+  page,
+}) => {
+  const errors = collectErrors(page);
   await page.goto('/lab/energy?quality=low');
-  await expect(page.getByText('This Lab is in production.')).toBeVisible();
+  const panel = page.getByRole('complementary', { name: 'Energy lab' });
+  await expect(panel).toBeVisible();
+  await expect(panel).toContainText('12.0 m');
+  await expect(panel).toContainText('400 kg');
+
+  // A heavier car: more energy of every kind, and the total still never changes as it rolls.
+  const mass = panel.getByLabel('Mass');
+  await mass.focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(panel).toContainText('450 kg');
+  await panel.getByRole('button', { name: 'Let it go again' }).click();
+  const total = async () => Number((await panel.textContent())!.match(/Total (\d+) kJ/)![1]);
+  const first = await total();
+  await expect(panel).toContainText(/[1-9]\d* km\/h/, { timeout: 15_000 });
+  for (let i = 0; i < 3; i++) {
+    expect(Math.abs((await total()) - first)).toBeLessThanOrEqual(1);
+    await page.waitForTimeout(400);
+  }
+
+  // The coaster, with its tanks.
+  await panel.getByRole('button', { name: 'The coaster' }).click();
+  await expect(panel.getByRole('button', { name: 'The coaster' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(panel).toContainText('The tanks keep count.');
+  await expect(page.getByText('height · mgh')).toBeVisible({ timeout: 10_000 });
+  await page.waitForTimeout(2500);
+  await expectCanvasRendered(page);
+  await page.screenshot({ path: test.info().outputPath('lab-energy.png') });
+  expect(errors).toEqual([]);
+});
+
+test('a Lab that does not exist says so', async ({ page }) => {
+  await page.goto('/lab/nowhere?quality=low');
+  await expect(page.getByText('There is no Lab here.', { exact: false })).toBeVisible();
 });

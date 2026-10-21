@@ -383,6 +383,16 @@ export class SfxKit {
         return;
       }
       case 'formula':
+        if (params.chapter === 10) {
+          // Up a scale (the climb), down it again quicker (the drop), then the opening chord: C over the 3:4:5 triad.
+          const up = [pyth('C', 5), pyth('D', 5), pyth('E', 5), pyth('G', 5), pyth('A', 5), pyth('C', 6)];
+          up.forEach((f, i) => this.bell.triggerAttackRelease(f, 1, t + i * 0.12, 0.22));
+          [...up].reverse().forEach((f, i) => this.bell.triggerAttackRelease(f, 1, t + 0.75 + i * 0.06, 0.2));
+          triangleChord(pyth('C', 4)).forEach((f, i) =>
+            this.bell.triggerAttackRelease(f, 3.5, t + 1.2 + i * 0.1, 0.42),
+          );
+          return;
+        }
         if (params.chapter === 9) {
           // Coming (higher) and going (lower): a phrase, the same phrase a step down, then the open A chord.
           const run = [pyth('E', 5), pyth('A', 5), pyth('C', 6)];
@@ -708,6 +718,49 @@ export class SfxKit {
         const chord = [pyth('A', 4), pyth('C', 5), pyth('E', 5), pyth('A', 5)];
         chord.forEach((f, i) => this.bell.triggerAttackRelease(f, 1.6, t + i * 0.06, 0.24));
         chord.forEach((f, i) => this.bell.triggerAttackRelease(f * k, 2.4, t + 1.3 + i * 0.06, 0.26));
+        return;
+      }
+      case 'chain': {
+        // The lift's chain dogs clacking over the ratchet, steady all the way up.
+        const dur = params.dur ?? 8;
+        const every = 1 / (params.rate ?? 6.5);
+        for (let k = 0; k * every < dur; k++) {
+          const at = t + k * every;
+          this.mono(this.clackNoise, at, (x) => this.clackNoise.triggerAttackRelease(0.025, x, 0.28));
+          if (k % 2 === 0)
+            this.mono(this.click, at + 0.01, (x) => this.click.triggerAttackRelease(0.012, x, 0.25));
+        }
+        return;
+      }
+      case 'brake': {
+        // The brakes clamping: a hiss of friction, a metallic squeal sliding down, and a crackle of sparks.
+        const dur = Math.max(params.dur ?? 3, 0.5);
+        const f = this.scrapeFilter.frequency;
+        f.cancelScheduledValues(t);
+        f.setValueAtTime(5200, t);
+        f.exponentialRampToValueAtTime(1600, t + dur);
+        const g = this.scrapeGain.gain;
+        g.cancelScheduledValues(t);
+        g.setValueAtTime(0, t);
+        g.linearRampToValueAtTime(0.2, t + 0.08);
+        g.linearRampToValueAtTime(0.12, t + dur * 0.8);
+        g.linearRampToValueAtTime(0, t + dur + 0.2);
+        this.metal.triggerAttackRelease(pyth('E', 6), dur * 0.6, t + 0.05, 0.25);
+        for (let k = 0; k < Math.round(dur * 14); k++) {
+          const at = t + (k / 14) * (0.95 + ((k * 37) % 7) / 70);
+          this.mono(this.click, at, (x) =>
+            this.click.triggerAttackRelease(0.008, x, 0.15 + ((k * 13) % 5) / 25),
+          );
+        }
+        return;
+      }
+      case 'peak': {
+        // A car turning back at the top of its swing: a bell as high as it climbed (the same note, every time,
+        // without friction; lower and lower with it).
+        const h = Math.max(params.h ?? 6, 0.3);
+        const f = pyth('C', 4) * Math.pow(2, Math.log2(h / 12) * 0.5 + 1);
+        this.bell.triggerAttackRelease(f, 1.4, t, 0.24);
+        this.blip.triggerAttackRelease(f * 2, 0.05, t, 0.2);
         return;
       }
       case 'uiHover':

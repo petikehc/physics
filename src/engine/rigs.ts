@@ -37,6 +37,11 @@ export interface CameraRig {
    * a phone, and turns this down.
    */
   portrait: number;
+  /**
+   * How far (m) the shot slides sideways, along the camera's right, on a wide screen: room beside its subject for a
+   * panel or an overlay. A tall screen keeps its panels below the picture, so there the shot stays centred.
+   */
+  side: number;
 }
 
 export function createCameraRig(): CameraRig {
@@ -63,6 +68,7 @@ export function createCameraRig(): CameraRig {
     veil: 0,
     lensY: 0,
     portrait: 1,
+    side: 0,
   };
 }
 

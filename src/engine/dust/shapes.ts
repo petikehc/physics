@@ -390,6 +390,17 @@ function stars(n: number) {
   return mix(n, 23, [[1, ball(0, 0, 0, 90, true)]], 6);
 }
 
+/** A plume of sparks rising from a point (local y = 0), thick low down and spreading thin as it climbs. */
+function embers(n: number) {
+  const plume: Sampler = (rng) => {
+    const k = Math.pow(rng(), 1.5);
+    const r = (0.2 + 1.8 * k) * Math.sqrt(rng());
+    const t = rng() * TAU;
+    return [Math.cos(t) * r, k * 5.5, Math.sin(t) * r];
+  };
+  return mix(n, 24, [[1, plume]], 0.1);
+}
+
 export const SHAPES: Record<string, (n: number) => Float32Array> = {
   pythagoras: pythagorasIcon,
   circle: circleIcon,
@@ -405,6 +416,7 @@ export const SHAPES: Record<string, (n: number) => Float32Array> = {
   grain,
   sand,
   stars,
+  embers,
 };
 
 export const ICON_ORDER = [

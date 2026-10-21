@@ -513,6 +513,37 @@ is corrected at beat labels when it exceeds 50 ms.
   sung and sung again a step lower before the formula.
 - Captions gain `hi` and `lo` colours, for bunched (higher, bluer) and stretched (lower, redder).
 
+**Chapter 10 (built)**
+- The station is a night fairground at the end of chapter 9's street: a roller coaster (a station platform, a chain
+  lift hill to 30 m, the first drop, a vertical loop, a camel-back hill and a brake run) in steel lit by floodlights,
+  lamps hung with strings of coloured bulbs, a Ferris wheel, and beside them a test track, a valley between a start
+  and a far hill, with a single car.
+- Beats: down the street to the fairground, its lights coming on; the title (Heilbronn, Manchester and Berlin, the
+  1840s: Mayer, Joule and Helmholtz), the coaster's loop scattering up into the night as stars. Hold on: riding in
+  the front car up the chain, over the top and down the first drop, then out to the side. Height into speed: slowed
+  right down, with the train's energy in three glass tanks hung beside the picture (height's part mgh, speed's part
+  ½mv², and heat) and a column with all three stacked, whose top never moves. Where it goes: the brakes clamp on,
+  sparks fly and the heat tank fills (Joule's churned water). Never higher: a car let go from 12 m on the test track
+  climbs back to 12 m and no higher, so a 16 m hill turns it back, again and again. Friction's share: with friction
+  each swing is a little lower until it rests, the heat tank filling, the total the same. The formula ½mv² + mgh =
+  const, and the mass cancelling. Handoff: back to the stopped train, sparks rising off its brakes in front of the
+  wheel; the camera tilts up after them as they scatter into the stars.
+- Maths: a track as a centripetal Catmull–Rom curve resampled by arc length, with which way is up for a rider; a ride
+  integrated by velocity Verlet with rolling friction, a chain lift (its work counted), brakes and end buffers; the
+  energies per kilogram, height + speed + heat − the chain's work staying constant to within 0.1%.
+- Your turn: drag the start and the far hill (or use the sliders), add friction, and let the car go; it never climbs
+  higher than it started, and the total never changes. Lab, Test track: the same with the car's mass (100–600 kg).
+  Lab, The coaster: the coaster going round and round, its tanks keeping count.
+- Sound: the roar layer follows the train's (or the test car's) speed. Score "energy": C–G/B–Am–F over a C–G drone,
+  the arpeggio climbing a stair and falling back; at the formula it climbs the scale and resolves on the 3:4:5 chord
+  that chapter 1 began with. SFX: the chain's clank up the lift hill, the brakes' hiss, and a note at each turn-back
+  pitched by its height.
+- Engine: shots can slide sideways on wide screens only (`side`), so a subject keeps clear of a panel beside it
+  while a phone keeps it centred; the camera director runs first each frame, so overlays placed in front of the
+  camera and their labels never trail it; a Dust shape for a plume of embers.
+- All ten chapters are playable (about 19 minutes). The end card says the finale is in production, and a Lab that
+  does not exist says so.
+
 ---
 
 ## 5. Technical architecture
@@ -611,7 +642,8 @@ src/
 3. Ch.2 (built: the slicing and onion proofs, Your turn, Lab and score) and ch.3 (built: the crown, the overflow, the line-up).
 4. Ch.4–6 (space, chase cam, the abstract realm).
 5. Ch.7–9 (built: helix shadows, clockwork Fourier, Doppler street).
-6. Ch.10, the Constellation finale and index, and the full teaser montage.
+6. Ch.10 (built: the night fairground and its coaster), the Constellation finale and index, and the full teaser
+   montage.
 7. Polish: mobile, reduced motion, a performance budget (60 fps on a mid laptop at the default tier, ≤ 200 KB gz of
    initial JS before chapter chunks), posters, transcript, deploy (GitHub Pages or Vercel).
 

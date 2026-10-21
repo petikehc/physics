@@ -11,4 +11,5 @@ export const STATION_VIEWS: Record<string, LazyExoticComponent<ComponentType>> =
   euler: lazy(() => import('./07-euler/Station')),
   fourier: lazy(() => import('./08-fourier/Station')),
   doppler: lazy(() => import('./09-doppler/Station')),
+  energy: lazy(() => import('./10-energy/Station')),
 };

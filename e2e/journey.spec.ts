@@ -326,6 +326,50 @@ test('chapter 9: Your turn sets the ambulance going for a listener on the street
   expect(errors).toEqual([]);
 });
 
+test('chapter 10: Your turn reshapes the test track, and the total energy never changes', async ({
+  page,
+}) => {
+  const errors = collectErrors(page);
+  await page.goto(`/play/energy${Q}`);
+  await waitForJourney(page);
+  const pauseAt = await page.evaluate(
+    () => window.__journey!.beats.find((b) => b.key === 'energy:yourTurn')!.pauseAt!,
+  );
+  await seek(page, pauseAt - 0.4);
+  await page.evaluate(() => window.__journey!.play());
+  const panel = page.getByRole('complementary', { name: 'Your turn' });
+  await expect(panel).toBeVisible({ timeout: 30_000 });
+  await expect(panel).toContainText('12.0 m');
+  await expect(panel).toContainText('16.0 m');
+
+  // A little friction (which also stops the countdown to the story going on), and a higher start.
+  const friction = panel.getByLabel('Friction');
+  await friction.focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(panel).toContainText('1% of its weight');
+  const start = panel.getByLabel('Start');
+  await start.focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(panel).toContainText('12.5 m');
+  await panel.getByRole('button', { name: 'Let it go again' }).click();
+
+  // The car rolls, trading height for speed and losing a little to heat, but the total stays put.
+  const total = async () => Number((await panel.textContent())!.match(/Total (\d+) kJ/)![1]);
+  const first = await total();
+  await expect(panel).toContainText(/[1-9]\d* km\/h/, { timeout: 15_000 });
+  for (let i = 0; i < 4; i++) {
+    expect(Math.abs((await total()) - first)).toBeLessThanOrEqual(1);
+    await page.waitForTimeout(400);
+  }
+
+  await panel.getByRole('button', { name: /Continue/ }).click();
+  await expect(panel).toBeHidden();
+  await expect
+    .poll(() => page.evaluate(() => window.__journey!.time()), { timeout: 20_000 })
+    .toBeGreaterThan(pauseAt + 0.2);
+  expect(errors).toEqual([]);
+});
+
 test('jumping ahead loads the chapter the playhead lands in', async ({ page }) => {
   const errors = collectErrors(page);
   // Start at chapter 1, whose neighbours are loaded with it, then jump two chapters on.

@@ -2,7 +2,7 @@ import { Link } from 'react-router';
 import { controller } from './controller';
 import { CHAPTERS } from '../chapters/registry';
 
-/** Shown when the journey reaches the end of what has been built so far. */
+/** Shown when the journey reaches the end of what has been built so far (the finale is still to come). */
 export function EndCard() {
   const ready = CHAPTERS.filter((c) => c.status === 'ready');
   const next = CHAPTERS.find((c) => c.status === 'soon');
@@ -17,10 +17,14 @@ export function EndCard() {
         <span className="eyebrow">
           Chapter {next.numeral} · {next.title}
         </span>
-      ) : null}
-      <h2>The story continues soon</h2>
+      ) : (
+        <span className="eyebrow">From sand to stars</span>
+      )}
+      <h2>{next ? 'The story continues soon' : 'The end, for now'}</h2>
       <p>
-        {done} complete. The remaining chapters are in production; this is where the journey will carry on.
+        {next
+          ? `${done} complete. The remaining chapters are in production; this is where the journey will carry on.`
+          : 'All ten chapters are told. The finale, where their stars gather into one constellation, is in production.'}
       </p>
       <div className="end-card__actions">
         <button

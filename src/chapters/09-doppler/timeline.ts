@@ -117,9 +117,9 @@ export function buildDoppler(j: JourneyBuilder) {
         dust,
         {
           x: o.x - 20,
-          y: o.y + 70,
-          z: o.z - 60,
-          scale: 70,
+          y: o.y + 2.6,
+          z: o.z - 20,
+          scale: 4.2,
           size: 0.55,
           spin: 0.001,
           swirl: 0.3,

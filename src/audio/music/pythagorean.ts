@@ -2,7 +2,16 @@ import * as Tone from 'tone';
 import { C3, pyth, triangleChord, type Note } from '../tuning';
 
 export type Theme =
-  'pythagoras' | 'circle' | 'water' | 'spheres' | 'gravity' | 'rising' | 'turning' | 'overtones' | 'night';
+  | 'pythagoras'
+  | 'circle'
+  | 'water'
+  | 'spheres'
+  | 'gravity'
+  | 'rising'
+  | 'turning'
+  | 'overtones'
+  | 'night'
+  | 'energy';
 
 /** How the score sounds during one beat. Values are targets the score glides to. */
 export interface Layers {
@@ -30,6 +39,7 @@ const RISING: Theme = 'rising';
 const TURNING: Theme = 'turning';
 const OVERTONES: Theme = 'overtones';
 const NIGHT: Theme = 'night';
+const ENERGY: Theme = 'energy';
 
 /**
  * Per-beat arrangement. Chapter 1 is "Pythagorean Drone" (C–Am–F–G over a C–G drone); chapter 2 turns to
@@ -41,8 +51,10 @@ const NIGHT: Theme = 'night';
  * is "Turning" (F–C–G–Dm, round by fifths, over a D–A drone, the arpeggio in near-pure sines starting each bar one
  * note further round, like a phase turning); chapter 8, Fourier's, is "Overtones" (Dsus2–G–Em7–Asus4 over the same D–A
  * drone, with no F or F♯ to rub against the clockwork's own harmonics of D; the arpeggio climbs the overtones); chapter 9, on the street at night, is "Night" (Am–Fmaj7–Dm7–Em7 over an A–E
- * drone, in the key of the siren's falling fourth; the arpeggio rises and falls back, like something going by). The
- * drone glides into each new key during the flight.
+ * drone, in the key of the siren's falling fourth; the arpeggio rises and falls back, like something going by); chapter 10, at the fairground, is "Energy"
+ * (C–G/B–Am–F, the bass stepping down like a coaster's drop, over chapter 1's C–G drone, the arpeggio climbing a stair
+ * of octaves and plunging back), and its formula resolves to chapter 1's 3:4:5 chord. The drone glides into each new
+ * key during the flight.
  */
 export const ARRANGEMENT: Record<string, Layers> = {
   teaser: { drone: 0.55, pad: 0.6, cutoff: 700, plucks: 0.14, arp: 0, harmony: 'prog' },
@@ -887,19 +899,102 @@ export const ARRANGEMENT: Record<string, Layers> = {
     drone: 0.8,
     pad: 1.0,
     cutoff: 2200,
-    plucks: 0.12,
+    plucks: 0.14,
     arp: 0.5,
     harmony: 'prog',
-    theme: NIGHT,
+    theme: ENERGY,
   },
-  'energy:soon': {
-    drone: 0.42,
-    pad: 0.5,
+  'energy:title': {
+    drone: 0.75,
+    pad: 0.95,
     cutoff: 900,
-    plucks: 0.1,
+    plucks: 0.16,
     arp: 0,
     harmony: 'prog',
-    theme: NIGHT,
+    theme: ENERGY,
+  },
+  // The ride: the chain and the rush of air carry it; the score holds its breath.
+  'energy:ride': {
+    drone: 0.35,
+    pad: 0.3,
+    cutoff: 600,
+    plucks: 0,
+    arp: 0,
+    harmony: 'prog',
+    theme: ENERGY,
+  },
+  'energy:tanks': {
+    drone: 0.7,
+    pad: 0.9,
+    cutoff: 1500,
+    plucks: 0.08,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: ENERGY,
+  },
+  'energy:brakes': {
+    drone: 0.55,
+    pad: 0.6,
+    cutoff: 1000,
+    plucks: 0.06,
+    arp: 0,
+    harmony: 'prog',
+    theme: ENERGY,
+  },
+  'energy:rollback': {
+    drone: 0.6,
+    pad: 0.75,
+    cutoff: 1200,
+    plucks: 0.06,
+    arp: 0.3,
+    harmony: 'prog',
+    theme: ENERGY,
+  },
+  'energy:friction': {
+    drone: 0.6,
+    pad: 0.7,
+    cutoff: 1000,
+    plucks: 0.06,
+    arp: 0.25,
+    harmony: 'prog',
+    theme: ENERGY,
+  },
+  'energy:formula': {
+    drone: 0.85,
+    pad: 1,
+    cutoff: 3000,
+    plucks: 0,
+    arp: 0,
+    harmony: 'resolve',
+    theme: ENERGY,
+  },
+  'energy:yourTurn': {
+    drone: 0.35,
+    pad: 0.4,
+    cutoff: 700,
+    plucks: 0.06,
+    arp: 0,
+    harmony: 'prog',
+    theme: ENERGY,
+  },
+  'energy:handoff': {
+    drone: 0.85,
+    pad: 1.1,
+    cutoff: 2600,
+    plucks: 0.18,
+    arp: 0.6,
+    harmony: 'prog',
+    theme: ENERGY,
+    arpOctave: 1,
+  },
+  'energy:lab': {
+    drone: 0.3,
+    pad: 0.35,
+    cutoff: 800,
+    plucks: 0.06,
+    arp: 0,
+    harmony: 'prog',
+    theme: ENERGY,
   },
   lab: { drone: 0.45, pad: 0.4, cutoff: 800, plucks: 0.1, arp: 0, harmony: 'prog' },
 };
@@ -1158,6 +1253,34 @@ const NIGHT_CHORDS: Chord[] = [
   ],
 ];
 
+// C – G/B – Am – F, the bass stepping down like a coaster's drop, over chapter 1's C–G drone: chapter 10.
+const ENERGY_CHORDS: Chord[] = [
+  [
+    ['C', 3],
+    ['G', 3],
+    ['C', 4],
+    ['E', 4],
+  ],
+  [
+    ['B', 2],
+    ['G', 3],
+    ['D', 4],
+    ['G', 4],
+  ],
+  [
+    ['A', 2],
+    ['E', 3],
+    ['A', 3],
+    ['C', 4],
+  ],
+  [
+    ['F', 2],
+    ['C', 3],
+    ['F', 3],
+    ['A', 3],
+  ],
+];
+
 const THEMES: Record<Theme, { chords: Chord[]; drone: [number, number, number] }> = {
   pythagoras: { chords: PYTHAGORAS_CHORDS, drone: [pyth('C', 2), pyth('G', 2), pyth('C', 3)] },
   circle: { chords: CIRCLE_CHORDS, drone: [pyth('A', 1), pyth('E', 2), pyth('A', 2)] },
@@ -1168,6 +1291,7 @@ const THEMES: Record<Theme, { chords: Chord[]; drone: [number, number, number] }
   turning: { chords: TURNING_CHORDS, drone: [pyth('D', 2), pyth('A', 2), pyth('D', 3)] },
   overtones: { chords: OVERTONES_CHORDS, drone: [pyth('D', 2), pyth('A', 2), pyth('D', 3)] },
   night: { chords: NIGHT_CHORDS, drone: [pyth('A', 1), pyth('E', 2), pyth('A', 2)] },
+  energy: { chords: ENERGY_CHORDS, drone: [pyth('C', 2), pyth('G', 2), pyth('C', 3)] },
 };
 
 const PENTATONIC: Array<[Note, number]> = [
@@ -1305,7 +1429,8 @@ export class PythagoreanScore {
             : chords[Math.max(this.chord - 1, 0) % chords.length]!.map(([n, o]) => pyth(n, o + up));
         // Up and down (chapter 1), round and round (chapter 2), rippling (chapter 3), wheeling (chapter 4),
         // falling (chapter 5), climbing a stair of octaves (chapter 6), each bar starting one further round (chapter 7),
-        // up the overtones (chapter 8), and up and back down again, like something going by (chapter 9).
+        // up the overtones (chapter 8), up and back down again, like something going by (chapter 9), and up a stair of
+        // octaves then plunging back, like a coaster (chapter 10).
         const order =
           this.theme === 'circle'
             ? [0, 1, 2, 3]
@@ -1323,12 +1448,17 @@ export class PythagoreanScore {
                         ? [0, 1, 2, 3, 4, 5, 6, 7]
                         : this.theme === 'night'
                           ? [0, 1, 2, 3, 4, 3, 2, 1]
-                          : [0, 1, 2, 3, 2, 1];
+                          : this.theme === 'energy'
+                            ? [0, 1, 2, 3, 4, 5, 6, 7, 3, 0]
+                            : [0, 1, 2, 3, 2, 1];
         const k = order[step % order.length]!;
         // Past the top of the chord, the stair goes on an octave up.
         const f =
           chord[k % chord.length]! *
-          (this.theme === 'rising' || this.theme === 'overtones' || this.theme === 'night'
+          (this.theme === 'rising' ||
+          this.theme === 'overtones' ||
+          this.theme === 'night' ||
+          this.theme === 'energy'
             ? 2 ** Math.floor(k / 4)
             : 1);
         this.arpSynth.triggerAttackRelease(f, '16n', time, l.arpFast ? 0.38 : 0.5);
