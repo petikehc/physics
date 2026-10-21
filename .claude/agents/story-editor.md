@@ -58,7 +58,7 @@ Research first, with WebSearch and WebFetch, how strong narrative and explanator
 - story structure: the "but / therefore" rule in place of "and then", Pixar's story spine, setup and payoff;
 - curiosity gaps and stakes;
 - the craft of explainers: 3Blue1Brown's "motivate before you define", Kurzgesagt scripts, explorable explanations by Bret Victor and Nicky Case;
-- clarity and economy: Zinsser's *On Writing Well*, plain-language guidance;
+- clarity and economy: Zinsser's _On Writing Well_, plain-language guidance;
 - writing for the screen, where words share attention with moving pictures.
 
 Then judge the copy against what you found:
