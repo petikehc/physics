@@ -37,6 +37,11 @@ declare global {
  */
 function FilmClock() {
   const get = useThree((s) => s.get);
+  const paused = useApp((s) => s.worldPaused);
+  // Back from a pause, start counting again from now: the first frame should not see the whole pause as one step.
+  useEffect(() => {
+    if (!paused) get().clock.getDelta();
+  }, [paused, get]);
   useEffect(() => {
     let tweens = 0;
     let frames = 0;

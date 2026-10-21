@@ -215,7 +215,11 @@ export default function Landing() {
     // The world draws again, and the film fades off it for the particles to carry on into the journey.
     set({ worldPaused: false });
     const out = gsap.timeline({ onComplete: () => navigate('/play') });
-    if (filming.current) out.to(screen.current, { autoAlpha: 0, duration: 0.7, ease: 'power2.in' }, 0);
+    if (filming.current) {
+      // Hold the film on its last frame as it fades: no more decoding while the world takes over.
+      screen.current?.querySelector('video')?.pause();
+      out.to(screen.current, { autoAlpha: 0, duration: 0.7, ease: 'power2.in' }, 0);
+    }
     // Finish whatever shape is forming, then gather into the first chapter's triangle.
     out.to(dust, { morph: 1, duration: 0.35, ease: 'power1.out' });
     if (dust.to !== 'pythagoras') {

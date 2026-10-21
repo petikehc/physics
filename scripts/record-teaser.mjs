@@ -49,7 +49,11 @@ const FADE = 0.6;
 const SEAM = 0.5;
 /** Played (unrecorded) before each clip, so its camera and Dust are already moving when it starts. */
 const PREROLL = 1.5;
-const SIZES = { landscape: [1280, 720], portrait: [720, 1280] };
+/**
+ * Each shape's size, and how far its picture is lifted (a share of its height): the landing page sets its title and
+ * buttons across the middle, so the film plays in the sky above them.
+ */
+const SIZES = { landscape: [1280, 720, 0.14], portrait: [720, 1280, 0.22] };
 /** Which clip's middle frame becomes the poster. */
 const POSTER = 1;
 
@@ -65,7 +69,7 @@ for (const [i, c] of CLIPS.entries()) {
   length = i === 0 ? c.dur : length + c.dur - FADE;
 }
 
-for (const [name, [width, height]] of Object.entries(SIZES)) {
+for (const [name, [width, height, lift]] of Object.entries(SIZES)) {
   if (only && only !== name) continue;
   const frames = join(tmpdir(), `teaser-${name}`);
   rmSync(frames, { recursive: true, force: true });
@@ -92,7 +96,10 @@ for (const [name, [width, height]] of Object.entries(SIZES)) {
     await page.evaluate((t) => window.__journey.seek(t), at(c));
     await page.waitForTimeout(2500);
   }
-  await page.evaluate(() => window.__film.start());
+  await page.evaluate((lift) => {
+    window.__journey.camera.lensY = lift;
+    window.__film.start();
+  }, lift);
   await page.waitForTimeout(500);
   const step = (n) =>
     page.evaluate(
