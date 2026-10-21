@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useApp } from '../state/store';
 import { controller } from './controller';
 import { CHAPTERS, chapterBySlug } from '../chapters/registry';
+import { segmentBySlug } from '../chapters/finale/meta';
 import { CaptionsIcon, NextIcon, PauseIcon, PlayIcon, PrevIcon } from '../ui/Icons';
 import { audio } from '../audio';
 
@@ -47,8 +48,8 @@ export function PlayerBar() {
     const beats = journey?.beats ?? [];
     let b = beats[0];
     for (const x of beats) if (x.start <= t) b = x;
-    const ch = chapterBySlug(b?.chapter);
-    return `${ch ? `${ch.numeral} · ${ch.short}` : ''}${b?.heading ? ` — ${b.heading}` : ''}`;
+    const seg = segmentBySlug(b?.chapter);
+    return `${seg ? seg.short : ''}${b?.heading ? ` — ${b.heading}` : ''}`;
   };
 
   return (
@@ -113,13 +114,14 @@ export function PlayerBar() {
         ))}
         {journey?.chapters.map((c) => {
           const meta = chapterBySlug(c.slug);
+          const soon = meta?.status === 'soon';
           return (
             <span
               key={c.slug}
-              className={`scrubber__marker scrubber__marker--chapter ${meta?.status === 'soon' ? 'scrubber__marker--soon' : ''}`}
+              className={`scrubber__marker scrubber__marker--chapter ${soon ? 'scrubber__marker--soon' : ''}`}
               style={{
                 left: `${(c.start / duration) * 100}%`,
-                borderColor: meta?.status === 'ready' ? meta.accent : undefined,
+                borderColor: soon ? undefined : segmentBySlug(c.slug)?.accent,
               }}
             />
           );
@@ -130,7 +132,7 @@ export function PlayerBar() {
           </span>
         ) : null}
       </div>
-      <div className="player__group" aria-label="Chapters" title="Ten chapters; more are in production">
+      <div className="player__group" aria-label="Chapters" title="Ten chapters">
         {CHAPTERS.map((c) => (
           <span
             key={c.slug}

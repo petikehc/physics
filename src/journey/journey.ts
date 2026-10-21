@@ -11,6 +11,7 @@ import { buildEuler } from '../chapters/07-euler/timeline';
 import { buildFourier } from '../chapters/08-fourier/timeline';
 import { buildDoppler } from '../chapters/09-doppler/timeline';
 import { buildEnergy } from '../chapters/10-energy/timeline';
+import { buildFinale } from '../chapters/finale/timeline';
 import { JourneyBuilder, type Journey } from './builder';
 
 /** Resets every rig and assembles the whole journey into one master timeline. */
@@ -31,6 +32,7 @@ export function buildJourney(): Journey {
   buildFourier(j);
   buildDoppler(j);
   buildEnergy(j);
+  buildFinale(j);
   const journey = j.finish();
   journey.master.progress(0);
   return journey;

@@ -53,8 +53,9 @@ const ENERGY: Theme = 'energy';
  * drone, with no F or F♯ to rub against the clockwork's own harmonics of D; the arpeggio climbs the overtones); chapter 9, on the street at night, is "Night" (Am–Fmaj7–Dm7–Em7 over an A–E
  * drone, in the key of the siren's falling fourth; the arpeggio rises and falls back, like something going by); chapter 10, at the fairground, is "Energy"
  * (C–G/B–Am–F, the bass stepping down like a coaster's drop, over chapter 1's C–G drone, the arpeggio climbing a stair
- * of octaves and plunging back), and its formula resolves to chapter 1's 3:4:5 chord. The drone glides into each new
- * key during the flight.
+ * of octaves and plunging back), and its formula resolves to chapter 1's 3:4:5 chord. The finale comes home to chapter
+ * 1's key, each star ringing its own chapter's note over it, and ends on the 3:4:5 chord. The drone glides into each
+ * new key during the flight.
  */
 export const ARRANGEMENT: Record<string, Layers> = {
   teaser: { drone: 0.55, pad: 0.6, cutoff: 700, plucks: 0.14, arp: 0, harmony: 'prog' },
@@ -996,6 +997,22 @@ export const ARRANGEMENT: Record<string, Layers> = {
     harmony: 'prog',
     theme: ENERGY,
   },
+  // The finale comes home to chapter 1's key: up into the stars on the fairground's theme, then C again, quiet under
+  // each star's own note, opening up for Noether and resolving on the 3:4:5 chord at the very end.
+  'finale:flight': {
+    drone: 0.8,
+    pad: 1,
+    cutoff: 2400,
+    plucks: 0.12,
+    arp: 0.5,
+    harmony: 'prog',
+    theme: ENERGY,
+    arpOctave: 1,
+  },
+  'finale:title': { drone: 0.7, pad: 0.9, cutoff: 1100, plucks: 0.08, arp: 0, harmony: 'prog' },
+  'finale:star': { drone: 0.5, pad: 0.6, cutoff: 900, plucks: 0.05, arp: 0, harmony: 'prog' },
+  'finale:noether': { drone: 0.8, pad: 1, cutoff: 2400, plucks: 0.12, arp: 0.45, harmony: 'prog', arpOctave: 1 },
+  'finale:end': { drone: 0.85, pad: 1.1, cutoff: 3000, plucks: 0, arp: 0, harmony: 'resolve' },
   lab: { drone: 0.45, pad: 0.4, cutoff: 800, plucks: 0.1, arp: 0, harmony: 'prog' },
 };
 
@@ -1314,6 +1331,8 @@ function fallback(key: string | null): Layers {
   if (key?.startsWith('calculus')) return ARRANGEMENT['calculus:speed']!;
   if (key?.startsWith('euler')) return ARRANGEMENT['euler:quarters']!;
   if (key?.startsWith('fourier')) return ARRANGEMENT['fourier:shapes']!;
+  // The finale's star-by-star beats are named after the chapters.
+  if (key?.startsWith('finale')) return ARRANGEMENT['finale:star']!;
   return QUIET;
 }
 

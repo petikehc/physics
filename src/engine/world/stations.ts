@@ -23,6 +23,8 @@ export const STATIONS: Record<string, StationPlacement> = {
   fourier: { x: 800, y: 200, z: -400 },
   doppler: { x: 1000, y: 0, z: 0 },
   energy: { x: 1200, y: 0, z: 0 },
+  // The finale hangs high in the night sky over the fairground, where the ride's sparks went.
+  finale: { x: 1200, y: 150, z: -150 },
 };
 
 export function station(slug: string): StationPlacement {

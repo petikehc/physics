@@ -7,18 +7,19 @@ import { Dust } from '../engine/dust/Dust';
 import { Sky } from '../engine/world/Sky';
 import { Beach } from '../engine/world/Beach';
 import { PostFX } from '../engine/world/PostFX';
-import { CHAPTERS, chapterBySlug } from '../chapters/registry';
+import { CHAPTERS } from '../chapters/registry';
 import { STATION_VIEWS } from '../chapters/stations';
 
 const DPR: Record<QualityTier, [number, number]> = { low: [1, 1.25], medium: [1, 1.5], high: [1, 2] };
 const DOWN: Record<QualityTier, QualityTier> = { high: 'medium', medium: 'low', low: 'low' };
 
-/** The stations to keep mounted: the current chapter and its neighbours, so a flight never lands on nothing. */
+/** Every station in the order the journey reaches them: the ten chapters, then the finale. */
+const ORDER = [...CHAPTERS.map((c) => c.slug), 'finale'];
+
+/** The stations to keep mounted: the current one and its neighbours, so a flight never lands on nothing. */
 function stationWindow(slug: string): string[] {
-  const i = chapterBySlug(slug)?.index ?? 0;
-  return CHAPTERS.slice(Math.max(0, i - 1), i + 2)
-    .map((c) => c.slug)
-    .filter((s) => STATION_VIEWS[s]);
+  const i = Math.max(ORDER.indexOf(slug), 0);
+  return ORDER.slice(Math.max(0, i - 1), i + 2).filter((s) => STATION_VIEWS[s]);
 }
 
 /** The single persistent 3D world behind every route. */
@@ -27,7 +28,7 @@ export function World() {
   const mode = useApp((s) => s.mode);
   const chapterSlug = useApp((s) => s.chapterSlug);
   const set = useApp((s) => s.set);
-  const showStations = mode === 'journey' || mode === 'lab';
+  const showStations = mode === 'journey' || mode === 'lab' || mode === 'map';
 
   return (
     <Canvas
@@ -44,7 +45,7 @@ export function World() {
       <Beach />
       <Dust />
       {showStations
-        ? stationWindow(chapterSlug).map((slug) => {
+        ? (mode === 'map' ? ['finale'] : stationWindow(chapterSlug)).map((slug) => {
             const Station = STATION_VIEWS[slug]!;
             return (
               <Suspense key={slug} fallback={null}>

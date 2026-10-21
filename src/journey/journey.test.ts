@@ -18,6 +18,9 @@ import { dopplerLevels, SIREN } from '../chapters/09-doppler/sound';
 import { energyRig, storyTestTrack, STORY_TEST } from '../chapters/10-energy/rig';
 import { readGauge, testNow } from '../chapters/10-energy/sandbox';
 import { heightAt } from '../chapters/10-energy/math';
+import { finaleRig } from '../chapters/finale/rig';
+import { INVARIANTS, STARS } from '../chapters/finale/layout';
+import { pyth } from '../audio/tuning';
 
 describe('the journey timeline', () => {
   const journey = buildJourney();
@@ -127,6 +130,20 @@ describe('the journey timeline', () => {
       'energy:formula',
       'energy:yourTurn',
       'energy:handoff',
+      'finale:flight',
+      'finale:title',
+      'finale:pythagoras',
+      'finale:circle-area',
+      'finale:archimedes',
+      'finale:kepler',
+      'finale:newton',
+      'finale:calculus',
+      'finale:euler',
+      'finale:fourier',
+      'finale:doppler',
+      'finale:energy',
+      'finale:noether',
+      'finale:end',
     ]);
     for (const b of journey.beats) expect(journey.master.labels[b.key]).toBeCloseTo(b.start, 6);
   });
@@ -661,5 +678,60 @@ describe('the journey timeline', () => {
     master.seek(journey.duration - 0.1, false);
     master.seek(t, false);
     expect(state()).toBe(snap);
+  });
+  it('gathers the stars into the constellation, visits each in turn, and leaves it as the index at the very end', () => {
+    const { master } = journey;
+    const rig = finaleRig();
+    const beat = (id: string) => journey.beats.find((b) => b.key === `finale:${id}`)!;
+    const state = () => JSON.stringify(rig, (k, v) => (k === '_gsap' ? undefined : v));
+
+    // The stars light one after another, in the order the story told them.
+    const title = beat('title');
+    let last = -1;
+    for (let t = title.start; t <= title.end; t += 0.25) {
+      master.seek(t, false);
+      expect(rig.lit).toBeGreaterThanOrEqual(last);
+      last = rig.lit;
+    }
+    expect(rig.lit).toBe(STARS.length);
+    expect(rig.thread).toBe(1);
+
+    // Each star, in turn: in focus, and keeping its colour once visited.
+    INVARIANTS.forEach((inv, i) => {
+      const b = beat(inv.slug);
+      master.seek(b.end - 0.05, false);
+      expect(rig.focus).toBe(i);
+      expect(rig.focusAmt).toBe(1);
+      expect(rig.visited).toBeCloseTo(i + 1, 6);
+      expect(runtime.dust.to).not.toBe('constellation');
+    });
+
+    // Twenty bells: each star as it lights, and again as it is visited, on its own chapter's note.
+    const stars = journey.cues.filter((c) => c.id === 'star');
+    expect(stars).toHaveLength(2 * STARS.length);
+    const notes = INVARIANTS.map((inv) => pyth(inv.note, 5));
+    expect(stars.map((c) => c.params!.hz)).toEqual([...notes, ...notes]);
+    expect(journey.cues.filter((c) => c.id === 'resolve')).toHaveLength(1);
+
+    // The index only once the journey has ended; the Dust gathered back into the stars.
+    master.seek(beat('end').start + 1, false);
+    expect(rig.index).toBe(0);
+    master.seek(journey.duration, false);
+    expect(rig.index).toBe(1);
+    expect(rig.glow).toBeGreaterThan(0);
+    expect(runtime.dust.to).toBe('constellation');
+    const snap = state();
+    master.seek(0, false);
+    expect(rig.index).toBe(0);
+    expect(rig.lit).toBe(0);
+    master.seek(journey.duration, false);
+    expect(state()).toBe(snap);
+  });
+
+  it('keeps the finale about two minutes long', () => {
+    const finale = journey.chapters.find((c) => c.slug === 'finale')!;
+    expect(finale.end).toBeCloseTo(journey.duration, 6);
+    expect(finale.end - finale.start).toBeGreaterThan(90);
+    expect(finale.end - finale.start).toBeLessThan(160);
   });
 });

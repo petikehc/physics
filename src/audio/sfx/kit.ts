@@ -763,6 +763,27 @@ export class SfxKit {
         this.blip.triggerAttackRelease(f * 2, 0.05, t, 0.2);
         return;
       }
+      case 'star': {
+        // A star lighting: a bell on its chapter's key note, with a glint an octave and a fifth above.
+        const f = params.hz ?? pyth('C', 5);
+        const g = params.gain ?? 0.6;
+        this.bell.triggerAttackRelease(f, 2.2, t, 0.3 * g);
+        this.blip.triggerAttackRelease(f * 3, 0.06, t + 0.02, 0.18 * g);
+        return;
+      }
+      case 'resolve': {
+        // Home: the journey's first chord again, rolled up from a low C, the 3:4:5 triad on top.
+        [pyth('C', 2), pyth('C', 3), pyth('G', 3)].forEach((f, i) =>
+          this.bell.triggerAttackRelease(f, 5, t + i * 0.12, 0.3),
+        );
+        triangleChord(pyth('C', 4)).forEach((f, i) =>
+          this.bell.triggerAttackRelease(f, 5, t + 0.45 + i * 0.14, 0.4),
+        );
+        triangleChord(pyth('C', 5)).forEach((f, i) =>
+          this.bell.triggerAttackRelease(f, 4, t + 0.95 + i * 0.1, 0.22),
+        );
+        return;
+      }
       case 'uiHover':
         return this.blip.triggerAttackRelease(1800, 0.02, t, 0.12);
       case 'uiClick':
