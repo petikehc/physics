@@ -1,9 +1,11 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { Route, Routes } from 'react-router';
-import { World } from './World';
 import { useApp } from '../state/store';
 import Landing from '../landing/Landing';
 
+// The 3D world (three.js, React Three Fiber, post-processing) is most of the code: it loads on its own, so the page
+// itself (the title, the buttons) shows first and the world fades in behind it.
+const World = lazy(() => import('./World').then((m) => ({ default: m.World })));
 const JourneyPage = lazy(() => import('../journey/JourneyPage'));
 const LabPage = lazy(() => import('../lab/LabPage'));
 const MapPage = lazy(() => import('../map/MapPage'));
@@ -47,7 +49,9 @@ export function App() {
 
   return (
     <>
-      <World />
+      <Suspense fallback={null}>
+        <World />
+      </Suspense>
       <Suspense fallback={null}>
         <Routes>
           <Route path="/" element={<Landing />} />
