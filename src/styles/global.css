@@ -93,6 +93,14 @@ a {
   inset: 0;
   z-index: 0;
   touch-action: none;
+  /* The world loads after the page: it fades in behind the title rather than popping in. */
+  animation: world-in 0.9s ease-out both;
+}
+
+@keyframes world-in {
+  from {
+    opacity: 0;
+  }
 }
 
 .overlay {
