@@ -18,7 +18,7 @@ The full research, storyboards and architecture are in [`docs/PLAN.md`](docs/PLA
 | VII  | Euler's Identity                    | **Playable**: journey, Your turn, Lab, score and sound effects |
 | VIII | Fourier Series                      | **Playable**: journey, Your turn, Lab, score and sound effects |
 | IX   | The Doppler Effect                  | **Playable**: journey, Your turn, Lab, score and sound effects |
-| X    | Conservation of Energy              | In production                                                  |
+| X    | Conservation of Energy              | **Playable**: journey, Your turn, Lab, score and sound effects |
 
 ## Running it
 
@@ -68,7 +68,8 @@ pull request.
   beat is padded so its caption can be read and carries sound cues and an optional Your-turn pause.
   `src/journey/controller.ts` drives playback, stepping and cues.
 - **The camera director** (`src/engine/camera`) turns the camera rig into shots (orbits, arcs, handheld breathing) and
-  hands the camera to the viewer in "Your turn" and the Labs.
+  hands the camera to the viewer in "Your turn" and the Labs. On a wide screen a shot can slide sideways (`side`) to
+  leave room for a panel beside its subject; on a phone, where panels sit below, it stays centred.
 - **The Dust** (`src/engine/dust`) is one GPU particle system that morphs between procedural point clouds. It carries
   every transition and the landing teaser.
 - **Sound** (`src/audio`) is procedural Tone.js, lazy-loaded when the viewer chooses sound. The score is in
@@ -76,9 +77,11 @@ pull request.
   arpeggio circling and climbing as the slices multiply, chapter 3's bath ripples in D, in chapter 4 Mars sings a
   note that follows how fast it turns, as Kepler imagined in Harmonices Mundi, in chapter 5 Newton's cannonball
   whistles higher the faster it falls, and in chapter 6 a voice sings a curve's height, which is also the slope of the
-  area under it. The same engine renders offline previews.
+  area under it. In chapter 9 the ambulance's siren is worked out from Doppler's formula as you hear it, and in
+  chapter 10 the coaster's rush follows its speed, each turn-back rings a note set by its height, and the journey
+  resolves on the 3:4:5 chord it began with. The same engine renders offline previews.
 - **The world** (`runtime.world`) fades from the dusk beach of the first chapters into deep space (`space` 0 → 1)
-  as the journey rises to the planets.
+  as the journey rises to the planets, and to a night street and fairground (`night`) for the last two chapters.
 
 ## Adding a chapter
 
