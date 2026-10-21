@@ -79,6 +79,11 @@ export function ChaptersMenu({ onClose }: { onClose: () => void }) {
             </div>
           </li>
         </ol>
+        <p className="sheet__foot">
+          <Link to="/transcript" onClick={onClose}>
+            Read every word of it: the transcript →
+          </Link>
+        </p>
       </div>
     </div>
   );

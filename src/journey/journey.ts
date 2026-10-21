@@ -14,6 +14,21 @@ import { buildEnergy } from '../chapters/10-energy/timeline';
 import { buildFinale } from '../chapters/finale/timeline';
 import { JourneyBuilder, type Journey } from './builder';
 
+/** Each chapter's part of the journey, in the order they are told, then the finale. */
+export const CHAPTER_BUILDERS: Array<(j: JourneyBuilder) => void> = [
+  buildPythagoras,
+  buildCircleArea,
+  buildArchimedes,
+  buildKepler,
+  buildNewton,
+  buildCalculus,
+  buildEuler,
+  buildFourier,
+  buildDoppler,
+  buildEnergy,
+  buildFinale,
+];
+
 /** Resets every rig and assembles the whole journey into one master timeline. */
 export function buildJourney(): Journey {
   resetRig(runtime.camera, createCameraRig());
@@ -22,17 +37,7 @@ export function buildJourney(): Journey {
   resetChapterRigs();
 
   const j = new JourneyBuilder();
-  buildPythagoras(j);
-  buildCircleArea(j);
-  buildArchimedes(j);
-  buildKepler(j);
-  buildNewton(j);
-  buildCalculus(j);
-  buildEuler(j);
-  buildFourier(j);
-  buildDoppler(j);
-  buildEnergy(j);
-  buildFinale(j);
+  for (const build of CHAPTER_BUILDERS) build(j);
   const journey = j.finish();
   journey.master.progress(0);
   return journey;
