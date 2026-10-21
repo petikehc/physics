@@ -61,8 +61,7 @@ function Star({ i, glow }: { i: number; glow: THREE.Texture }) {
   );
   const html = useMemo(() => tex(meta.formulaTeX), [meta.formulaTeX]);
   // Which way is out from the thread's bend at this star (where its icon forms): its numeral sits that way, and its
-  // formula straight above or below, away from the icon, so neighbours' numerals stay apart and a formula never meets
-  // its icon (or runs off the side of a phone).
+  // formula the other way, so neighbours' numerals stay apart and a formula never meets its icon.
   const out = useMemo(() => {
     const c = iconAt(i);
     const s = STARS[i]!;
@@ -111,7 +110,10 @@ function Star({ i, glow }: { i: number; glow: THREE.Texture }) {
     const f = formula.current;
     if (f) {
       f.style.opacity = String(here * clamp01(rig.formula) * lit);
-      beside(f, 0, out[1] > 0 ? -1 : 1, 34);
+      // Diagonally away from the icon, between the thread's two arms; on a phone, too narrow for that, straight
+      // above or below.
+      if (state.size.width >= 600) beside(f, -out[0], -out[1], 30);
+      else beside(f, 0, out[1] > 0 ? -1 : 1, 34);
     }
   });
 
