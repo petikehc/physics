@@ -15,6 +15,8 @@ export interface Shot {
   lift?: number;
   veil?: number;
   portrait?: number;
+  /** A sideways slide on wide screens only (see CameraRig.side); a shot that frames anything resets it to 0. */
+  side?: number;
   orbit?: { mix?: number; angle?: number; radius?: number; height?: number };
 }
 
@@ -31,6 +33,7 @@ export function shotVars(slug: string, s: Shot): Record<string, number> {
   if (s.lift !== undefined) v.lift = s.lift;
   if (s.veil !== undefined) v.veil = s.veil;
   if (s.portrait !== undefined) v.portrait = s.portrait;
+  if (s.side !== undefined || s.pos || s.target) v.side = s.side ?? 0;
   if (s.orbit) {
     if (s.orbit.mix !== undefined) v.orbitMix = s.orbit.mix;
     if (s.orbit.angle !== undefined) v.orbitAngle = s.orbit.angle;

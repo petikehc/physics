@@ -47,26 +47,29 @@ export function TrackControls({ c, idPrefix, full = false }: Props & { full?: bo
   };
   return (
     <>
-      <Slider
-        id={`${idPrefix}-h0`}
-        label="Start"
-        value={c.h0}
-        min={HEIGHT_RANGE[0]}
-        max={HEIGHT_RANGE[1]}
-        step={0.5}
-        text={`${c.h0.toFixed(1)} m`}
-        onChange={(v) => change(() => setHill('h0', v))}
-      />
-      <Slider
-        id={`${idPrefix}-h4`}
-        label="Far hill"
-        value={c.h4}
-        min={HEIGHT_RANGE[0]}
-        max={HEIGHT_RANGE[1]}
-        step={0.5}
-        text={`${c.h4.toFixed(1)} m`}
-        onChange={(v) => change(() => setHill('h4', v))}
-      />
+      {/* Side by side on a phone, where the panel has to stay short. */}
+      <div className="field-pair">
+        <Slider
+          id={`${idPrefix}-h0`}
+          label="Start"
+          value={c.h0}
+          min={HEIGHT_RANGE[0]}
+          max={HEIGHT_RANGE[1]}
+          step={0.5}
+          text={`${c.h0.toFixed(1)} m`}
+          onChange={(v) => change(() => setHill('h0', v))}
+        />
+        <Slider
+          id={`${idPrefix}-h4`}
+          label="Far hill"
+          value={c.h4}
+          min={HEIGHT_RANGE[0]}
+          max={HEIGHT_RANGE[1]}
+          step={0.5}
+          text={`${c.h4.toFixed(1)} m`}
+          onChange={(v) => change(() => setHill('h4', v))}
+        />
+      </div>
       <Slider
         id={`${idPrefix}-mu`}
         label="Friction"
@@ -102,25 +105,23 @@ export function TrackControls({ c, idPrefix, full = false }: Props & { full?: bo
 export function EnergyReadout({ c }: { c: EnergySnapshot }) {
   const total = c.pe + c.ke + c.heat;
   const bar = (kj: number, colour: string, name: string) => (
-    <div style={{ display: 'grid', gridTemplateColumns: '64px 1fr 64px', alignItems: 'center', gap: 8 }}>
-      <span style={{ color: colour, fontFamily: 'var(--font-body)', fontSize: 13 }}>{name}</span>
-      <span
-        style={{
-          height: 8,
-          borderRadius: 4,
-          background: colour,
-          width: `${Math.min(100, (kj / Math.max(c.full, 1)) * 100)}%`,
-          transition: 'width 0.1s linear',
-        }}
-      />
-      <span style={{ textAlign: 'right' }}>{kj} kJ</span>
+    <div className="energy-bar">
+      <span className="energy-bar__name" style={{ color: colour }}>
+        {name}
+      </span>
+      <span className="energy-bar__track">
+        <span style={{ background: colour, width: `${Math.min(100, (kj / Math.max(c.full, 1)) * 100)}%` }} />
+      </span>
+      <span className="energy-bar__value">{kj} kJ</span>
     </div>
   );
   return (
     <div className="readout" aria-live="polite">
-      {bar(c.pe, SYM10.pe, 'height')}
-      {bar(c.ke, SYM10.ke, 'speed')}
-      {bar(c.heat, SYM10.heat, 'heat')}
+      <div className="energy-bars">
+        {bar(c.pe, SYM10.pe, 'height')}
+        {bar(c.ke, SYM10.ke, 'speed')}
+        {bar(c.heat, SYM10.heat, 'heat')}
+      </div>
       <span style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--chalk-dim)' }}>
         Total {total} kJ · {c.kmh} km/h at {c.h.toFixed(1)} m
       </span>

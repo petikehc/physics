@@ -41,7 +41,8 @@ export function TestTrack() {
       1,
       0.75 * on,
     );
-    label.current?.position.set(TEST_CX + 24, h, TEST_Z + 0.7);
+    // Named just above the line from the start's side of the valley, where it was let go, reading into the valley.
+    label.current?.position.set(TEST_CX - 18.5, h, TEST_Z + 0.7);
     const words = `${h.toFixed(h % 1 ? 1 : 0)} m, where it started`;
     if (text.current) {
       if (said.current !== words) {
@@ -49,7 +50,7 @@ export function TestTrack() {
         text.current.textContent = words;
       }
       text.current.style.opacity = String(on);
-      beside(text.current, 1, 0, 6);
+      beside(text.current, 1, 1, 4);
     }
   });
 

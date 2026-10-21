@@ -12,12 +12,12 @@ import { useEnergy } from './useEnergy';
 
 const SLUG = 'energy';
 type V3 = [number, number, number];
-type Frame = { pos: V3; target: V3; portrait: number };
+type Frame = { pos: V3; target: V3; portrait: number; side?: number };
 type Mode = 'test' | 'coaster';
 
 /** The panel sits on the right (on a phone, below), so each view keeps its subject left of centre. */
 const FRAMES: Record<Mode, Frame> = {
-  test: { pos: [TEST_CX + 16, 11, 70], target: [TEST_CX + 16, 7, 22], portrait: 1 },
+  test: { pos: [TEST_CX, 11, 82], target: [TEST_CX, 7, 22], portrait: 1, side: 11 },
   coaster: { pos: [42, 16, 100], target: [42, 12, -2], portrait: 0.9 },
 };
 

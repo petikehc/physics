@@ -9,7 +9,7 @@ export function YourTurnPanel({ onContinue }: { onContinue: () => void }) {
     <YourTurnShell
       onContinue={onContinue}
       labHref="/lab/energy"
-      body="Raise or lower the start and the far hill (drag them, or use the sliders), add friction, and let the car go. It never climbs higher than it started."
+      body="Drag the start and the far hill up or down, add friction, and let the car go. It never climbs higher than it started."
     >
       <TrackControls c={c} idPrefix="yt" />
       <EnergyReadout c={c} />

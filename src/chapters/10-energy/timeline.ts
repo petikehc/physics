@@ -17,7 +17,7 @@ import {
 } from './rig';
 
 const SLUG = 'energy';
-type Frame = { pos: V3; target: V3; portrait: number };
+type Frame = { pos: V3; target: V3; portrait: number; side?: number };
 
 /** The fairground from the front and to the left: the coaster's lift hill, its loop, and the wheel behind. */
 const FAIR: Frame = { pos: [-34, 7, 46], target: [12, 12, -6], portrait: 0.6 };
@@ -25,12 +25,12 @@ const FAIR: Frame = { pos: [-34, 7, 46], target: [12, 12, -6], portrait: 0.6 };
 const SIDE: Frame = { pos: [55, 12, 64], target: [55, 9, -2], portrait: 0.8 };
 /** The brake run, close, from in front and to the left; the tanks hang on the right. */
 const BRAKES: Frame = { pos: [77, 5, 24], target: [93, 2.5, -3], portrait: 0.7 };
-/** The test track, side on, a little to its right: the tanks hang on the right of the picture. */
-const TEST: Frame = { pos: [TEST_CX + 15, 9, 76], target: [TEST_CX + 15, 7, 22], portrait: 0.8 };
+/** The test track, side on; on a wide screen, slid to its right, where the tanks hang. */
+const TEST: Frame = { pos: [TEST_CX, 10, 98], target: [TEST_CX, 8, 22], portrait: 0.8, side: 17 };
 /** As the test track, further back and lower in the picture, leaving room for the formula at the top. */
-const FORMULA: Frame = { pos: [TEST_CX + 6, 13, 92], target: [TEST_CX + 6, 11, 22], portrait: 0.8 };
-/** The viewer's test track, a little right of centre so the panel leaves it clear. */
-const PLAY: Frame = { pos: [TEST_CX + 16, 11, 70], target: [TEST_CX + 16, 7, 22], portrait: 1 };
+const FORMULA: Frame = { pos: [TEST_CX, 13, 92], target: [TEST_CX, 11, 22], portrait: 0.8, side: 6 };
+/** The viewer's test track; on a wide screen, left of centre so the panel at the side leaves it clear. */
+const PLAY: Frame = { pos: [TEST_CX, 11, 82], target: [TEST_CX, 7, 22], portrait: 1, side: 11 };
 
 /** The camera on a ride in the front car: in its seat, looking along the track ahead. */
 function pov(ride: RideSample[], t0: number, t1: number, at: number, approach: number, step = 0.1) {
@@ -260,7 +260,7 @@ export function buildEnergy(j: JourneyBuilder) {
       id: 'yourTurn',
       kind: 'yourTurn',
       heading: 'Your turn',
-      body: 'Drag the start and the far hill up or down, add friction, change the car’s mass, and let it go.',
+      body: 'Drag the start and the far hill up or down, add friction, and let the car go.',
     },
     ({ tl, pauseHere }) => {
       tl.to(rig, { tanks: 0, duration: 0.5 }, 0);

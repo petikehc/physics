@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { MathLabel } from '../../../engine/labels/MathLabel';
 import { beside } from '../../../engine/labels/beside';
 import { clamp01 } from '../../../engine/ease';
+import { runtime } from '../../../engine/runtime';
 import { station } from '../../../engine/world/stations';
 import { glassMaterial, waterMaterial } from '../../../engine/materials/water';
 import { energyRig, SYM10 } from '../rig';
@@ -60,6 +61,7 @@ export function Tanks() {
     [],
   );
 
+  // After the camera has moved (-2) and before the labels are projected (0), so they never trail it.
   useFrame((state) => {
     const on = clamp01(rig.tanks);
     const g = root.current;
@@ -78,8 +80,10 @@ export function Tanks() {
     const k = wide ? (0.8 * halfH) / SET.h : Math.min((0.42 * halfH) / SET.h, (1.7 * halfW) / SET.w);
     // With the viewer's panel on the right (Your turn, the Lab), they hang on the left instead.
     const side = rig.lab > 0.5 || rig.interactive > 0.5 ? -1 : 1;
-    const cx = wide ? side * (halfW * 0.95 - (SET.w * k) / 2) : 0;
-    const cy = wide ? -halfH * 0.08 : halfH * 0.8 - (SET.h * k) / 2;
+    const cx = wide ? side * (halfW * 0.92 - (SET.w * k) / 2) : 0;
+    // A lens shift (a phone's panel lifting the picture) moves the top of the screen down the frustum.
+    const shift = 2 * halfH * runtime.camera.lensY;
+    const cy = (wide ? -halfH * 0.08 : halfH * 0.8 - (SET.h * k) / 2) - shift;
     cam.getWorldDirection(forward);
     right.set(1, 0, 0).applyQuaternion(cam.quaternion);
     up.set(0, 1, 0).applyQuaternion(cam.quaternion);
@@ -142,7 +146,7 @@ export function Tanks() {
       el.style.opacity = String(show);
       beside(el, dx, dy, 3);
     });
-  });
+  }, -0.5);
 
   return (
     <group ref={root} visible={false}>

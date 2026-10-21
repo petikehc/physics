@@ -727,7 +727,8 @@ export class SfxKit {
         for (let k = 0; k * every < dur; k++) {
           const at = t + k * every;
           this.mono(this.clackNoise, at, (x) => this.clackNoise.triggerAttackRelease(0.025, x, 0.28));
-          if (k % 2 === 0) this.mono(this.click, at + 0.01, (x) => this.click.triggerAttackRelease(0.012, x, 0.25));
+          if (k % 2 === 0)
+            this.mono(this.click, at + 0.01, (x) => this.click.triggerAttackRelease(0.012, x, 0.25));
         }
         return;
       }
@@ -747,7 +748,9 @@ export class SfxKit {
         this.metal.triggerAttackRelease(pyth('E', 6), dur * 0.6, t + 0.05, 0.25);
         for (let k = 0; k < Math.round(dur * 14); k++) {
           const at = t + (k / 14) * (0.95 + ((k * 37) % 7) / 70);
-          this.mono(this.click, at, (x) => this.click.triggerAttackRelease(0.008, x, 0.15 + ((k * 13) % 5) / 25));
+          this.mono(this.click, at, (x) =>
+            this.click.triggerAttackRelease(0.008, x, 0.15 + ((k * 13) % 5) / 25),
+          );
         }
         return;
       }

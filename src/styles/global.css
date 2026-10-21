@@ -1095,6 +1095,47 @@ a {
   cursor: default;
 }
 
+.field-pair {
+  display: contents;
+}
+
+/* Chapter 10's energy, as three bars: one row each, or side by side on a phone. */
+.energy-bars {
+  display: grid;
+  gap: 4px;
+}
+
+.energy-bar {
+  display: grid;
+  grid-template-columns: 64px 1fr 64px;
+  grid-template-areas: 'name bar value';
+  align-items: center;
+  gap: 8px;
+}
+
+.energy-bar__name {
+  grid-area: name;
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+
+.energy-bar__track {
+  grid-area: bar;
+}
+
+.energy-bar__track > span {
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  transition: width 0.1s linear;
+}
+
+.energy-bar__value {
+  grid-area: value;
+  text-align: right;
+  white-space: nowrap;
+}
+
 .lab-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1167,6 +1208,27 @@ a {
 
   .your-turn__title {
     font-size: 26px;
+  }
+
+  .field-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .energy-bars {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .energy-bar {
+    grid-template-columns: auto 1fr;
+    grid-template-areas: 'name value' 'bar bar';
+    gap: 4px;
+  }
+
+  .energy-bar__value {
+    font-size: 12px;
   }
 
   .lab-panel {
