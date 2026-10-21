@@ -12,13 +12,13 @@ export interface FinaleRig {
   lit: number;
   /** How much of the thread joining them is drawn (0..1). */
   thread: number;
-  /** How many stars the epilogue has visited, each keeping its chapter's colour once it has (0..10). */
+  /** How many stars the sweep has reached, each keeping its chapter's colour once it has (0..10). */
   visited: number;
-  /** The star the epilogue is at (−1: none), and how strongly the others step back for it (0..1). */
+  /** The star the sweep is at (−1: none), and how strongly the others step back for it (0..1). */
   focus: number;
   focusAmt: number;
-  /** The formula beside the star in focus (0..1), shown once the camera has arrived. */
-  formula: number;
+  /** What the star in focus kept the same, in a word or two beside it (0..1). */
+  tag: number;
   /** Every star at full brightness and colour, the thread too (Noether). */
   glow: number;
   /** The stars' numerals beside them (0..1). */
@@ -34,7 +34,7 @@ export const FINALE_DEFAULTS: FinaleRig = {
   visited: 0,
   focus: -1,
   focusAmt: 0,
-  formula: 0,
+  tag: 0,
   glow: 0,
   labels: 0,
   index: 0,

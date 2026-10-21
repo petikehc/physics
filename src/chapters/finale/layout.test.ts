@@ -9,6 +9,8 @@ describe('the constellation', () => {
     expect(STARS).toHaveLength(CHAPTERS.length);
     expect(INVARIANTS.map((v) => v.slug)).toEqual(CHAPTERS.map((c) => c.slug));
     expect(STAR_CHAPTERS).toEqual(CHAPTERS.map((c) => c.slug));
+    // A tag for each star, a word or two to read in passing.
+    for (const v of INVARIANTS) expect(v.tag.split(' ').length).toBeLessThanOrEqual(4);
   });
 
   it('keeps its stars far enough apart to be told apart, and rises from first to last', () => {

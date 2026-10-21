@@ -1,20 +1,18 @@
 import { useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { station } from '../../engine/world/stations';
 import { clamp01 } from '../../engine/ease';
 import { ChalkLine, partialPolyline, type ChalkLineHandle } from '../../engine/lines/ChalkLine';
 import { MathLabel } from '../../engine/labels/MathLabel';
 import { beside } from '../../engine/labels/beside';
-import { tex } from '../../engine/labels/tex';
 import { CHAPTERS } from '../registry';
-import { iconAt, ICON_DISTANCE, STARS } from './layout';
+import { iconAt, ICON_DISTANCE, INVARIANTS, STARS } from './layout';
 import { finaleRig, SLUG } from './rig';
 import { useConstellation } from './store';
 
 const ORIGIN = station(SLUG);
-/** A star before the epilogue has given it its chapter's colour: warm white. */
+/** A star before the sweep has given it its chapter's colour: warm white. */
 const WHITE = new THREE.Color('#fff1d8');
 
 /** A soft round glow, white at the centre and fading to nothing, for every star's halo. */
@@ -44,7 +42,7 @@ function Star({ i, glow }: { i: number; glow: THREE.Texture }) {
   const core = useRef<THREE.Mesh>(null);
   const halo = useRef<THREE.Sprite>(null);
   const label = useRef<HTMLDivElement>(null);
-  const formula = useRef<HTMLDivElement>(null);
+  const tag = useRef<HTMLDivElement>(null);
   const said = useRef('');
   const coreMat = useMemo(() => new THREE.MeshBasicMaterial({ color: '#ffffff', toneMapped: false }), []);
   const haloMat = useMemo(
@@ -59,9 +57,8 @@ function Star({ i, glow }: { i: number; glow: THREE.Texture }) {
       }),
     [glow],
   );
-  const html = useMemo(() => tex(meta.formulaTeX), [meta.formulaTeX]);
   // Which way is out from the thread's bend at this star (where its icon forms): its numeral sits that way, and its
-  // formula the other way, so neighbours' numerals stay apart and a formula never meets its icon.
+  // tag the other way, so neighbours' numerals stay apart and a tag never meets its icon.
   const out = useMemo(() => {
     const c = iconAt(i);
     const s = STARS[i]!;
@@ -106,10 +103,10 @@ function Star({ i, glow }: { i: number; glow: THREE.Texture }) {
       el.style.opacity = String(clamp01(rig.labels) * lit * (1 - away));
       beside(el, out[0], out[1], 10);
     }
-    // Its formula under it while the epilogue is at it.
-    const f = formula.current;
+    // What its chapter kept the same, in a word or two, while the sweep is at it.
+    const f = tag.current;
     if (f) {
-      f.style.opacity = String(here * clamp01(rig.formula) * lit);
+      f.style.opacity = String(here * clamp01(rig.tag) * lit);
       // Diagonally away from the icon, between the thread's two arms; on a phone, too narrow for that, straight
       // above or below.
       if (state.size.width >= 600) beside(f, -out[0], -out[1], 30);
@@ -149,14 +146,9 @@ function Star({ i, glow }: { i: number; glow: THREE.Texture }) {
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
       <MathLabel ref={label} className="math-label math-label--small" color={meta.accent} />
-      <Html center zIndexRange={[5, 0]} style={{ pointerEvents: 'none' }}>
-        <div
-          ref={formula}
-          className="math-label math-label--chip"
-          style={{ color: meta.accent, opacity: 0 }}
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
-      </Html>
+      <MathLabel ref={tag} className="math-label math-label--chip" color={meta.accent}>
+        {INVARIANTS[i]!.tag}
+      </MathLabel>
     </group>
   );
 }

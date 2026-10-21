@@ -1010,7 +1010,7 @@ export const ARRANGEMENT: Record<string, Layers> = {
     arpOctave: 1,
   },
   'finale:title': { drone: 0.7, pad: 0.9, cutoff: 1100, plucks: 0.08, arp: 0, harmony: 'prog' },
-  'finale:star': { drone: 0.62, pad: 0.78, cutoff: 1000, plucks: 0.08, arp: 0, harmony: 'prog' },
+  'finale:sweep': { drone: 0.62, pad: 0.78, cutoff: 1200, plucks: 0.08, arp: 0.2, harmony: 'prog' },
   'finale:noether': {
     drone: 0.8,
     pad: 1,
@@ -1339,8 +1339,6 @@ function fallback(key: string | null): Layers {
   if (key?.startsWith('calculus')) return ARRANGEMENT['calculus:speed']!;
   if (key?.startsWith('euler')) return ARRANGEMENT['euler:quarters']!;
   if (key?.startsWith('fourier')) return ARRANGEMENT['fourier:shapes']!;
-  // The finale's star-by-star beats are named after the chapters.
-  if (key?.startsWith('finale')) return ARRANGEMENT['finale:star']!;
   return QUIET;
 }
 

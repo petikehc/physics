@@ -20,11 +20,12 @@ export const STARS: V3[] = [
   [36, 15, 0],
 ];
 
-/** What each chapter kept the same: a name, and a sentence or two to say so. */
+/** What each chapter kept the same: a name, a sentence or two to say so, and a tag of a word or two for its star. */
 export interface Invariant {
   slug: string;
   heading: string;
   body: string;
+  tag: string;
   /** The chapter's key, for the note its star sings (its score's tonic). */
   note: 'C' | 'D' | 'E' | 'F' | 'G' | 'A';
 }
@@ -32,60 +33,70 @@ export interface Invariant {
 export const INVARIANTS: Invariant[] = [
   {
     slug: 'pythagoras',
+    tag: 'area',
     heading: 'Area',
     body: 'Cut squares into pieces and move them about: the area stays the same. That is how a² + b² became c².',
     note: 'C',
   },
   {
     slug: 'circle-area',
+    tag: 'area',
     heading: 'Area, again',
     body: 'Slice a disc and lay the slices head to tail: they still cover πr², however thin the slices.',
     note: 'A',
   },
   {
     slug: 'archimedes',
+    tag: 'weight',
     heading: 'Weight',
     body: 'Lower a crown into water: the weight it loses is exactly the weight of the water it pushes aside.',
     note: 'D',
   },
   {
     slug: 'kepler',
+    tag: 'angular momentum',
     heading: 'Equal areas',
     body: 'Near the Sun or far from it, a planet sweeps out equal areas in equal times: its angular momentum never changes.',
     note: 'E',
   },
   {
     slug: 'newton',
+    tag: 'one law',
     heading: 'One law',
     body: 'The pull that drops an apple holds the Moon in its orbit: the same law of gravity on Earth and in the sky.',
     note: 'G',
   },
   {
     slug: 'calculus',
+    tag: 'the total change',
     heading: 'The total change',
     body: 'Slice the way from a to b as finely as you like: the climbs of the slices always add up to the same whole climb, F(b) − F(a).',
     note: 'F',
   },
   {
     slug: 'euler',
+    tag: 'length one',
     heading: 'Length one',
     body: 'As the point turns round the circle its length never changes: always 1, so cos²θ + sin²θ = 1. Pythagoras again.',
     note: 'D',
   },
   {
     slug: 'fourier',
+    tag: 'the same wave',
     heading: 'The same wave',
     body: 'Drawn in one stroke or built from turning circles, it is the same wave: nothing is lost in the telling.',
     note: 'D',
   },
   {
     slug: 'doppler',
+    tag: 'the speed of sound',
     heading: 'The speed of sound',
     body: 'Whoever moves, the waves spread at the same speed; only how often they arrive changes, and with it the pitch.',
     note: 'A',
   },
   {
     slug: 'energy',
+    tag: 'energy',
     heading: 'Energy',
     body: 'Height, speed and heat trade places all the way round the ride; their total never changes.',
     note: 'C',
