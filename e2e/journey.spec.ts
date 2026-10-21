@@ -13,6 +13,32 @@ test('the landing teaser renders and offers the journey', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test('the landing plays its film of the journey, naming each chapter, and hands back to the live world', async ({
+  page,
+}) => {
+  const errors = collectErrors(page);
+  await page.goto(`/${Q}`);
+  const film = page.locator('.teaser-film');
+  await expect(film).toBeVisible({ timeout: 30_000 });
+  const chip = page.locator('.landing .chip');
+  await expect(chip).toHaveText(/^I · /);
+  await expect(chip).toHaveText(/^II · The Area of a Circle/, { timeout: 30_000 });
+
+  await page.getByRole('button', { name: 'Watch in silence' }).click();
+  await expect(film).toBeHidden();
+  await waitForJourney(page);
+  await page.waitForTimeout(2000);
+  await expectCanvasRendered(page);
+  expect(errors).toEqual([]);
+});
+
+test('with reduced motion, the landing keeps its live particles and plays no film', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(`/${Q}`);
+  await expect(page.getByRole('button', { name: /Begin the journey/ })).toBeVisible();
+  await expect(page.locator('.teaser-film')).toHaveCount(0);
+});
+
 for (const viewport of [
   { width: 1440, height: 900, name: 'desktop' },
   { width: 390, height: 844, name: 'phone' },
