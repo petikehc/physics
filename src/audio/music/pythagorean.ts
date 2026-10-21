@@ -1011,7 +1011,15 @@ export const ARRANGEMENT: Record<string, Layers> = {
   },
   'finale:title': { drone: 0.7, pad: 0.9, cutoff: 1100, plucks: 0.08, arp: 0, harmony: 'prog' },
   'finale:star': { drone: 0.5, pad: 0.6, cutoff: 900, plucks: 0.05, arp: 0, harmony: 'prog' },
-  'finale:noether': { drone: 0.8, pad: 1, cutoff: 2400, plucks: 0.12, arp: 0.45, harmony: 'prog', arpOctave: 1 },
+  'finale:noether': {
+    drone: 0.8,
+    pad: 1,
+    cutoff: 2400,
+    plucks: 0.12,
+    arp: 0.45,
+    harmony: 'prog',
+    arpOctave: 1,
+  },
   'finale:end': { drone: 0.85, pad: 1.1, cutoff: 3000, plucks: 0, arp: 0, harmony: 'resolve' },
   lab: { drone: 0.45, pad: 0.4, cutoff: 800, plucks: 0.1, arp: 0, harmony: 'prog' },
 };

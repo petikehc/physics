@@ -9,9 +9,9 @@ import { iconAt, INVARIANTS, STARS, type V3 } from './layout';
 import { DUST_SCALE, finaleRig, FINALE_DEFAULTS, SLUG } from './rig';
 
 /** The whole constellation, from in front, a little high in the picture to keep it clear of the captions. */
-const WIDE = { pos: [0, -1, 100] as V3, target: [0, -4, 0] as V3, portrait: 0.9 };
+const WIDE = { pos: [0, -3, 100] as V3, target: [0, -6, 0] as V3, portrait: 0.9 };
 /** The same as the index: on a wide screen, slid so the stars stay clear of the panel on the right. */
-export const INDEX_FRAME = { ...WIDE, side: 12 };
+export const INDEX_FRAME = { ...WIDE, side: 16 };
 const ICON_SCALE = 1.6;
 
 /** Close on one star and its chapter's icon beside it, framed between the two. */
@@ -19,7 +19,8 @@ function closeOn(i: number) {
   const s = STARS[i]!;
   const c = iconAt(i);
   const mid: V3 = [(s[0] + c[0]) / 2, (s[1] + c[1]) / 2, (s[2] + c[2]) / 2];
-  return { pos: [mid[0], mid[1], mid[2] + 32] as V3, target: mid, portrait: 1 };
+  // On a wide screen, slid so the star stands right of centre, clear of the caption at the bottom left.
+  return { pos: [mid[0], mid[1], mid[2] + 32] as V3, target: mid, portrait: 1, side: -5 };
 }
 
 /** The finale: up from the fairground to the stars, which gather into the constellation; what each chapter kept the
@@ -91,8 +92,9 @@ export function buildFinale(j: JourneyBuilder) {
       { id: inv.slug, heading: `${meta.numeral} · ${inv.heading}`, body: inv.body },
       ({ tl, cue }) => {
         shot(tl, SLUG, { ...closeOn(i), fov: 40, dof: 0, shake: 0.25 }, 1.8, 0, 'power2.inOut');
-        tl.set(rig, { focus: i }, 0);
+        tl.set(rig, { focus: i, formula: 0 }, 0);
         tl.to(rig, { focusAmt: 1, duration: 0.8 }, 0);
+        tl.to(rig, { formula: 1, duration: 0.6 }, 1.6);
         tl.to(rig, { visited: i + 1, duration: 1, ease: 'power1.inOut' }, 0.4);
         const from = i === 0 ? 'constellation' : ICON_ORDER[i - 1]!;
         const at = iconAt(i);
@@ -133,7 +135,10 @@ export function buildFinale(j: JourneyBuilder) {
     },
     ({ tl, cue }) => {
       // Every star in its colour and the thread lit, as the constellation is turned: turned, it is still the same.
-      tl.to(rig, { focusAmt: 0, glow: 1, visited: STARS.length, duration: 2 }, 0);
+      tl.to(rig, { formula: 0, duration: 0.4 }, 0);
+      tl.to(rig, { glow: 1, visited: STARS.length, duration: 2 }, 0);
+      // The other stars' numerals come back once the camera has drawn back far enough to show them all.
+      tl.to(rig, { focusAmt: 0, duration: 1.2 }, 1.6);
       tl.set(runtime.camera, { orbitAngle: Math.PI / 2, orbitRadius: 96, orbitHeight: 3 }, 0);
       shot(
         tl,

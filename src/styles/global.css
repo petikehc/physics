@@ -967,43 +967,97 @@ a {
   transform: rotate(-90deg);
 }
 
-.end-card {
+.constellation {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: min(520px, calc(100vw - 2 * var(--gutter)));
-  text-align: center;
-  display: grid;
-  gap: 14px;
-  justify-items: center;
-  padding: 32px 24px;
-  border-radius: 24px;
-  background: rgba(21, 23, 29, 0.78);
-  border: 1px solid var(--line);
+  right: var(--gutter);
+  top: calc(var(--gutter) + 64px);
+  width: min(360px, calc(100vw - 2 * var(--gutter)));
+  max-height: calc(100% - 2 * var(--gutter) - 64px - 84px);
+  overflow: auto;
+  padding: 22px;
+  border-radius: 20px;
+  background: rgba(21, 23, 29, 0.84);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.end-card h2 {
+/* The map has no player bar under it. */
+.constellation--map {
+  max-height: calc(100% - 2 * var(--gutter) - 64px);
+}
+
+.constellation h2 {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(32px, 4vw, 44px);
+  font-size: 34px;
+  line-height: 1;
   margin: 0;
-  line-height: 1.05;
 }
 
-.end-card p {
+.constellation h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.constellation p {
   margin: 0;
   color: var(--chalk-dim);
 }
 
-.end-card__actions {
+.constellation p strong {
+  color: var(--chalk);
+  font-weight: 500;
+}
+
+.constellation__stars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.constellation__star {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.constellation__star:hover,
+.constellation__star:focus-visible,
+.constellation__star[aria-pressed='true'] {
+  border-color: currentColor;
+  background: rgba(244, 239, 230, 0.06);
+}
+
+.constellation__detail {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(14, 15, 19, 0.6);
+  border: 1px solid var(--line);
+}
+
+.constellation__actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  justify-content: center;
-  margin-top: 6px;
+}
+
+.constellation__actions .btn {
+  padding: 9px 14px;
+  font-size: 14px;
 }
 
 /* ---------- Lab ---------- */
@@ -1229,6 +1283,31 @@ a {
 
   .energy-bar__value {
     font-size: 12px;
+  }
+
+  .constellation {
+    top: auto;
+    bottom: calc(84px + env(safe-area-inset-bottom));
+    left: var(--gutter);
+    right: var(--gutter);
+    width: auto;
+    max-height: 46vh;
+    padding: 16px;
+    gap: 10px;
+  }
+
+  .constellation--map {
+    bottom: calc(var(--gutter) + env(safe-area-inset-bottom));
+  }
+
+  .constellation h2 {
+    font-size: 26px;
+  }
+
+  .constellation__star {
+    width: 30px;
+    height: 30px;
+    font-size: 11px;
   }
 
   .lab-panel {

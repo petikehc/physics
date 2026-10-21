@@ -9,7 +9,7 @@ import { MathLabel } from '../../engine/labels/MathLabel';
 import { beside } from '../../engine/labels/beside';
 import { tex } from '../../engine/labels/tex';
 import { CHAPTERS } from '../registry';
-import { STARS } from './layout';
+import { iconAt, ICON_DISTANCE, STARS } from './layout';
 import { finaleRig, SLUG } from './rig';
 import { useConstellation } from './store';
 
@@ -60,6 +60,14 @@ function Star({ i, glow }: { i: number; glow: THREE.Texture }) {
     [glow],
   );
   const html = useMemo(() => tex(meta.formulaTeX), [meta.formulaTeX]);
+  // Which way is out from the thread's bend at this star (where its icon forms): its numeral sits that way, and its
+  // formula straight above or below, away from the icon, so neighbours' numerals stay apart and a formula never meets
+  // its icon (or runs off the side of a phone).
+  const out = useMemo(() => {
+    const c = iconAt(i);
+    const s = STARS[i]!;
+    return [(c[0] - s[0]) / ICON_DISTANCE, (c[1] - s[1]) / ICON_DISTANCE] as const;
+  }, [i]);
 
   useFrame((state) => {
     const { hovered, selected } = useConstellation.getState();
@@ -89,19 +97,21 @@ function Star({ i, glow }: { i: number; glow: THREE.Texture }) {
     // Its numeral beside it; as the index, its name too while it is pointed at or chosen.
     const el = label.current;
     if (el) {
-      const words = picked ? `${meta.numeral} · ${meta.short}` : meta.numeral;
+      // (On a phone the stars stand too close for names: the panel below says which it is.)
+      const words = picked && state.size.width >= 600 ? `${meta.numeral} · ${meta.short}` : meta.numeral;
       if (said.current !== words) {
         said.current = words;
         el.textContent = words;
       }
-      el.style.opacity = String(clamp01(rig.labels) * lit * (1 - 0.6 * away));
-      beside(el, 1, 1, 10);
+      // Close on another star, this one's numeral steps aside altogether (it may be off the edge of the picture).
+      el.style.opacity = String(clamp01(rig.labels) * lit * (1 - away));
+      beside(el, out[0], out[1], 10);
     }
     // Its formula under it while the epilogue is at it.
     const f = formula.current;
     if (f) {
-      f.style.opacity = String(here * lit);
-      beside(f, 0, -1, 22);
+      f.style.opacity = String(here * clamp01(rig.formula) * lit);
+      beside(f, 0, out[1] > 0 ? -1 : 1, 34);
     }
   });
 
@@ -167,7 +177,7 @@ function Thread() {
  */
 export default function FinaleStation() {
   const rig = finaleRig();
-  const glow = useMemo(glowTexture, []);
+  const glow = useMemo(() => glowTexture(), []);
   const group = useRef<THREE.Group>(null);
   useFrame(() => {
     if (group.current) group.current.visible = rig.on > 0.001;
