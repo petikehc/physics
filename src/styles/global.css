@@ -37,6 +37,9 @@
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 
   --gutter: clamp(16px, 3vw, 32px);
+  /* The side gutters, widened past a phone's notch when it is turned on its side. */
+  --edge-l: max(var(--gutter), env(safe-area-inset-left));
+  --edge-r: max(var(--gutter), env(safe-area-inset-right));
   --radius: 14px;
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
 
@@ -53,6 +56,8 @@ body,
   margin: 0;
   height: 100%;
   overflow: hidden;
+  /* A swipe down steps back a beat: never let it pull the page down to reload as well. */
+  overscroll-behavior: none;
   background: var(--ink);
   color: var(--chalk);
   font-family: var(--font-body);
@@ -312,7 +317,7 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: var(--gutter);
+  padding: var(--gutter) var(--edge-r) var(--gutter) var(--edge-l);
   padding-top: max(var(--gutter), env(safe-area-inset-top));
   pointer-events: none;
 }
@@ -361,7 +366,7 @@ a {
   display: grid;
   place-items: center;
   text-align: center;
-  padding: var(--gutter);
+  padding: var(--gutter) var(--edge-r) var(--gutter) var(--edge-l);
   pointer-events: none;
 }
 
@@ -439,7 +444,7 @@ a {
   z-index: 10;
   display: grid;
   place-items: center;
-  padding: var(--gutter);
+  padding: var(--gutter) var(--edge-r) var(--gutter) var(--edge-l);
 }
 
 .sheet {
@@ -521,9 +526,9 @@ a {
 
 .captions {
   position: absolute;
-  left: var(--gutter);
+  left: var(--edge-l);
   bottom: calc(124px + env(safe-area-inset-bottom));
-  max-width: min(560px, calc(100vw - 2 * var(--gutter)));
+  max-width: min(560px, calc(100vw - var(--edge-l) - var(--edge-r)));
   pointer-events: none;
 }
 
@@ -637,7 +642,7 @@ a {
   place-items: center;
   text-align: center;
   pointer-events: none;
-  padding: var(--gutter);
+  padding: var(--gutter) var(--edge-r) var(--gutter) var(--edge-l);
 }
 
 .title-card__numeral {
@@ -746,8 +751,8 @@ a {
 
 .player {
   position: absolute;
-  left: var(--gutter);
-  right: var(--gutter);
+  left: var(--edge-l);
+  right: var(--edge-r);
   bottom: max(var(--gutter), env(safe-area-inset-bottom));
   display: flex;
   align-items: center;
@@ -899,10 +904,10 @@ a {
 
 .your-turn {
   position: absolute;
-  right: var(--gutter);
+  right: var(--edge-r);
   top: 50%;
   transform: translateY(-50%);
-  width: min(340px, calc(100vw - 2 * var(--gutter)));
+  width: min(340px, calc(100vw - var(--edge-l) - var(--edge-r)));
   padding: 22px;
   border-radius: 20px;
   background: rgba(21, 23, 29, 0.82);
@@ -969,9 +974,9 @@ a {
 
 .constellation {
   position: absolute;
-  right: var(--gutter);
+  right: var(--edge-r);
   top: calc(var(--gutter) + 64px);
-  width: min(360px, calc(100vw - 2 * var(--gutter)));
+  width: min(360px, calc(100vw - var(--edge-l) - var(--edge-r)));
   max-height: calc(100% - 2 * var(--gutter) - 64px - 84px);
   overflow: auto;
   padding: 22px;
@@ -1064,10 +1069,10 @@ a {
 
 .lab-panel {
   position: absolute;
-  right: var(--gutter);
+  right: var(--edge-r);
   top: calc(var(--gutter) + 64px);
   bottom: var(--gutter);
-  width: min(360px, calc(100vw - 2 * var(--gutter)));
+  width: min(360px, calc(100vw - var(--edge-l) - var(--edge-r)));
   overflow: auto;
   padding: 22px;
   border-radius: 20px;
@@ -1227,6 +1232,21 @@ a {
 
 /* ---------- Responsive ---------- */
 
+/* Hints for how the page is being used: keys on a computer, swipes on a touch screen. */
+.for-touch {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .for-keys {
+    display: none;
+  }
+
+  .for-touch {
+    display: inline;
+  }
+}
+
 @media (max-width: 720px) {
   .brand__chapter {
     display: none;
@@ -1253,8 +1273,8 @@ a {
     top: auto;
     bottom: calc(84px + env(safe-area-inset-bottom));
     transform: none;
-    left: var(--gutter);
-    right: var(--gutter);
+    left: var(--edge-l);
+    right: var(--edge-r);
     width: auto;
     padding: 16px;
     gap: 10px;
@@ -1288,8 +1308,8 @@ a {
   .constellation {
     top: auto;
     bottom: calc(84px + env(safe-area-inset-bottom));
-    left: var(--gutter);
-    right: var(--gutter);
+    left: var(--edge-l);
+    right: var(--edge-r);
     width: auto;
     max-height: 46vh;
     padding: 16px;
@@ -1312,8 +1332,8 @@ a {
 
   .lab-panel {
     top: auto;
-    left: var(--gutter);
-    right: var(--gutter);
+    left: var(--edge-l);
+    right: var(--edge-r);
     width: auto;
     max-height: 46vh;
   }
@@ -1328,6 +1348,137 @@ a {
 
   .chapter-row__actions {
     grid-column: 2;
+  }
+}
+
+/* A phone on its side (shortWide() in engine/camera/fit.ts): too short for text under the picture. The journey's
+   captions and formula take a column down the left, and the camera moves the picture over to the right of it.
+   Panels stand at the right from the top bar down, and the player stops short of them. A size smaller throughout. */
+@media (max-height: 500px) and (min-aspect-ratio: 3/2) {
+  :root {
+    --gutter: 14px;
+    --side-panel: min(320px, 44vw);
+    --below-bar: calc(var(--gutter) + 54px);
+  }
+
+  .brand__name {
+    font-size: 19px;
+  }
+
+  .landing__inner {
+    margin-top: 16vh;
+    gap: 10px;
+  }
+
+  .landing__title {
+    font-size: 52px;
+  }
+
+  .landing__sub {
+    font-size: 14px;
+    max-width: 560px;
+  }
+
+  .landing__actions {
+    margin-top: 2px;
+  }
+
+  .landing__foot {
+    font-size: 12px;
+  }
+
+  /* Shade the text's column as well as the bottom, for wide scenes that still reach into it. */
+  .bottom-shade {
+    height: 100%;
+    background:
+      linear-gradient(to right, rgba(10, 11, 14, 0.7), rgba(10, 11, 14, 0) 50%),
+      linear-gradient(to top, rgba(10, 11, 14, 0.7), rgba(10, 11, 14, 0) 40%);
+  }
+
+  .overlay:has(.your-turn, .constellation) .bottom-shade {
+    background: linear-gradient(to top, rgba(10, 11, 14, 0.7), rgba(10, 11, 14, 0) 40%);
+  }
+
+  .captions {
+    bottom: calc(78px + env(safe-area-inset-bottom));
+    max-width: min(40vw, 380px);
+  }
+
+  .captions__heading {
+    font-size: 21px;
+    margin-bottom: 4px;
+  }
+
+  .captions__body {
+    font-size: 13.5px;
+    line-height: 1.45;
+  }
+
+  .formula {
+    top: var(--below-bar);
+    left: var(--edge-l);
+    transform: none;
+    font-size: 34px;
+  }
+
+  .formula__caption {
+    text-align: left;
+  }
+
+  .title-card__numeral {
+    font-size: 20px;
+    margin-bottom: 2px;
+  }
+
+  .title-card__title {
+    font-size: 48px;
+  }
+
+  .title-card__meta {
+    margin-top: 10px;
+  }
+
+  .player {
+    gap: 10px;
+    padding: 6px 12px 6px 6px;
+  }
+
+  .player__play {
+    width: 40px;
+    height: 40px;
+  }
+
+  .your-turn,
+  .constellation,
+  .lab-panel {
+    top: var(--below-bar);
+    bottom: auto;
+    left: auto;
+    right: var(--edge-r);
+    width: var(--side-panel);
+    max-height: calc(100% - var(--below-bar) - max(var(--gutter), env(safe-area-inset-bottom)));
+    transform: none;
+    overflow: auto;
+    padding: 14px 16px;
+    gap: 10px;
+  }
+
+  .your-turn__title,
+  .constellation h2,
+  .lab-panel h1 {
+    font-size: 26px;
+  }
+
+  /* However far the panel scrolls, Continue stays in reach. */
+  .your-turn .continue-btn {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    box-shadow: 0 -10px 14px 4px rgba(21, 23, 29, 0.9);
+  }
+
+  .overlay:has(.your-turn, .constellation) .player {
+    right: calc(var(--edge-r) + var(--side-panel) + 10px);
   }
 }
 
