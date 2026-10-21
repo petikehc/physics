@@ -2,7 +2,7 @@ import gsap from 'gsap';
 import { useApp } from '../state/store';
 import { audio } from '../audio';
 import { runtime } from '../engine/runtime';
-import { beatAt, cuesBetween, type BeatMarker, type Journey } from './builder';
+import { beatAt, cuesBetween, type BeatKind, type BeatMarker, type Journey } from './builder';
 import { buildJourney } from './journey';
 import { HOOKS } from '../chapters/hooks';
 import { continuousMeter, createSoundFrame, type Levels } from '../chapters/sound';
@@ -226,7 +226,17 @@ interface TestHook {
   pause: () => void;
   time: () => number;
   duration: number;
-  beats: Array<{ key: string; start: number; end: number; pauseAt?: number }>;
+  /** Every beat, with its caption (for tests, and the copy inventory: scripts/copy-inventory.mjs). */
+  beats: Array<{
+    key: string;
+    chapter: string;
+    kind: BeatKind;
+    heading?: string;
+    body?: string;
+    start: number;
+    end: number;
+    pauseAt?: number;
+  }>;
   camera: typeof runtime.camera;
   /** Every chapter's live rig, by slug (read-only use in tests). */
   rigs: typeof runtime.chapters;
@@ -254,7 +264,16 @@ function exposeTestHook(c: JourneyController) {
     pause: () => c.pause(),
     time: () => c.time,
     duration: j.duration,
-    beats: j.beats.map((b) => ({ key: b.key, start: b.start, end: b.end, pauseAt: b.pauseAt })),
+    beats: j.beats.map((b) => ({
+      key: b.key,
+      chapter: b.chapter,
+      kind: b.kind ?? 'normal',
+      heading: b.heading,
+      body: b.body,
+      start: b.start,
+      end: b.end,
+      pauseAt: b.pauseAt,
+    })),
     camera: runtime.camera,
     rigs: runtime.chapters,
     renderAudio: async (seconds, from = 0) => {

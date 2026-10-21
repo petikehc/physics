@@ -89,6 +89,18 @@ pull request.
   gather into a constellation of ten, one per chapter, and one sweep along them shows what each kept the same,
   before Noether's theorem says why. At the end of the journey, and at `/map`, the constellation is the index.
 
+## Checking the words
+
+The story editor (`.claude/agents/story-editor.md`) is a Claude Code subagent that fact-checks every theorem, date,
+name and number a viewer reads, reviews how the story flows, and checks each caption is on screen long enough to
+read. It reports with sources and suggested rewrites, and edits nothing. It works from the caption inventory, which
+lists every timed caption with the seconds it is shown and the reading speed that needs:
+
+```bash
+npm run build && npm run preview &
+node scripts/copy-inventory.mjs --out copy-inventory.md
+```
+
 ## Adding a chapter
 
 1. Create `src/chapters/NN-slug/` with `rig.ts` (animated numbers), `math.ts` (+ tests), `Station.tsx` (reads the rig),
