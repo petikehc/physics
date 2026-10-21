@@ -13,6 +13,49 @@ test('the landing teaser renders and offers the journey', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test('the landing plays its film of the journey, naming each chapter, and hands back to the live world', async ({
+  page,
+}) => {
+  test.setTimeout(240_000);
+  const errors = collectErrors(page);
+  await page.goto(`/${Q}`);
+  const film = page.locator('.teaser-film');
+  await expect(film).toBeVisible({ timeout: 30_000 });
+  await expect(page.locator('.landing .chip')).toHaveText(/^I · /);
+  // The chip names the chapter the film shows, not the particles' (read together; the particles' loop would be
+  // on chapter VII or VIII by then).
+  const shown = () =>
+    page.evaluate(() => ({
+      t: document.querySelector<HTMLVideoElement>('.teaser-film video')!.currentTime,
+      chip: document.querySelector('.landing .chip')!.textContent,
+    }));
+  await expect
+    .poll(
+      async () => {
+        const { t, chip } = await shown();
+        return t > 27 && t < 29 ? chip : 'not yet';
+      },
+      { timeout: 60_000, intervals: [250] },
+    )
+    .toMatch(/^IX · The Doppler Effect/);
+
+  // Software rendering composites the film and the world slowly, so the hand-over takes far longer here than on a
+  // real screen.
+  await page.getByRole('button', { name: 'Watch in silence' }).click();
+  await expect(film).toBeHidden({ timeout: 90_000 });
+  await waitForJourney(page);
+  await page.waitForTimeout(2000);
+  await expectCanvasRendered(page);
+  expect(errors).toEqual([]);
+});
+
+test('with reduced motion, the landing keeps its live particles and plays no film', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(`/${Q}`);
+  await expect(page.getByRole('button', { name: /Begin the journey/ })).toBeVisible();
+  await expect(page.locator('.teaser-film')).toHaveCount(0);
+});
+
 for (const viewport of [
   { width: 1440, height: 900, name: 'desktop' },
   { width: 390, height: 844, name: 'phone' },
