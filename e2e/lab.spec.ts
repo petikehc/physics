@@ -289,6 +289,31 @@ test('the energy lab lets a car go on a valley you shape, and runs the coaster w
   expect(errors).toEqual([]);
 });
 
+test('the map is the constellation: choose a star to read what it kept, and open its Lab', async ({
+  page,
+}) => {
+  const errors = collectErrors(page);
+  await page.goto('/map?quality=low');
+  const panel = page.getByRole('complementary', { name: 'The constellation' });
+  await expect(panel).toBeVisible();
+  await expect(panel.getByRole('group', { name: 'Chapters' }).getByRole('button')).toHaveCount(10);
+  await page.waitForTimeout(3000);
+  await expectCanvasRendered(page);
+
+  await panel.getByRole('button', { name: /^X · / }).click();
+  await expect(panel.getByRole('button', { name: /^X · / })).toHaveAttribute('aria-pressed', 'true');
+  await expect(panel).toContainText('Energy.');
+  await expect(panel.getByRole('link', { name: 'Play chapter X' })).toHaveAttribute(
+    'href',
+    /\/play\/energy$/,
+  );
+  await page.screenshot({ path: test.info().outputPath('map.png') });
+  await panel.getByRole('link', { name: 'Open the Lab' }).click();
+  await expect(page).toHaveURL(/\/lab\/energy/);
+  await expect(page.getByRole('complementary', { name: 'Energy lab' })).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
 test('a Lab that does not exist says so', async ({ page }) => {
   await page.goto('/lab/nowhere?quality=low');
   await expect(page.getByText('There is no Lab here.', { exact: false })).toBeVisible();
