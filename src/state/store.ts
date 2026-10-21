@@ -59,6 +59,11 @@ export interface AppState extends Prefs {
   soundEnabled: boolean;
   cameraMode: CameraMode;
   dragging: boolean;
+  /**
+   * The world does not draw on its own: the landing page's film covers it, or a recording is stepping it frame by
+   * frame (window.__film).
+   */
+  worldPaused: boolean;
 
   // Journey (discrete state only; per-frame time is read from the timeline directly).
   /** Increments each time a journey timeline is built (0 = none). */
@@ -82,6 +87,7 @@ export const useApp = create<AppState>((set, get) => ({
   soundEnabled: false,
   cameraMode: 'directed',
   dragging: false,
+  worldPaused: false,
   journeyId: 0,
   playing: false,
   beatKey: null,

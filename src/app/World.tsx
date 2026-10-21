@@ -1,5 +1,6 @@
-import { Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Suspense, useEffect } from 'react';
+import { advance, Canvas, useThree } from '@react-three/fiber';
+import gsap from 'gsap';
 import { PerformanceMonitor } from '@react-three/drei';
 import { useApp, type QualityTier } from '../state/store';
 import { CameraDirector } from '../engine/camera/CameraDirector';
@@ -22,17 +23,61 @@ function stationWindow(slug: string): string[] {
   return ORDER.slice(Math.max(0, i - 1), i + 2).filter((s) => STATION_VIEWS[s]);
 }
 
+declare global {
+  interface Window {
+    /** For recording a film of the world frame by frame (scripts/record-teaser.mjs). */
+    __film?: { start: () => void; step: (seconds: number) => void };
+  }
+}
+
+/**
+ * Takes the world's two clocks off real time on request: GSAP's (every timeline and tween) and the renderer's
+ * (every frame's delta). Each step then moves both on by exactly the same amount and draws one frame, however long
+ * that frame takes to draw.
+ */
+function FilmClock() {
+  const get = useThree((s) => s.get);
+  useEffect(() => {
+    let tweens = 0;
+    let frames = 0;
+    const pixel = new Uint8Array(4);
+    window.__film = {
+      start: () => {
+        useApp.getState().set({ worldPaused: true });
+        gsap.ticker.remove(gsap.updateRoot);
+        tweens = gsap.ticker.time;
+        frames = get().clock.elapsedTime;
+      },
+      step: (seconds) => {
+        tweens += seconds;
+        frames += seconds;
+        gsap.updateRoot(tweens);
+        advance(frames);
+        // Wait until the frame is drawn, so steps never queue up ahead of a slow renderer.
+        const gl = get().gl.getContext();
+        gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+      },
+    };
+    return () => {
+      delete window.__film;
+    };
+  }, [get]);
+  return null;
+}
+
 /** The single persistent 3D world behind every route. */
 export function World() {
   const quality = useApp((s) => s.quality);
   const mode = useApp((s) => s.mode);
   const chapterSlug = useApp((s) => s.chapterSlug);
   const set = useApp((s) => s.set);
+  const paused = useApp((s) => s.worldPaused);
   const showStations = mode === 'journey' || mode === 'lab' || mode === 'map';
 
   return (
     <Canvas
       className="world"
+      frameloop={paused ? 'never' : 'always'}
       dpr={DPR[quality]}
       shadows={quality !== 'low'}
       gl={{ antialias: false, powerPreference: 'high-performance', stencil: false }}
@@ -40,6 +85,7 @@ export function World() {
       aria-hidden="true"
     >
       <PerformanceMonitor onDecline={() => set({ quality: DOWN[useApp.getState().quality] })} flipflops={2} />
+      <FilmClock />
       <CameraDirector />
       <Sky />
       <Beach />

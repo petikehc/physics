@@ -8,11 +8,13 @@ import { createCameraRig, createDustRig, createWorldRig, resetRig } from '../eng
 import { ICON_ORDER } from '../engine/dust/shapes';
 import { TEASER } from '../engine/world/stations';
 import { portraitFit } from '../engine/camera/fit';
-import { CHAPTERS } from '../chapters/registry';
+import { chapterBySlug, CHAPTERS } from '../chapters/registry';
+import { segmentBySlug } from '../chapters/finale/meta';
 import { audio } from '../audio';
 import { TopBar } from '../ui/TopBar';
 import { ChaptersMenu } from '../ui/ChaptersMenu';
 import { PlayIcon } from '../ui/Icons';
+import { FILM } from './film';
 
 const MORPH = 2.4;
 const HOLD = 1.8;
@@ -43,6 +45,24 @@ function teaserFrame(width: number, height: number, chipTop: number) {
   // Stepping back by k gathers the icon towards the target, which sits in the middle of the screen.
   const mid = (hi + lo) / 2 / k;
   return { orbitRadius: RADIUS * k, lensY: ((top + bottom) / 2 - mid) / 2 };
+}
+
+/**
+ * The film: a few seconds of each chapter, recorded from the journey (scripts/record-teaser.mjs), cut for the
+ * screen's shape. Not for viewers who asked for less motion or to save data: they keep the live particles.
+ */
+function filmFor(reduced: boolean) {
+  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+  if (reduced || saveData) return null;
+  const base = `${import.meta.env.BASE_URL}teaser/${window.innerHeight > window.innerWidth ? 'portrait' : 'landscape'}`;
+  return { webm: `${base}.webm`, mp4: `${base}.mp4` };
+}
+
+/** Which chapter (or the finale) the film shows at time t. */
+function filmSlugAt(t: number) {
+  let slug = FILM.clips[0]!.slug;
+  for (const c of FILM.clips) if (t >= c.from) slug = c.slug;
+  return slug;
 }
 
 /** Builds the looping sneak-peek: the Dust re-forms into each chapter's icon while the camera drifts. */
@@ -96,18 +116,25 @@ function buildTeaser(onIcon: (i: number) => void) {
 export default function Landing() {
   const navigate = useNavigate();
   const set = useApp((s) => s.set);
-  const [icon, setIcon] = useState(0);
+  const reduced = useApp((s) => s.reducedMotion);
+  const [shown, setShown] = useState(CHAPTERS[0]!.slug);
   const [menu, setMenu] = useState(false);
   const [leaving, setLeaving] = useState(false);
+  const [film] = useState(() => filmFor(reduced));
   const teaser = useRef<ReturnType<typeof buildTeaser> | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const chip = useRef<HTMLSpanElement>(null);
+  const screen = useRef<HTMLDivElement>(null);
+  const filming = useRef(false);
   const left = useRef(false);
 
   useEffect(() => {
     set({ mode: 'teaser', cameraMode: 'directed' });
     audio.setScene('teaser');
-    teaser.current = buildTeaser(setIcon);
+    // While the film plays, the chip follows it instead of the particles.
+    teaser.current = buildTeaser((i) => {
+      if (!filming.current) setShown(CHAPTERS[i % CHAPTERS.length]!.slug);
+    });
     // Keep the icons above the text whenever the layout changes (resizing, rotating, web fonts arriving).
     const frame = () => {
       const el = chip.current;
@@ -127,8 +154,24 @@ export default function Landing() {
       teaser.current?.loop.kill();
       teaser.current?.sway.kill();
       audio.setScene(null);
+      set({ worldPaused: false });
     };
   }, [set]);
+
+  // Once the film is really playing (not just loading, or blocked from playing), fade it in over the particles,
+  // and let the world stop drawing underneath it.
+  const onFilmPlaying = () => {
+    if (filming.current || left.current) return;
+    filming.current = true;
+    gsap.to(screen.current, {
+      autoAlpha: 1,
+      duration: 1.2,
+      ease: 'power1.inOut',
+      onComplete: () => {
+        if (!left.current) set({ worldPaused: true });
+      },
+    });
+  };
 
   useLayoutEffect(() => {
     const el = root.current;
@@ -169,7 +212,10 @@ export default function Landing() {
     t?.sway.pause();
     const dust = runtime.dust;
     const cam = runtime.camera;
+    // The world draws again, and the film fades off it for the particles to carry on into the journey.
+    set({ worldPaused: false });
     const out = gsap.timeline({ onComplete: () => navigate('/play') });
+    if (filming.current) out.to(screen.current, { autoAlpha: 0, duration: 0.7, ease: 'power2.in' }, 0);
     // Finish whatever shape is forming, then gather into the first chapter's triangle.
     out.to(dust, { morph: 1, duration: 0.35, ease: 'power1.out' });
     if (dust.to !== 'pythagoras') {
@@ -200,10 +246,30 @@ export default function Landing() {
     });
   };
 
-  const current = CHAPTERS[icon % CHAPTERS.length]!;
+  const segment = segmentBySlug(shown)!;
+  const chapter = chapterBySlug(shown);
 
   return (
     <div className="overlay" ref={root}>
+      {film ? (
+        <div className="teaser-film" ref={screen} aria-hidden="true">
+          <video
+            muted
+            playsInline
+            loop
+            autoPlay
+            preload="auto"
+            disablePictureInPicture
+            onPlaying={onFilmPlaying}
+            onTimeUpdate={(e) => {
+              if (filming.current && !left.current) setShown(filmSlugAt(e.currentTarget.currentTime));
+            }}
+          >
+            <source src={film.webm} type="video/webm" />
+            <source src={film.mp4} type="video/mp4" />
+          </video>
+        </div>
+      ) : null}
       <TopBar onChapters={() => setMenu(true)} />
       <div className="landing">
         <div className="landing__inner">
@@ -211,9 +277,9 @@ export default function Landing() {
             ref={chip}
             className="chip"
             aria-live="polite"
-            style={{ borderColor: `${current.accent}66`, color: current.accent }}
+            style={{ borderColor: `${segment.accent}66`, color: segment.accent }}
           >
-            {current.numeral} · {current.title}
+            {chapter ? `${chapter.numeral} · ${chapter.title}` : `${segment.eyebrow} · ${segment.title}`}
           </span>
           <h1 className="landing__title">
             From Sand to <em>Stars</em>

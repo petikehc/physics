@@ -428,6 +428,33 @@ a {
   pointer-events: none;
 }
 
+/* The film of the journey: over the live particles, under the title, faded in once it plays. */
+.teaser-film {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  background: var(--ink);
+}
+
+.teaser-film video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Darker where the title and buttons sit, so they read over any scene. */
+.teaser-film::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 66%, rgba(10, 11, 14, 0.62), rgba(10, 11, 14, 0) 100%),
+    linear-gradient(to top, rgba(10, 11, 14, 0.7), rgba(10, 11, 14, 0) 38%);
+}
+
 /* ---------- Chapters menu ---------- */
 
 .sheet-backdrop {
