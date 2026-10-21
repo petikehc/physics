@@ -286,7 +286,7 @@ export function buildEnergy(j: JourneyBuilder) {
     {
       id: 'handoff',
       heading: 'Into the night',
-      body: 'Every one of these stories kept something the same: an area, a weight of water, a sweep of orbit, a circle’s radius, and here, energy. The heat of the ride drifts up into the night sky, where the journey began.',
+      body: 'The ride’s heat doesn’t vanish either: it drifts up off the brakes and out into the night.',
       minDuration: 10,
     },
     ({ tl, cue }) => {
