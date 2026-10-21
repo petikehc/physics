@@ -1,0 +1,1 @@
+import{y as e}from"./index-BUyJ30Ln.js";var t=e(e=>({hovered:null,selected:null,set:t=>e(t)}));export{t};
