@@ -152,7 +152,7 @@ function Star({ i, glow }: { i: number; glow: THREE.Texture }) {
       <Html center zIndexRange={[5, 0]} style={{ pointerEvents: 'none' }}>
         <div
           ref={formula}
-          className="math-label"
+          className="math-label math-label--chip"
           style={{ color: meta.accent, opacity: 0 }}
           dangerouslySetInnerHTML={{ __html: html }}
         />
