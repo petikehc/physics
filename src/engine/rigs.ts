@@ -32,6 +32,8 @@ export interface CameraRig {
   veil: number;
   /** Lifts the whole picture by this fraction of the screen height (a lens shift: the perspective is unchanged). */
   lensY: number;
+  /** Moves the whole picture right by this fraction of the screen width (a lens shift, as lensY). */
+  lensX: number;
   /**
    * How much a narrow (portrait) screen steps back and widens the lens, 0..1. A shot composed upright already fits
    * a phone, and turns this down.
@@ -67,6 +69,7 @@ export function createCameraRig(): CameraRig {
     dof: 0,
     veil: 0,
     lensY: 0,
+    lensX: 0,
     portrait: 1,
     side: 0,
   };
