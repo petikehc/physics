@@ -77,6 +77,8 @@ export function World() {
   const chapterSlug = useApp((s) => s.chapterSlug);
   const set = useApp((s) => s.set);
   const paused = useApp((s) => s.worldPaused);
+  // A recording measures frames by the real clock, which crawls: a quality given in the URL stays put.
+  const qualityFixed = useApp((s) => s.qualityFixed);
   const showStations = mode === 'journey' || mode === 'lab' || mode === 'map';
 
   return (
@@ -89,7 +91,12 @@ export function World() {
       camera={{ fov: 40, near: 0.05, far: 2500, position: [0, 28.2, 9.5] }}
       aria-hidden="true"
     >
-      <PerformanceMonitor onDecline={() => set({ quality: DOWN[useApp.getState().quality] })} flipflops={2} />
+      {qualityFixed ? null : (
+        <PerformanceMonitor
+          onDecline={() => set({ quality: DOWN[useApp.getState().quality] })}
+          flipflops={2}
+        />
+      )}
       <FilmClock />
       <CameraDirector />
       <Sky />

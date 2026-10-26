@@ -27,7 +27,10 @@ const only = opt('only', null);
 /** --clips 0,3: record only these (to try a change quickly); the videos then hold just them, and film.ts is kept. */
 const pick = opt('clips', null)?.split(',').map(Number);
 
-/** The moments: a beat, how far into it the clip starts, and how long it runs (seconds). */
+/**
+ * The moments: a beat, how far into it the clip starts, and how long it runs (seconds). Each stays inside its beat, so
+ * no cut or caption change of the journey's own lands in the middle of a clip.
+ */
 const ALL = [
   { beat: 'pythagoras:draw', at: 6.5, dur: 3.5 },
   { beat: 'pythagoras:pour', at: 2, dur: 3.5 },
@@ -39,7 +42,7 @@ const ALL = [
   { beat: 'euler:shadows', at: 2, dur: 3.5 },
   { beat: 'fourier:spectrum', at: 1.5, dur: 3.5 },
   { beat: 'doppler:mach', at: 10.5, dur: 3.5 },
-  { beat: 'energy:ride', at: 15, dur: 3 },
+  { beat: 'energy:tanks', at: 1.5, dur: 3 },
   { beat: 'finale:end', at: 0.3, dur: 4.2 },
 ];
 const CLIPS = pick ? ALL.filter((_, i) => pick.includes(i)) : ALL;
@@ -53,7 +56,7 @@ const PREROLL = 1.5;
  * Each shape's size, and how far its picture is lifted (a share of its height): the landing page sets its title and
  * buttons across the middle, so the film plays in the sky above them.
  */
-const SIZES = { landscape: [1280, 720, 0.14], portrait: [720, 1280, 0.22] };
+const SIZES = { landscape: [1920, 1080, 0.14], portrait: [1080, 1920, 0.22] };
 /** Which clip's middle frame becomes the poster. */
 const POSTER = 1;
 
