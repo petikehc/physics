@@ -1,0 +1,1 @@
+import{t as e}from"./react-D69nbhuO.js";var t=e(e=>({hovered:null,selected:null,set:t=>e(t)}));export{t};
