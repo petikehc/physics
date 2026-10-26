@@ -47,6 +47,12 @@ renders the soundtrack offline and the picture frame by frame (by seeking the ti
 into `previews/journey.mp4`. It needs no GPU. Add `--resume` to continue an interrupted render and `--from`/`--seconds`
 to render a slice.
 
+### Stills for sharing
+
+The link preview (`public/og.jpg`) and the still shown to browsers without WebGL (`public/still.jpg`) are recorded
+from the journey too: with the build served, `node scripts/record-stills.mjs`. Re-record them when the finale or
+chapter I changes. The transcript (`/transcript`) needs nothing: it reads every chapter's own timeline.
+
 ### Deploys and previews
 
 Every push publishes the site to GitHub Pages (the `gh-pages` branch, built by `.github/workflows/pages.yml`):

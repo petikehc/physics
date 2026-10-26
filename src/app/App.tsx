@@ -1,5 +1,5 @@
-import { lazy, Suspense, useEffect } from 'react';
-import { Route, Routes } from 'react-router';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { Link, Route, Routes, useLocation } from 'react-router';
 import { World } from './World';
 import { useApp } from '../state/store';
 import Landing from '../landing/Landing';
@@ -7,6 +7,7 @@ import Landing from '../landing/Landing';
 const JourneyPage = lazy(() => import('../journey/JourneyPage'));
 const LabPage = lazy(() => import('../lab/LabPage'));
 const MapPage = lazy(() => import('../map/MapPage'));
+const TranscriptPage = lazy(() => import('../transcript/TranscriptPage'));
 
 function hasWebGL(): boolean {
   try {
@@ -17,15 +18,21 @@ function hasWebGL(): boolean {
   }
 }
 
+/** Without 3D: a still from the journey, and its words to read instead. */
 function NoWebGL() {
   return (
-    <div className="page">
+    <div className="page page--still">
       <div className="page__inner">
         <span className="eyebrow">From Sand to Stars</span>
         <h1>This journey needs WebGL</h1>
         <p style={{ color: 'var(--chalk-dim)' }}>
           Your browser could not start 3D graphics. Try a recent version of Chrome, Edge, Firefox or Safari,
-          or enable hardware acceleration.
+          or enable hardware acceleration. Meanwhile, every word of it is here to read.
+        </p>
+        <p>
+          <Link className="btn btn--primary" to="/transcript">
+            Read the transcript
+          </Link>
         </p>
       </div>
     </div>
@@ -34,6 +41,8 @@ function NoWebGL() {
 
 export function App() {
   const reduced = useApp((s) => s.reducedMotion);
+  const location = useLocation();
+  const [webgl] = useState(hasWebGL);
   const set = useApp((s) => s.set);
 
   useEffect(() => {
@@ -43,13 +52,16 @@ export function App() {
     return () => mq.removeEventListener('change', on);
   }, [set]);
 
-  if (!hasWebGL()) return <NoWebGL />;
+  // The transcript is words only: it needs no 3D world, so it works without WebGL too.
+  const reading = location.pathname === '/transcript';
+  if (!reading && !webgl) return <NoWebGL />;
 
   return (
     <>
-      <World />
+      {reading ? null : <World />}
       <Suspense fallback={null}>
         <Routes>
+          <Route path="/transcript" element={<TranscriptPage />} />
           <Route path="/" element={<Landing />} />
           <Route path="/play" element={<JourneyPage />} />
           <Route path="/play/:slug" element={<JourneyPage />} />

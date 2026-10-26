@@ -471,6 +471,20 @@ a {
   margin: 0;
 }
 
+.sheet__foot {
+  margin: 18px 0 0;
+  font-size: 14px;
+}
+
+.sheet__foot a {
+  color: var(--chalk-dim);
+}
+
+.sheet__foot a:hover,
+.sheet__foot a:focus-visible {
+  color: var(--chalk);
+}
+
 .chapter-list {
   list-style: none;
   margin: 0;
@@ -1228,6 +1242,110 @@ a {
   font-size: clamp(40px, 6vw, 72px);
   margin: 0 0 12px;
   line-height: 1;
+}
+
+/* Without 3D: a still from the journey behind the words. */
+.page--still {
+  background:
+    linear-gradient(to top, rgba(14, 15, 19, 0.92) 30%, rgba(14, 15, 19, 0.45)),
+    url('/still.jpg') center / cover no-repeat,
+    var(--ink);
+}
+
+/* ---------- Transcript ---------- */
+
+/* A page to read: the words scroll under the top bar, so it gets a backing. */
+.overlay--reading .topbar {
+  background: linear-gradient(to bottom, var(--ink) 70%, rgba(14, 15, 19, 0));
+}
+
+.transcript {
+  padding-bottom: calc(var(--gutter) + 48px);
+}
+
+.transcript__intro,
+.transcript__lead {
+  font-size: 18px;
+  line-height: 1.6;
+  color: rgba(244, 239, 230, 0.9);
+}
+
+.transcript__contents ol {
+  list-style: none;
+  padding: 0;
+  margin: 24px 0 8px;
+  display: grid;
+  gap: 6px;
+}
+
+.transcript__contents a {
+  color: var(--chalk);
+  text-decoration: none;
+}
+
+.transcript__contents a:hover,
+.transcript__contents a:focus-visible {
+  text-decoration: underline;
+}
+
+.transcript__contents span {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-right: 8px;
+}
+
+.transcript__chapter {
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: calc(var(--gutter) + 64px);
+}
+
+.transcript__chapter h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(32px, 4.5vw, 48px);
+  line-height: 1.05;
+  margin: 6px 0 12px;
+}
+
+.transcript__beat h3 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 24px;
+  margin: 28px 0 6px;
+}
+
+.transcript__beat p,
+.transcript__turn {
+  margin: 0;
+  line-height: 1.65;
+  color: rgba(244, 239, 230, 0.86);
+}
+
+.transcript__formula {
+  margin: 28px 0 0;
+  font-size: clamp(22px, 3.4vw, 32px);
+  overflow-x: auto;
+}
+
+.transcript__turn {
+  margin-top: 24px;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: rgba(21, 23, 29, 0.6);
+}
+
+.transcript__turn a,
+.transcript__beat a {
+  color: var(--chalk);
+}
+
+.transcript__play {
+  margin-top: 24px;
 }
 
 /* ---------- Responsive ---------- */
