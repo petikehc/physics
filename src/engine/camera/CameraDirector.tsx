@@ -6,7 +6,7 @@ import gsap from 'gsap';
 import { runtime } from '../runtime';
 import { useApp } from '../../state/store';
 import type { CameraRig } from '../rigs';
-import { portraitFit } from './fit';
+import { portraitFit, SIDE_ROOM, sideRoom } from './fit';
 
 /** Limits for the free camera in "Your turn" and the Labs. Stations set these when they take over. */
 export const orbitLimits = {
@@ -49,7 +49,9 @@ export function CameraDirector() {
   const cameraMode = useApp((s) => s.cameraMode);
   const dragging = useApp((s) => s.dragging);
   const reduced = useApp((s) => s.reducedMotion);
+  const mode = useApp((s) => s.mode);
   const lens = useRef('');
+  const room = useRef(0);
   const controls = useRef<CameraControlsImpl>(null);
   const lastTarget = useRef(new THREE.Vector3(0, 0, 0));
   const blend = useRef({ t: 0, pos: new THREE.Vector3(), target: new THREE.Vector3() });
@@ -80,14 +82,22 @@ export function CameraDirector() {
   }, [cameraMode, camera]);
 
   // Before everything else each frame (orbit controls run at -1), so all that follows sees this frame's camera.
-  useFrame((state) => {
-    // The lens shift: a view window moved down the full picture lifts everything in it.
+  useFrame((state, dt) => {
+    // The lens shift: a view window moved down (or left) across the full picture lifts (or moves right) everything
+    // in it. On a phone on its side the journey's text takes a column on the left, and the picture eases over.
     const { width, height } = state.size;
+    const roomTo = sideRoom(mode, width, height);
+    room.current =
+      Math.abs(roomTo - room.current) < 1e-4
+        ? roomTo
+        : room.current + (roomTo - room.current) * (1 - Math.exp(-dt * 3));
     const lift = runtime.camera.lensY;
-    const key = `${width}x${height}:${lift.toFixed(4)}`;
+    const shift = runtime.camera.lensX + room.current;
+    const key = `${width}x${height}:${lift.toFixed(4)}:${shift.toFixed(4)}`;
     if (key !== lens.current) {
       lens.current = key;
-      if (Math.abs(lift) > 1e-4) camera.setViewOffset(width, height, 0, lift * height, width, height);
+      if (Math.abs(lift) > 1e-4 || Math.abs(shift) > 1e-4)
+        camera.setViewOffset(width, height, -shift * width, lift * height, width, height);
       else camera.clearViewOffset();
     }
 
@@ -113,7 +123,9 @@ export function CameraDirector() {
     // A portrait screen steps back and widens the lens, as much as the shot allows.
     const full = portraitFit(state.size.width / Math.max(state.size.height, 1));
     const k = Math.min(Math.max(rig.portrait, 0), 1);
-    const fit = { dolly: 1 + (full.dolly - 1) * k, fov: 1 + (full.fov - 1) * k };
+    // Beside the text column, a little further back, as far as the picture has moved over.
+    const aside = 1 + (SIDE_ROOM.dolly - 1) * (room.current / SIDE_ROOM.shift);
+    const fit = { dolly: (1 + (full.dolly - 1) * k) * aside, fov: 1 + (full.fov - 1) * k };
     if (fit.dolly !== 1) pos.current.sub(target.current).multiplyScalar(fit.dolly).add(target.current);
 
     const amp = reduced ? 0 : rig.shake;

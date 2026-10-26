@@ -3,6 +3,14 @@ import { collectErrors, expectCanvasRendered, seek, waitForJourney } from './hel
 
 const Q = '?quality=low';
 
+// The tests work each Your-turn panel themselves. Left on, its 14 s countdown can run out while a slow,
+// software-rendered run is still checking the panel, and the journey moves on underneath the test.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() =>
+    window.localStorage.setItem('sand-to-stars:prefs', JSON.stringify({ autoContinue: false })),
+  );
+});
+
 test('the landing teaser renders and offers the journey', async ({ page }) => {
   const errors = collectErrors(page);
   await page.goto(`/${Q}`);
@@ -470,4 +478,43 @@ test('reduced motion: no film grain, and playback stops at the end of each beat'
   const t = await page.evaluate(() => window.__journey!.time());
   expect(Math.abs(t - next)).toBeLessThan(0.001);
   await expect(page.getByRole('button', { name: 'Play', exact: true })).toBeVisible();
+});
+
+test.describe('a phone on its side', () => {
+  test.use({ viewport: { width: 844, height: 390 }, hasTouch: true, isMobile: true });
+
+  test('captions keep to a column above the player, and a Your-turn panel fits with Continue in reach', async ({
+    page,
+  }) => {
+    const errors = collectErrors(page);
+    await page.goto(`/play/archimedes${Q}`);
+    await waitForJourney(page);
+    const beats = await page.evaluate(() => window.__journey!.beats);
+    const player = page.getByRole('group', { name: 'Journey player' });
+
+    await seek(page, beats.find((b) => b.key === 'archimedes:lower')!.start + 2);
+    const captions = page.locator('.captions');
+    await expect(captions).toBeVisible();
+    const c = (await captions.boundingBox())!;
+    const p = (await player.boundingBox())!;
+    expect(c.y + c.height).toBeLessThanOrEqual(p.y);
+    expect(c.x + c.width).toBeLessThan(844 / 2);
+
+    // The longest panel: it runs from under the top bar to the bottom, scrolls, and keeps Continue in sight.
+    await seek(page, beats.find((b) => b.key === 'archimedes:yourTurn')!.pauseAt! - 0.4);
+    await page.evaluate(() => window.__journey!.play());
+    const panel = page.getByRole('complementary', { name: 'Your turn' });
+    await expect(panel).toBeVisible({ timeout: 30_000 });
+    const box = (await panel.boundingBox())!;
+    expect(box.y).toBeGreaterThan(0);
+    expect(box.y + box.height).toBeLessThanOrEqual(390);
+    const beside = (await player.boundingBox())!;
+    expect(beside.x + beside.width).toBeLessThanOrEqual(box.x);
+    const go = panel.getByRole('button', { name: /Continue/ });
+    const b = (await go.boundingBox())!;
+    expect(b.y + b.height).toBeLessThanOrEqual(box.y + box.height + 1);
+    await go.click();
+    await expect(panel).toBeHidden();
+    expect(errors).toEqual([]);
+  });
 });
