@@ -1,1 +1,0 @@
-import{b as e,d as t,v as n}from"./rig-B9WpdrdZ.js";var r=null,i=0,a=!1;function o(t){r=t&&t.length>=8?e(n(t,512),50):null,i++}var s=()=>r??t(),c=()=>i,l=()=>r!==null,u=()=>a,d=e=>void(a=e);export{o as a,u as i,c as n,d as o,l as r,s as t};
