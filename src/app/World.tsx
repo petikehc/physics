@@ -48,7 +48,7 @@ function FilmClock() {
     const pixel = new Uint8Array(4);
     window.__film = {
       start: () => {
-        useApp.getState().set({ worldPaused: true });
+        useApp.getState().set({ worldPaused: true, recording: true });
         gsap.ticker.remove(gsap.updateRoot);
         tweens = gsap.ticker.time;
         frames = get().clock.elapsedTime;

@@ -73,6 +73,8 @@ export interface AppState extends Prefs {
    * frame (window.__film).
    */
   worldPaused: boolean;
+  /** A film is being recorded (window.__film): the world draws no film grain of its own. */
+  recording: boolean;
 
   // Journey (discrete state only; per-frame time is read from the timeline directly).
   /** Increments each time a journey timeline is built (0 = none). */
@@ -98,6 +100,7 @@ export const useApp = create<AppState>((set, get) => ({
   cameraMode: 'directed',
   dragging: false,
   worldPaused: false,
+  recording: false,
   journeyId: 0,
   playing: false,
   beatKey: null,

@@ -15,6 +15,8 @@ import { useApp } from '../../state/store';
 /** Cinematic finish: depth of field on macro shots (high tier), bloom, vignette, film grain, ACES. */
 export function PostFX() {
   const quality = useApp((s) => s.quality);
+  // Grain drawn anew every frame is noise to a video encoder, and the landing page lays its own over the film.
+  const recording = useApp((s) => s.recording);
   const dof = useRef<DepthOfFieldEffect>(null);
 
   useFrame(() => {
@@ -49,7 +51,7 @@ export function PostFX() {
           highlights split into colour fringes. */}
       <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
       <Vignette offset={0.28} darkness={0.72} />
-      <Noise premultiply blendFunction={BlendFunction.SOFT_LIGHT} opacity={0.35} />
+      {recording ? <></> : <Noise premultiply blendFunction={BlendFunction.SOFT_LIGHT} opacity={0.35} />}
     </EffectComposer>
   );
 }
