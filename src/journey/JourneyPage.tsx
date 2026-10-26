@@ -13,6 +13,10 @@ import { Captions, FormulaOverlay, TitleCard } from './Overlays';
 import { EndCard } from './EndCard';
 import { VIEWS } from '../chapters/views';
 
+/** What a touch can start on without being a swipe through the story: the controls and the panels that scroll. */
+const CONTROLS =
+  'button, a, input, select, textarea, label, [role="slider"], .player, .topbar, .popover, .your-turn, .constellation';
+
 /** The cinematic journey: one master timeline, a player, and overlays driven by the current beat. */
 export default function JourneyPage() {
   const { slug } = useParams();
@@ -75,7 +79,9 @@ export default function JourneyPage() {
     let touch: { x: number; y: number } | null = null;
     const onTouchStart = (e: TouchEvent) => {
       const t = e.touches[0];
-      touch = t ? { x: t.clientX, y: t.clientY } : null;
+      // Only one finger across the scene itself is a swipe: not a drag on a control, a scroll in a panel or a pinch.
+      const onControl = (e.target as Element | null)?.closest?.(CONTROLS);
+      touch = t && e.touches.length === 1 && !onControl && !menu ? { x: t.clientX, y: t.clientY } : null;
     };
     const onTouchEnd = (e: TouchEvent) => {
       const t = e.changedTouches[0];
