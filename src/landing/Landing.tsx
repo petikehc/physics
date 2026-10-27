@@ -219,7 +219,7 @@ export default function Landing() {
             From Sand to <em>Stars</em>
           </h1>
           <p className="landing__sub">
-            Ten theorems of mathematics and physics, told as one cinematic journey, from a triangle in the
+            Ten great ideas of mathematics and physics, told as one cinematic journey, from a triangle in the
             sand to the stars.
           </p>
           <div className="landing__actions">
@@ -239,7 +239,7 @@ export default function Landing() {
           </div>
         </div>
         <p className="landing__foot">
-          Ten chapters and a finale (about 20 minutes) · best with headphones ·{' '}
+          Ten chapters and a finale (about 24 minutes) · best with headphones ·{' '}
           <span className="for-keys">space to pause, arrows to step</span>
           <span className="for-touch">swipe to step</span>
         </p>

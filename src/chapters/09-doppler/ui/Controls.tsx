@@ -132,7 +132,7 @@ export function LightControls({ c, idPrefix, onZ }: Props & { onZ: (z: number) =
       </div>
       <div className="readout" aria-live="polite">
         <span className="readout__eq" style={{ color: 'var(--sym-lo)' }}>
-          Moving away at {(beta * 100).toFixed(1)}% of the speed of light
+          Read as a Doppler shift: moving away at {(beta * 100).toFixed(1)}% of the speed of light
         </span>
         <span style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--chalk-dim)' }}>
           Every wavelength × {(1 + asked).toFixed(2)}: hydrogen's blue-green {hb.name} line,{' '}

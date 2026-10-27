@@ -43,14 +43,18 @@ export interface Journey {
   chapters: Array<{ slug: string; start: number; end: number }>;
 }
 
-const WORDS_PER_SECOND = 3.1;
+const WORDS_PER_SECOND = 2.5; // 150 wpm at 1×; about 187 wpm at 1.25×, the BBC ceiling
+const CHARS_PER_SECOND = 15; // symbols and numbers read slower than words
 
 /** Seconds a viewer needs to read a caption, plus a breath. */
-export function readingTime(def: Pick<BeatDef, 'heading' | 'body'>): number {
+export function readingTime(def: Pick<BeatDef, 'heading' | 'body' | 'kind'>): number {
   const text =
     `${def.heading ?? ''} ${(def.body ?? '').replace(/\[(?:a|b|c|r|pi|w|p|area|t|v|pull|f|cos|sin|hi|lo|pe|ke|heat|sup):([^\]]+)\]/g, '$1')}`.trim();
   if (!text) return 0;
-  return text.split(/\s+/).length / WORDS_PER_SECOND + 1.4;
+  const read = Math.max(text.split(/\s+/).length / WORDS_PER_SECOND, text.length / CHARS_PER_SECOND);
+  const lead = def.kind === 'title' ? 3 : 0.6; // the title body appears 3 s in (Overlays.tsx)
+  const build = def.kind === 'formula' ? 1 : 0; // the formula assembles while the caption is read
+  return lead + read + build + 0.8;
 }
 
 /**

@@ -195,7 +195,7 @@ export function System() {
       ))}
       <group ref={ruleAt}>
         <MathLabel ref={ruleText} className="math-label math-label--chip" color={SYM4.area}>
-          T² ÷ a³ = 1
+          T² ÷ a³ = 1 (years, AU)
         </MathLabel>
       </group>
     </group>

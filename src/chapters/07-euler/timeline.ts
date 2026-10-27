@@ -68,7 +68,7 @@ export function buildEuler(j: JourneyBuilder) {
     {
       id: 'title',
       kind: 'title',
-      body: "Berlin, 1748. Leonhard Euler finds that turning chapter VI's growth sideways makes it go round a circle, and that half way round, five great numbers meet in one line.",
+      body: "Euler's formula shows what growth turned sideways does: it goes round a circle. Halfway round, five great numbers meet in one line.",
       minDuration: 10,
     },
     ({ tl, cue }) => {
@@ -125,7 +125,7 @@ export function buildEuler(j: JourneyBuilder) {
     {
       id: 'circle',
       heading: 'Pushed sideways',
-      body: 'Push the point at right angles to its arrow, [sin:i times] itself, and it never gets further out: it goes round. At time θ it is at e[sup:iθ]; at θ = π, it reaches −1.',
+      body: 'Push the point at right angles to its arrow, [sin:i times] itself, and it never gets farther out: it goes round. At time θ it is at e[sup:iθ]; at θ = π, it reaches −1.',
     },
     ({ tl, cue }) => {
       // The arrow's turns, and the axes' names, step aside for the point and its own name.
@@ -220,7 +220,7 @@ export function buildEuler(j: JourneyBuilder) {
     {
       id: 'series',
       heading: 'Why a circle?',
-      body: "Euler's reason: e[sup:iθ] = 1 + iθ + (iθ)²/2! + (iθ)³/3! + … Each i turns the next arrow a quarter turn; the factorials shrink them. Head to tail, at θ = π, they spiral in onto −1.",
+      body: "Euler's reason: e[sup:iθ] = 1 + iθ + (iθ)²/2! + (iθ)³/3! + … Each i turns the next arrow a quarter turn; the factorials soon shrink them. Head to tail, at θ = π, they spiral in onto −1.",
     },
     ({ tl, cue }) => {
       tl.to(rig, { triangle: 0, squares: 0, duration: 0.6 }, 0);
@@ -242,7 +242,7 @@ export function buildEuler(j: JourneyBuilder) {
     {
       id: 'identity',
       heading: 'Five numbers',
-      body: 'At θ = π the point is at −1. One more step, [cos:+1], brings it home to 0. Five numbers meet there: e from growth, i from turning, π from the circle, 1 and 0.',
+      body: 'At θ = π the point is at −1. One more step, [cos:+1], brings it to the centre, 0. Five numbers meet there: e from growth, i from turning, π from the circle, 1 and 0.',
     },
     ({ tl, cue }) => {
       tl.to(rig, { series: 0, duration: 0.8 }, 0);
@@ -345,7 +345,7 @@ export function buildEuler(j: JourneyBuilder) {
     {
       id: 'handoff',
       heading: 'Circles on circles',
-      body: 'Put a smaller arrow on the tip of the first, turning three times as fast the other way. Its tip draws a rounded square. With enough circles, Fourier found, you can draw any shape.',
+      body: 'Put a smaller arrow on the tip of the first, turning three times as fast the other way. Its tip draws a rounded square. With enough circles, Fourier claimed, you can build any repeating wave.',
     },
     ({ tl, cue }) => {
       tl.to(rig, { triangle: 0, angle: 0, tag: 0, marks: 0.4, duration: 0.6 }, 0);

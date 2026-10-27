@@ -165,7 +165,7 @@ export function buildEnergy(j: JourneyBuilder) {
   const tanksDef: BeatDef = {
     id: 'tanks',
     heading: 'Height into speed',
-    body: 'Slowed right down, with its energy in tanks: [pe:height]’s part, mgh, and [ke:speed]’s part, ½mv². Down into the loop, height pours into speed; up and round, speed pours back into height. A little leaks away as [heat:heat]. The total never moves.',
+    body: 'Slowed right down, with its energy in tanks: [pe:height]’s part, mgh, and [ke:speed]’s part, ½mv². Down into the loop, height pours into speed; up and round, speed pours back into height. A little turns to [heat:heat]. All three together never change.',
   };
   j.beat(SLUG, tanksDef, ({ tl, cue }) => {
     tl.set(rig, { gauge: 0, heat: 1 }, 0);
@@ -183,7 +183,7 @@ export function buildEnergy(j: JourneyBuilder) {
   const brakesDef: BeatDef = {
     id: 'brakes',
     heading: 'Where it goes',
-    body: 'At the end, the brakes clamp on. The speed doesn’t vanish: it turns into [heat:heat], in the brakes, the wheels, the air. James Joule measured it in the 1840s: so much work, churning water, always made so much warmth.',
+    body: 'At the end, the brakes clamp on. The energy doesn’t vanish: it becomes [heat:heat], in the brakes, the wheels, the air. James Joule measured it in the 1840s: so much work, churning water, always made so much warmth.',
   };
   j.beat(SLUG, brakesDef, ({ tl, cue }) => {
     // The camera follows the train into the brakes.
@@ -238,13 +238,13 @@ export function buildEnergy(j: JourneyBuilder) {
     tl.fromTo(rig, { testT: 0 }, { testT: until, duration: len, ease: 'none', immediateRender: false }, 0.4);
     const track = storyTestTrack();
     for (const turn of turns(testRide(1)).filter((x) => x.t < until))
-      cue(0.4 + turn.t / fast, 'peak', { h: heightAt(track, turn.s) });
+      cue(0.4 + (turn.t * len) / until, 'peak', { h: heightAt(track, turn.s) });
   });
 
   const formula: BeatDef = {
     id: 'formula',
     kind: 'formula',
-    body: 'The total, ½mv² + mgh, stays the same; friction only turns some of it into heat. And the mass m is in every part, so it cancels: a heavy car and a light one roll exactly alike.',
+    body: 'Without friction, ½mv² + mgh stays the same; with it, the loss turns up as heat. Mass m is in every part, so it cancels: heavy and light cars roll alike.',
     minDuration: 8,
   };
   j.beat(SLUG, formula, ({ tl, cue }) => {

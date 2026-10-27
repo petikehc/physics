@@ -36,7 +36,7 @@ export function buildPythagoras(j: JourneyBuilder) {
     {
       id: 'title',
       kind: 'title',
-      body: 'Samos, about 530 BC. Draw a triangle with one square corner. Its three sides hide a rule that has held for 2,500 years.',
+      body: 'Samos, about 530 BC. Draw a triangle with one square corner. Its three sides hide a rule people have used for nearly 4,000 years.',
       minDuration: 7.5,
     },
     ({ tl, cue }) => {
@@ -302,7 +302,7 @@ export function buildPythagoras(j: JourneyBuilder) {
     {
       id: 'slices',
       heading: 'Sliced like a pie',
-      body: 'Archimedes measured circles by cutting them into slices like these. That is the next chapter.',
+      body: 'Archimedes measured circles with many-sided shapes, cut into slices like these. That is the next chapter.',
     },
     ({ tl, cue }) => {
       // The beach's dust gathers onto the carved circle and lies flat on it, exactly over the groove. (It rises

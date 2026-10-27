@@ -116,7 +116,7 @@ export function buildNewton(j: JourneyBuilder) {
     {
       id: 'title',
       kind: 'title',
-      body: 'Woolsthorpe, 1666. Plague has closed Cambridge, and young Isaac Newton is home on the family farm. He watches an apple fall, and wonders: does the same pull reach as far as the Moon?',
+      body: 'Woolsthorpe, 1666. Plague has closed Cambridge, and young Isaac Newton is home on the family farm. An apple falls, he later recalled, and he wonders: does that pull reach the Moon?',
       minDuration: 9,
     },
     ({ tl, cue }) => {
@@ -351,7 +351,7 @@ export function buildNewton(j: JourneyBuilder) {
     {
       id: 'ellipse',
       heading: 'Kepler, explained',
-      body: "From this one law, Newton worked out all three of Kepler's laws. Fire faster still and the ball swings out on an ellipse, the planet's centre at one focus, sweeping equal areas in equal times.",
+      body: "With his laws of motion, this one law gives all three of Kepler's laws. Fire faster still and the ball swings out on an ellipse, the planet's centre at one focus, sweeping equal areas in equal times.",
     },
     ({ tl, cue }) => {
       shot(

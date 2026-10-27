@@ -238,7 +238,7 @@ export function buildDoppler(j: JourneyBuilder) {
     {
       id: 'redshift',
       heading: 'Light, stretched',
-      body: 'Light is a wave too. A galaxy rushing away from us stretches its light, and every line of its hydrogen [lo:shifts towards the red]. In 1929 Edwin Hubble found almost every galaxy red-shifted, the farther the more: the universe is expanding.',
+      body: 'Light is a wave too. A galaxy rushing away from us stretches its light, and every line of its hydrogen [lo:shifts towards the red]. Slipher found most galaxies red-shifted; in 1929 Hubble showed the farther, the faster. The universe is expanding.',
       minDuration: 12,
     },
     ({ tl, cue }) => {

@@ -50,7 +50,7 @@ export function buildArchimedes(j: JourneyBuilder) {
     {
       id: 'title',
       kind: 'title',
-      body: "Syracuse, about 250 BC. King Hiero's new gold crown is a gift for the gods, but rumour says the goldsmith swapped some of the gold for silver. Archimedes must find out without harming it.",
+      body: "Syracuse, about 250 BC. The story goes that King Hiero's new gold crown, a gift for the gods, may be part silver: rumour says the goldsmith swapped some of the gold. Archimedes must find out without harming it.",
       minDuration: 8,
     },
     ({ tl, cue }) => {
@@ -123,7 +123,7 @@ export function buildArchimedes(j: JourneyBuilder) {
     {
       id: 'lower',
       heading: 'Lower it into the water',
-      body: 'Like Archimedes easing into his bath, the crown pushes water aside as it goes under, and the overflow runs from the spout into a beaker. Watch the scale: [w:1,000 g] falls to [w:935 g].',
+      body: 'Like Archimedes in his bath, legend says, the crown pushes water aside as it goes under, and the overflow runs from the spout into a beaker. Watch the scale: [w:1,000 g] falls to [w:935 g].',
     },
     ({ tl, cue }) => {
       shot(
@@ -321,7 +321,7 @@ export function buildArchimedes(j: JourneyBuilder) {
     {
       id: 'handoff',
       heading: 'Up and away',
-      body: 'A bubble of air is far lighter than the water around it, so the water pushes it up, all the way to the surface and beyond, towards the stars.',
+      body: 'A bubble of air weighs far less than the water it pushes aside, so up it goes. Overhead, the planets wander. But how do they move?',
     },
     ({ tl, cue }) => {
       tl.to(rig, { play: 0, duration: 0.8 }, 0);
