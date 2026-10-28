@@ -55,7 +55,7 @@ function sphereMaterial(): THREE.ShaderMaterial {
       varying vec2 vInfo;
       ${STRETCH_GLSL}
       void main() {
-        float rim = 1.0 - abs(dot(normalize(vN), normalize(vView)));
+        float rim = max(1.0 - abs(dot(normalize(vN), normalize(vView))), 0.0);
         float a = (0.03 + 0.97 * pow(rim, 4.0)) * vInfo.x * uOpacity;
         gl_FragColor = vec4(stretchColor(vInfo.y, normalize(vLocal).x) * a * 0.2, 1.0);
       }

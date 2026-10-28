@@ -95,7 +95,9 @@ const airFragment = /* glsl */ `
   uniform vec3 uColor;
   uniform float uOpacity;
   void main() {
-    float rim = 1.0 - abs(dot(normalize(vNormal), normalize(vView)));
+    // Rounding can push the dot a hair past 1; pow() of the negative rim is NaN on Apple GPUs, and bloom spreads one
+    // NaN pixel over the whole frame, blanking it.
+    float rim = max(1.0 - abs(dot(normalize(vNormal), normalize(vView))), 0.0);
     float glow = pow(rim, 4.0) * 1.4 + pow(rim, 1.5) * 0.08;
     gl_FragColor = vec4(uColor * glow, glow * uOpacity);
   }

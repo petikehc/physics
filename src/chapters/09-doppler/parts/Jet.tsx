@@ -76,7 +76,7 @@ function sheen(color: string, noise: boolean): THREE.ShaderMaterial {
         return mix(mix(hash(i), hash(i + vec2(1, 0)), f.x), mix(hash(i + vec2(0, 1)), hash(i + vec2(1, 1)), f.x), f.y);
       }
       void main() {
-        float rim = 1.0 - abs(dot(normalize(vN), normalize(vView)));
+        float rim = max(1.0 - abs(dot(normalize(vN), normalize(vView))), 0.0);
         float a = 0.18 + 0.82 * pow(rim, 2.0);
         // Along the cone (local x runs 0 at the tip to −1 at the base): fade in from the tip and out at the base.
         float along = -vLocal.x;
