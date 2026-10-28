@@ -1,0 +1,1 @@
+var e=130.8128;function t(e){let t=1.5**e;for(;t>=2;)t/=2;for(;t<1;)t*=2;return t}var n={C:t(0),D:t(2),E:t(4),F:t(-1),G:t(1),A:t(3),B:t(5)};function r(t,r=3,i=e){return i*n[t]*2**(r-3)}function i(t=e*2){let n=t/4;return[3*n,4*n,5*n]}function a(t,n=e*2){return n/4*t}export{i,r as n,a as r,e as t};
