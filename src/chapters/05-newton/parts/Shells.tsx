@@ -29,7 +29,7 @@ const shellFragment = /* glsl */ `
   uniform vec3 uColor;
   uniform float uOpacity;
   void main() {
-    float rim = 1.0 - abs(dot(normalize(vNormal), normalize(vView)));
+    float rim = max(1.0 - abs(dot(normalize(vNormal), normalize(vView))), 0.0);
     float a = (pow(rim, 3.0) * 0.45 + 0.025) * uOpacity;
     gl_FragColor = vec4(uColor * a, a);
   }
