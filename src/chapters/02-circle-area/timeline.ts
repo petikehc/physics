@@ -59,7 +59,7 @@ export function buildCircleArea(j: JourneyBuilder) {
     {
       id: 'title',
       kind: 'title',
-      body: 'Syracuse, about 250 BC. How much space does a circle cover? To answer, Archimedes cut it into more and more pieces.',
+      body: 'How much space does a circle cover? Archimedes found out by cutting it into more and more pieces.',
       minDuration: 7.5,
     },
     ({ tl, cue }) => {
@@ -103,7 +103,7 @@ export function buildCircleArea(j: JourneyBuilder) {
     SLUG,
     {
       id: 'slice',
-      heading: 'Cut it like a pie',
+      heading: 'Eight equal wedges',
       body: 'A bronze disc of radius [r:r]. Slice it straight through the centre, again and again, into 8 equal wedges.',
     },
     ({ tl, cue }) => {
@@ -234,7 +234,7 @@ export function buildCircleArea(j: JourneyBuilder) {
     {
       id: 'onion',
       heading: 'Or peel it like an onion',
-      body: 'A second way to see it: think of the disc as thin rings and unroll each one into a straight strip. Stacked up, the strips make a triangle with base [pi:2πr] and height [r:r]. Half of base times height: [pi:π][r:r²] again.',
+      body: 'Or unroll the disc’s thin rings into straight strips. Stacked, they make a triangle, base [pi:2πr], height [r:r]: the triangle Archimedes used. Half base times height: [pi:π][r:r²].',
     },
     ({ tl, cue }) => {
       tl.to(rig, { ghost: 0, duration: 0.8 }, 0);
@@ -317,7 +317,7 @@ export function buildCircleArea(j: JourneyBuilder) {
     {
       id: 'handoff',
       heading: 'A golden puzzle',
-      body: 'King Hiero of Syracuse had another question for Archimedes: was his new crown pure gold, or had the goldsmith cheated?',
+      body: 'A circle’s size has a formula; a crown’s has none. Yet King Hiero must know: is his new crown pure gold?',
     },
     ({ tl, cue }) => {
       // The slices fly home into one disc, which sinks as the sand gathers into a crown.
