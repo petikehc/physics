@@ -98,7 +98,7 @@ export function buildDoppler(j: JourneyBuilder) {
     {
       id: 'title',
       kind: 'title',
-      body: 'Prague, 1842. Christian Doppler argues that the colour of a star should change with how fast it moves towards us or away. Three years later, horn players on a train near Utrecht prove the idea right, with sound.',
+      body: 'Doppler argues that a star’s colour should shift as it moves towards us or away. In 1845, horn players on a Dutch train confirm it for sound.',
       minDuration: 10,
     },
     ({ tl }) => {
@@ -141,7 +141,7 @@ export function buildDoppler(j: JourneyBuilder) {
     {
       id: 'pass',
       heading: 'Going by',
-      body: 'Stand at the kerb as an ambulance races past. As it comes, its siren sounds [hi:high]; the moment it passes, the note [lo:drops], and stays low as it drives away. Yet the siren itself never changed.',
+      body: 'Stand at the kerb as an ambulance races past. As it comes, its siren sounds [hi:high]; as it passes, the note [lo:drops] and stays low. Yet the siren never changed.',
       minDuration: PASS.dur,
     },
     ({ tl, cue }) => {
@@ -161,7 +161,7 @@ export function buildDoppler(j: JourneyBuilder) {
   const shellsDef: BeatDef = {
     id: 'shells',
     heading: 'Bunched up, stretched out',
-    body: 'Now slow time right down, and draw each wave of the siren as it spreads: a sphere round the spot it was sent from. The ambulance chases the waves it sends ahead, [hi:bunching them up]; behind, they [lo:stretch out].',
+    body: 'Slow time right down and draw each wave as a sphere round where it was sent. The ambulance chases the waves ahead, [hi:bunching them up]; behind, they [lo:stretch out].',
     minDuration: 13,
   };
   j.beat(SLUG, shellsDef, ({ tl, cue }) => {
@@ -180,7 +180,7 @@ export function buildDoppler(j: JourneyBuilder) {
   const formula: BeatDef = {
     id: 'formula',
     kind: 'formula',
-    body: "Doppler's formula: the pitch heard, f′, is the siren's own f times (v + vₒ)/(v − vₛ), where v is the speed of sound, vₛ how fast the source comes towards you and vₒ how fast you go towards it.",
+    body: "Doppler's formula: the pitch heard, f′, is the siren's own f times (v + vₒ)/(v − vₛ): v is sound's speed, vₛ the source's speed towards you, vₒ yours towards it.",
     minDuration: 8,
   };
   j.beat(SLUG, formula, ({ tl, cue }) => {
@@ -205,7 +205,7 @@ export function buildDoppler(j: JourneyBuilder) {
   const machDef: BeatDef = {
     id: 'mach',
     heading: 'Faster than sound',
-    body: 'Swap the ambulance for a jet and speed it up. At the speed of sound it keeps pace with its own waves, and they pile into a wall at its nose. Faster still, they trail behind it in a cone; as the cone sweeps over you, the sound arrives all at once: a sonic boom.',
+    body: 'Now a jet. At the speed of sound it keeps pace with its own waves, which pile into a wall. Faster, they trail in a cone; as it sweeps over you: a sonic boom.',
     minDuration: boom - JET0 + 2.6,
   };
   j.beat(SLUG, machDef, ({ tl, cue }) => {
@@ -238,7 +238,7 @@ export function buildDoppler(j: JourneyBuilder) {
     {
       id: 'redshift',
       heading: 'Light, stretched',
-      body: 'Light is a wave too. A galaxy rushing away from us stretches its light, and every line of its hydrogen [lo:shifts towards the red]. Slipher found most galaxies red-shifted; in 1929 Hubble showed the farther, the faster. The universe is expanding.',
+      body: 'Light is a wave too. A galaxy rushing away stretches its light; its hydrogen lines [lo:shift red]. Slipher found most galaxies red-shifted; in 1929 Hubble showed the farther, the faster. The universe is expanding.',
       minDuration: 12,
     },
     ({ tl, cue }) => {
@@ -307,7 +307,7 @@ export function buildDoppler(j: JourneyBuilder) {
     {
       id: 'handoff',
       heading: 'Coming and going',
-      body: "Anything fast that goes by does it: a train, a racing car, a roller coaster's whoosh. A coaster's speed comes and goes as it climbs and dives. Where does its speed go on the way up, and where does it come back from?",
+      body: "Anything fast that passes does it, like a roller coaster's whoosh. But a coaster's speed also comes and goes, as it climbs and dives. Where does that speed go, and come back from?",
     },
     ({ tl, cue }) => {
       tl.to(rig, { siren: 0, you: 0, spheres: 0, rings: 0, duration: 1 }, 0);

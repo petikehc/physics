@@ -54,7 +54,7 @@ export function buildFinale(j: JourneyBuilder) {
     {
       id: 'title',
       kind: 'title',
-      body: 'It began as a triangle scratched in the sand. The same grains have come all this way, and are stars now: one for each idea.',
+      body: 'It began as a triangle scratched in sand. The same grains have come all this way, and are stars now.',
       minDuration: 8,
     },
     ({ tl, cue }) => {
@@ -95,7 +95,7 @@ export function buildFinale(j: JourneyBuilder) {
     {
       id: 'sweep',
       heading: 'What each one kept',
-      body: 'Whatever else changed, every idea along the way kept something the same.',
+      body: 'Whatever else changed, every idea along the way kept something the same. Why?',
     },
     ({ tl, cue }) => {
       tl.set(runtime.camera, { fov: 40, dof: 0, shake: 0.25 }, 0);
@@ -156,8 +156,8 @@ export function buildFinale(j: JourneyBuilder) {
     {
       id: 'noether',
       heading: 'Noether’s answer',
-      body: 'Emmy Noether, 1918: each continuous symmetry of the laws keeps something. The same at every moment: energy. In every direction: angular momentum. Everywhere: momentum.',
-      minDuration: 10,
+      body: 'Emmy Noether, 1918: if the laws of physics are the same at every moment, energy is kept; the same in every direction, angular momentum; the same everywhere, momentum.',
+      minDuration: 13,
     },
     ({ tl }) => {
       // Every star in its colour and the thread lit, as the constellation is turned: turned, it is still the same.
