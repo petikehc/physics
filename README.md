@@ -1,6 +1,6 @@
 # From Sand to Stars
 
-Ten theorems of mathematics and physics, told as one cinematic 3D journey, from a triangle scratched in the sand to the
+Ten great ideas of mathematics and physics, told as one cinematic 3D journey, from a triangle scratched in the sand to the
 stars. Built with React, TypeScript, three.js (React Three Fiber), GSAP and Tone.js.
 
 The full research, storyboards and architecture are in [`docs/PLAN.md`](docs/PLAN.md).

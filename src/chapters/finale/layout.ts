@@ -42,7 +42,7 @@ export const INVARIANTS: Invariant[] = [
     slug: 'circle-area',
     tag: 'area',
     heading: 'Area, again',
-    body: 'Slice a disc and lay the slices head to tail: they still cover πr², however thin the slices.',
+    body: 'Slice a disc and lay the slices in a row: they still cover πr², however thin the slices.',
     note: 'A',
   },
   {
@@ -77,14 +77,14 @@ export const INVARIANTS: Invariant[] = [
     slug: 'euler',
     tag: 'length one',
     heading: 'Length one',
-    body: 'As the point turns round the circle its length never changes: always 1, so cos²θ + sin²θ = 1. Pythagoras again.',
+    body: 'As the point turns round the circle its arrow’s length never changes: always 1, so cos²θ + sin²θ = 1. Pythagoras again.',
     note: 'D',
   },
   {
     slug: 'fourier',
     tag: 'the same wave',
     heading: 'The same wave',
-    body: 'Drawn in one stroke or built from turning circles, it is the same wave: nothing is lost in the telling.',
+    body: 'Built from circles, the wave keeps its energy: the circles’ squared sizes add up to the whole, a² + b² = c² for waves.',
     note: 'D',
   },
   {

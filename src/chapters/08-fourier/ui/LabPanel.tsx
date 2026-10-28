@@ -135,7 +135,7 @@ export function LabPanel() {
         <>
           <p>
             Draw any closed shape on the stars (it closes itself when you let go). A hundred and one circles,
-            turning both ways at every speed, redraw it. Use fewer, and see how much of it a few big circles
+            turning both ways at whole-number speeds, redraw it. Use fewer, and see how much of it a few big circles
             catch.
           </p>
           <div className="field">

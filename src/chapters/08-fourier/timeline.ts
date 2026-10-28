@@ -248,7 +248,7 @@ export function buildFourier(j: JourneyBuilder) {
     {
       id: 'handoff',
       heading: 'Any closed shape',
-      body: 'Let circles turn both ways, at every speed, and their tip can draw any closed shape at all. A hundred of them draw an ambulance. Its siren sounds higher as it comes, lower as it goes. Why?',
+      body: 'Let circles turn both ways at whole-number speeds and their tip can trace a closed shape. A hundred of them draw an ambulance. Its siren sounds higher as it comes, lower as it goes. Why?',
     },
     ({ tl, cue }) => {
       tl.to(rig, { clockwork: 0, trace: 0, ghost: 0, stage: 0, sing: 0, duration: 1 }, 0);

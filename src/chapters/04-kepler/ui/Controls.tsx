@@ -103,7 +103,7 @@ export function OrbitReadout({ o }: { o: OrbitSnapshot }) {
       <span style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--chalk-dim)' }}>
         {f.circle
           ? 'A circle: the same speed all the way round, and one steady note.'
-          : `At its nearest it's ${s}× faster and ${s}× closer to the Sun, so it turns ${times(f.turn)}× faster: ${
+          : `At its nearest it's ${s}× faster and ${s}× closer to the Sun than at its farthest, so it turns ${times(f.turn)}× faster: ${
               f.interval
                 ? `${withArticle(f.interval.name)} (${f.interval.ratio[0]} : ${f.interval.ratio[1]}), as Kepler heard it.`
                 : `its note slides up ${f.octaves.toFixed(1)} octaves.`

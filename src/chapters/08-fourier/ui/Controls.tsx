@@ -80,7 +80,7 @@ export function WaveReadout({ c }: { c: FourierSnapshot }) {
       <span style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'var(--chalk-dim)' }}>
         Sizes {shown.map((h) => fraction(Math.round(first / h.a))).join(', ')}
         {more}. Highest point {top.toFixed(2)}
-        {id === 'square' && n >= 3 ? ': still 9% over the square at each jump, however many circles.' : '.'}
+        {id === 'square' && n >= 3 ? ': it overshoots each jump by 9% of the jump, however many circles.' : '.'}
       </span>
     </div>
   );

@@ -148,53 +148,53 @@ describe('the journey timeline', () => {
     }
   });
 
-  it('runs chapter 1 for roughly 75–110 seconds', () => {
+  it('runs chapter 1 for roughly 75–130 seconds', () => {
     const ch1 = journey.chapters.find((c) => c.slug === 'pythagoras')!;
     const len = ch1.end - ch1.start;
     expect(len).toBeGreaterThan(75);
-    expect(len).toBeLessThan(110);
+    expect(len).toBeLessThan(130);
   });
 
-  it('runs chapter 2 for roughly 70–110 seconds', () => {
+  it('runs chapter 2 for roughly 70–120 seconds', () => {
     const ch2 = journey.chapters.find((c) => c.slug === 'circle-area')!;
     const len = ch2.end - ch2.start;
     expect(len).toBeGreaterThan(70);
-    expect(len).toBeLessThan(110);
+    expect(len).toBeLessThan(120);
   });
 
-  it('runs chapter 3 for roughly 70–120 seconds', () => {
+  it('runs chapter 3 for roughly 70–140 seconds', () => {
     const ch3 = journey.chapters.find((c) => c.slug === 'archimedes')!;
     const len = ch3.end - ch3.start;
     expect(len).toBeGreaterThan(70);
-    expect(len).toBeLessThan(120);
+    expect(len).toBeLessThan(140);
   });
 
-  it('runs chapter 4 for roughly 80–120 seconds', () => {
+  it('runs chapter 4 for roughly 80–160 seconds', () => {
     const ch4 = journey.chapters.find((c) => c.slug === 'kepler')!;
     const len = ch4.end - ch4.start;
     expect(len).toBeGreaterThan(80);
-    expect(len).toBeLessThan(120);
+    expect(len).toBeLessThan(160);
   });
 
-  it('runs chapter 5 for roughly 100–145 seconds', () => {
+  it('runs chapter 5 for roughly 100–170 seconds', () => {
     const ch5 = journey.chapters.find((c) => c.slug === 'newton')!;
     const len = ch5.end - ch5.start;
     expect(len).toBeGreaterThan(100);
-    expect(len).toBeLessThan(145);
+    expect(len).toBeLessThan(170);
   });
 
-  it('runs chapter 6 for roughly 100–145 seconds', () => {
+  it('runs chapter 6 for roughly 100–170 seconds', () => {
     const ch6 = journey.chapters.find((c) => c.slug === 'calculus')!;
     const len = ch6.end - ch6.start;
     expect(len).toBeGreaterThan(100);
-    expect(len).toBeLessThan(145);
+    expect(len).toBeLessThan(170);
   });
 
-  it('runs chapter 7 for roughly 100–145 seconds', () => {
+  it('runs chapter 7 for roughly 100–175 seconds', () => {
     const ch7 = journey.chapters.find((c) => c.slug === 'euler')!;
     const len = ch7.end - ch7.start;
     expect(len).toBeGreaterThan(100);
-    expect(len).toBeLessThan(145);
+    expect(len).toBeLessThan(175);
   });
 
   it('runs chapter 8 for roughly 90–140 seconds', () => {

@@ -245,7 +245,7 @@ test('the doppler lab plays an ambulance and a jet to a listener, and red-shifts
   // Light: a red shift of 0.4 stretches every wavelength by 1.4.
   await panel.getByRole('button', { name: 'Light' }).click();
   await panel.getByLabel('Red shift z').fill('0.4');
-  await expect(panel).toContainText('Moving away at 32.4% of the speed of light', { timeout: 10_000 });
+  await expect(panel).toContainText('Read as a Doppler shift: moving away at 32.4% of the speed of light', { timeout: 10_000 });
   await expect(panel).toContainText('arrives at 681 nm');
   await page.waitForTimeout(2500);
   await expect(page.getByText('Hα', { exact: true })).toBeVisible();

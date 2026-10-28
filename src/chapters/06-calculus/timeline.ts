@@ -55,7 +55,7 @@ export function buildCalculus(j: JourneyBuilder) {
     {
       id: 'title',
       kind: 'title',
-      body: 'Cambridge and Paris, 1660s and 1670s. Newton, and Leibniz on his own, invent a mathematics of change: how fast a thing grows, and how much it adds up to. The two questions turn out to be one.',
+      body: 'Woolsthorpe and Paris, 1660s and 1670s. Newton, and Leibniz on his own, invent a mathematics of change: how fast a thing grows, and how much it adds up to. The two questions turn out to be one.',
       minDuration: 10,
     },
     ({ tl, cue }) => {
@@ -143,7 +143,7 @@ export function buildCalculus(j: JourneyBuilder) {
     {
       id: 'columns',
       heading: 'Adding up a curve',
-      body: 'When the speed changes unevenly, the area is curved. Fill it with columns and add them up: 4, then 8, 16… The thinner the columns, the closer their total comes to the area. Leibniz wrote this sum of thin strips with a long S: ∫ f dx.',
+      body: 'When the speed changes unevenly, the area is curved. Fill it with 4 columns, then 8, then 16. The thinner the columns, the closer their total comes to the area. Leibniz wrote this sum of thin strips with a long S: ∫ f dx.',
     },
     ({ tl, cue }) => {
       tl.to(rig, { strips: 0, area: 0, duration: 0.8 }, 0);

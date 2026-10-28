@@ -541,7 +541,7 @@ is corrected at beat labels when it exceeds 50 ms.
 - Engine: shots can slide sideways on wide screens only (`side`), so a subject keeps clear of a panel beside it
   while a phone keeps it centred; the camera director runs first each frame, so overlays placed in front of the
   camera and their labels never trail it; a Dust shape for a plume of embers.
-- All ten chapters are playable (about 19 minutes). The end card says the finale is in production, and a Lab that
+- All ten chapters are playable (about 24 minutes). The end card says the finale is in production, and a Lab that
   does not exist says so.
 
 **Finale (built)**

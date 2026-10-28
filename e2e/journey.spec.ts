@@ -279,7 +279,7 @@ test('chapter 8: Your turn builds a wave from circles', async ({ page }) => {
   // A square wave from four circles: odd speeds, each a smaller fraction.
   await expect(panel).toContainText('Speeds 1, 3, 5, 7');
   await expect(panel).toContainText('Sizes 1, 1/3, 1/5, 1/7');
-  await expect(panel).toContainText('still 9% over the square');
+  await expect(panel).toContainText('it overshoots each jump by 9% of the jump');
 
   // Two more circles, then a sawtooth: every speed, each 1/n.
   const circles = panel.getByLabel('Circles');
