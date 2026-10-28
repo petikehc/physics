@@ -1,0 +1,1 @@
+import{x as e}from"./index-B5KLYgQ-.js";var t=e(e=>({hovered:null,selected:null,set:t=>e(t)}));export{t};
