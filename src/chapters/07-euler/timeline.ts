@@ -270,7 +270,7 @@ export function buildEuler(j: JourneyBuilder) {
     {
       id: 'formula',
       kind: 'formula',
-      body: "Euler's formula, e[sup:iθ] = cos θ + i sin θ, published in 1748. At θ = π it gives Euler's identity.",
+      body: "Euler's identity: at θ = π, Euler's formula (1748), e[sup:iθ] = cos θ + i sin θ, lands on −1.",
       minDuration: 7,
     },
     ({ tl, cue }) => {
@@ -345,7 +345,7 @@ export function buildEuler(j: JourneyBuilder) {
     {
       id: 'handoff',
       heading: 'Circles on circles',
-      body: 'Put a smaller arrow on the tip of the first, turning three times as fast the other way. Its tip draws a rounded square. With enough circles, Fourier claimed, you can build any repeating wave.',
+      body: 'On its tip put a smaller arrow, turning three times as fast the other way. Its tip draws a rounded square. With enough circles, Fourier claimed, you can build any repeating wave.',
     },
     ({ tl, cue }) => {
       tl.to(rig, { triangle: 0, angle: 0, tag: 0, marks: 0.4, duration: 0.6 }, 0);

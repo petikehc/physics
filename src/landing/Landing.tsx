@@ -220,7 +220,7 @@ export default function Landing() {
           </h1>
           <p className="landing__sub">
             Ten great ideas of mathematics and physics, told as one cinematic journey, from a triangle in the
-            sand to the stars.
+            sand to the stars. In each, something stays the same.
           </p>
           <div className="landing__actions">
             <button
@@ -239,7 +239,7 @@ export default function Landing() {
           </div>
         </div>
         <p className="landing__foot">
-          Ten chapters and a finale (about 24 minutes) · best with headphones ·{' '}
+          Ten chapters and a finale (about 22 minutes) · best with headphones ·{' '}
           <span className="for-keys">space to pause, arrows to step</span>
           <span className="for-touch">swipe to step</span>
         </p>

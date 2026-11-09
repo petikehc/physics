@@ -99,7 +99,7 @@ export function buildEnergy(j: JourneyBuilder) {
     {
       id: 'title',
       kind: 'title',
-      body: 'Heilbronn, Manchester and Berlin, the 1840s. A ship’s doctor, a brewer and a young physician each arrive at the same idea: energy is never made and never destroyed, only changed from one kind into another.',
+      body: 'A ship’s doctor, a brewer and a young physician each reach the same idea: energy is never made or destroyed, only changed from one kind to another.',
       minDuration: 10,
     },
     ({ tl }) => {
@@ -132,7 +132,7 @@ export function buildEnergy(j: JourneyBuilder) {
   const rideDef: BeatDef = {
     id: 'ride',
     heading: 'Hold on',
-    body: 'Climb aboard. A chain hauls the train slowly up the lift hill, then lets it go at the top. From there nothing pushes it, yet down it plunges, round the loop and over the next hill. Where does all that speed come from?',
+    body: 'Climb aboard. The chain hauls you up the lift hill and lets go. Nothing pushes now, yet down you plunge, round the loop, over the hill.',
   };
   const settle = 1.6;
   const out = 2.4;
@@ -165,7 +165,7 @@ export function buildEnergy(j: JourneyBuilder) {
   const tanksDef: BeatDef = {
     id: 'tanks',
     heading: 'Height into speed',
-    body: 'Slowed right down, with its energy in tanks: [pe:height]’s part, mgh, and [ke:speed]’s part, ½mv². Down into the loop, height pours into speed; up and round, speed pours back into height. A little turns to [heat:heat]. All three together never change.',
+    body: 'Slowed right down, its energy in tanks: [pe:height]’s part, mgh, and [ke:speed]’s part, ½mv². Down, height pours into speed; up, speed pours back. A little turns to [heat:heat]. All three together never change.',
   };
   j.beat(SLUG, tanksDef, ({ tl, cue }) => {
     tl.set(rig, { gauge: 0, heat: 1 }, 0);
@@ -183,7 +183,7 @@ export function buildEnergy(j: JourneyBuilder) {
   const brakesDef: BeatDef = {
     id: 'brakes',
     heading: 'Where it goes',
-    body: 'At the end, the brakes clamp on. The energy doesn’t vanish: it becomes [heat:heat], in the brakes, the wheels, the air. James Joule measured it in the 1840s: so much work, churning water, always made so much warmth.',
+    body: 'At the end, the brakes clamp on. The energy doesn’t vanish: it becomes [heat:heat] in the brakes, wheels and air. Joule measured it in the 1840s: so much work, always so much warmth.',
   };
   j.beat(SLUG, brakesDef, ({ tl, cue }) => {
     // The camera follows the train into the brakes.
@@ -208,7 +208,7 @@ export function buildEnergy(j: JourneyBuilder) {
   const rollDef: BeatDef = {
     id: 'rollback',
     heading: 'Never higher',
-    body: `Let a car go on this test track from [pe:${STORY_TEST.h0} m]. However the track bends, it climbs back to ${STORY_TEST.h0} m, where its speed runs out, and no higher: facing a ${STORY_TEST.h4} m hill, it stops short and rolls back. Again, and again.`,
+    body: `Let a car go from [pe:${STORY_TEST.h0} m]. However the track bends, it climbs back to ${STORY_TEST.h0} m and no higher: facing a ${STORY_TEST.h4} m hill, it stops short and rolls back. Again, and again.`,
     minDuration: 13,
   };
   j.beat(SLUG, rollDef, ({ tl, cue }) => {
@@ -228,7 +228,7 @@ export function buildEnergy(j: JourneyBuilder) {
   const frictionDef: BeatDef = {
     id: 'friction',
     heading: 'Friction’s share',
-    body: 'Now with friction (sped up). Each swing climbs a little lower, as the wheels throw off sparks and the [heat:heat] tank fills, until the car rests at the bottom. Height, speed and heat together: the total is still the same.',
+    body: 'Now with friction (sped up). Each swing climbs lower as sparks fly and the [heat:heat] tank fills, until the car rests. Height, speed and heat together: still the same total.',
   };
   j.beat(SLUG, frictionDef, ({ tl, cue }) => {
     tl.set(rig, { run: 1, testT: 0, heat: 1, level: 1 }, 0);

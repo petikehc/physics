@@ -49,7 +49,7 @@ export function buildKepler(j: JourneyBuilder) {
     {
       id: 'title',
       kind: 'title',
-      body: 'Prague, 1601. Johannes Kepler inherits the life’s work of the great observer Tycho Brahe: decades of careful sightings of the planets. Everyone since the Greeks had said planets move in circles.',
+      body: 'Kepler inherits Tycho Brahe’s life’s work: decades of exact sightings of the planets. Since the Greeks, everyone has said planets move in circles.',
       minDuration: 9,
     },
     ({ tl, cue }) => {
@@ -134,7 +134,7 @@ export function buildKepler(j: JourneyBuilder) {
     {
       id: 'ellipse',
       heading: 'Two pins and a loop of string',
-      body: 'What fits is an ellipse. Loop a string round two pins and draw with it pulled tight: the two distances always add up to the same. Kepler named each pin a focus, and the Sun sits on one.',
+      body: 'What fits is an ellipse. Loop a string round two pins and draw it tight: the two distances always add up the same. Each pin is a focus; the Sun sits on one.',
     },
     ({ tl, cue }) => {
       shot(
@@ -202,7 +202,7 @@ export function buildKepler(j: JourneyBuilder) {
     {
       id: 'compare',
       heading: 'Short and wide, long and thin',
-      body: 'Near the Sun a fan is short, so it must be wide: Mars races. Far away it is long and thin: Mars crawls. Each one takes the same time and covers [area:the same area].',
+      body: 'Near the Sun a fan is short, so it must be wide: Mars races. Far out it is long and thin: Mars crawls. Same time, [area:same area].',
     },
     ({ tl }) => {
       shot(
@@ -223,7 +223,7 @@ export function buildKepler(j: JourneyBuilder) {
     {
       id: 'formula',
       kind: 'formula',
-      body: "Kepler's second law, published in 1609: the [area:area swept] divided by the [t:time it takes] is the same all the way round.",
+      body: 'Published in 1609: the [area:area swept], divided by the [t:time it takes], is the same all the way round.',
       minDuration: 6.5,
     },
     ({ tl, cue }) => {
@@ -274,7 +274,7 @@ export function buildKepler(j: JourneyBuilder) {
     {
       id: 'harmony',
       heading: 'The harmony of the worlds',
-      body: "A decade later Kepler found a rule that ties all six known planets together: square a planet's year, divide by the cube of its distance from the Sun, and every planet gives the same number. He published it in 1619.",
+      body: 'In 1618 Kepler found a rule for all six planets: a year squared, divided by the distance cubed, gives every planet the same number.',
     },
     ({ tl, cue }) => {
       tl.to(rig, { fans: 0, duration: 0.8 }, 0);
@@ -318,7 +318,7 @@ export function buildKepler(j: JourneyBuilder) {
     {
       id: 'handoff',
       heading: 'How, but not why',
-      body: "Kepler's laws say how the planets move, but not why. He suspected a force reaching out from the Sun, but could not pin it down. Nearly seventy years later Isaac Newton did, and the story goes that it began with a falling apple.",
+      body: "Kepler's laws say how planets move, not why. He suspected a force from the Sun but never pinned it down. Newton did, decades later; the story goes it began with an apple.",
     },
     ({ tl, cue }) => {
       tl.set(rig, { years: YEARS }, 0);

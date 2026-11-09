@@ -55,7 +55,7 @@ export function buildCalculus(j: JourneyBuilder) {
     {
       id: 'title',
       kind: 'title',
-      body: 'Woolsthorpe and Paris, 1660s and 1670s. Newton, and Leibniz on his own, invent a mathematics of change: how fast a thing grows, and how much it adds up to. The two questions turn out to be one.',
+      body: 'Newton and Leibniz, each on his own, invent a mathematics of change: how fast, and how much. The two questions turn out to be one.',
       minDuration: 10,
     },
     ({ tl, cue }) => {
@@ -107,7 +107,7 @@ export function buildCalculus(j: JourneyBuilder) {
     {
       id: 'speed',
       heading: 'Speed into distance',
-      body: "The falling apple's [f:speed] grows steadily, 9.8 m/s faster every second. The distance it falls is the [area:area under its speed]: a triangle, 4.9 m after one second. Cut at each quarter second, its strips go 1, 3, 5, 7.",
+      body: 'The apple gains 9.8 m/s every second. The distance it falls is the [area:area under its speed]: a triangle, 4.9 m after one second. Its quarter-second strips go 1, 3, 5, 7.',
     },
     ({ tl, cue }) => {
       shot(
@@ -143,7 +143,7 @@ export function buildCalculus(j: JourneyBuilder) {
     {
       id: 'columns',
       heading: 'Adding up a curve',
-      body: 'When the speed changes unevenly, the area is curved. Fill it with 4 columns, then 8, then 16. The thinner the columns, the closer their total comes to the area. Leibniz wrote this sum of thin strips with a long S: ∫ f dx.',
+      body: 'When the speed changes unevenly, fill the area with 4 columns, then 8, then 16. The thinner they are, the closer their sum comes to the area. Leibniz wrote it with a long S: ∫ f dx.',
     },
     ({ tl, cue }) => {
       tl.to(rig, { strips: 0, area: 0, duration: 0.8 }, 0);
@@ -187,7 +187,7 @@ export function buildCalculus(j: JourneyBuilder) {
     {
       id: 'stack',
       heading: 'Stacking the area',
-      body: "Take eight columns again, swing each one up onto the wall above, and stand it on the ones before: each step climbs by its own column's [area:area]. The top of the stair is the area so far, A(x).",
+      body: "Now swing each column up onto the wall and stack it on the ones before. The stair climbs by each column's [area:area]; its top is the area so far, A(x).",
     },
     ({ tl, cue }) => {
       tl.to(rig, { total: 0, duration: 0.5 }, 0);
@@ -219,7 +219,7 @@ export function buildCalculus(j: JourneyBuilder) {
     {
       id: 'slope',
       heading: 'How steep is each step?',
-      body: "A step climbs one column's area, [f:f] × Δx, over a run of Δx, so its slope is [f:f], the column's height. Make the columns thinner, and the stair smooths into a curve: [area:A(x)], whose slope at every x is f(x).",
+      body: "Each step climbs [f:f] × Δx over its width Δx, so its slope is [f:f], the column's height. Thinner columns smooth the stair into a curve, [area:A(x)], whose slope is f(x).",
     },
     ({ tl, cue }) => {
       shot(
@@ -255,7 +255,7 @@ export function buildCalculus(j: JourneyBuilder) {
     {
       id: 'match',
       heading: 'Slope and area undo each other',
-      body: 'At every x, the slope of [area:the area curve] is the height of [f:the curve below]. Finding slopes and finding areas are one problem, run forwards and backwards. That is the fundamental theorem of calculus.',
+      body: 'At every x, the slope of [area:the area curve] is the height of [f:the curve below]. Slopes and areas are one problem, run forwards and backwards: the fundamental theorem of calculus.',
     },
     ({ tl }) => {
       tl.to(rig, { blocks: 0, duration: 1 }, 0);
@@ -274,7 +274,7 @@ export function buildCalculus(j: JourneyBuilder) {
     {
       id: 'formula',
       kind: 'formula',
-      body: 'The fundamental theorem of calculus: to find the area under f from a to b, take any F whose slope is f, and subtract. Newton had it by 1666; Leibniz, on his own, in the 1670s.',
+      body: 'To find the area under f from a to b, take any F whose slope is f, and subtract. Newton had it by 1666; Leibniz, on his own, in the 1670s.',
       minDuration: 7,
     },
     ({ tl, cue }) => {

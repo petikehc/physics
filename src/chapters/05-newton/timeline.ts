@@ -116,7 +116,7 @@ export function buildNewton(j: JourneyBuilder) {
     {
       id: 'title',
       kind: 'title',
-      body: 'Woolsthorpe, 1666. Plague has closed Cambridge, and young Isaac Newton is home on the family farm. An apple falls, he later recalled, and he wonders: does that pull reach the Moon?',
+      body: 'Plague has closed Cambridge, so young Newton is home on the farm. An apple falls, he later recalled, and he wonders: does that pull reach the Moon?',
       minDuration: 9,
     },
     ({ tl, cue }) => {
@@ -259,7 +259,7 @@ export function buildNewton(j: JourneyBuilder) {
     {
       id: 'moon',
       heading: 'The Moon is falling too',
-      body: "Newton tried it on the Moon, 60 times as far from the Earth's centre as the apple. In a second the apple falls 4.9 m, the Moon just 1.36 mm: 3,600 times less, and 3,600 is 60 × 60.",
+      body: "Newton tried the Moon: 60 times farther from Earth's centre than the apple. In a second the apple falls 4.9 m, the Moon 1.36 mm: 3,600 times less, and 3,600 = 60 × 60.",
     },
     ({ tl, cue }) => {
       tl.to(rig, { arrows: 0, straight: 0, ball: 0, duration: 0.8 }, 0);
@@ -295,7 +295,7 @@ export function buildNewton(j: JourneyBuilder) {
     {
       id: 'shells',
       heading: 'Spread over a sphere',
-      body: 'Why the square? The pull spreads out in every direction, like light from a lamp. Twice as far, it covers four times the area; three times as far, nine. So it weakens with the square of the distance.',
+      body: 'Why the square? The pull spreads out like light from a lamp. Twice as far, it covers four times the area; three times, nine. So it weakens with distance squared.',
     },
     ({ tl, cue }) => {
       tl.to(rig, { sixty: 0, falls: 0, duration: 1 }, 0);
@@ -322,7 +322,7 @@ export function buildNewton(j: JourneyBuilder) {
     {
       id: 'formula',
       kind: 'formula',
-      body: "Newton's law of universal gravitation, 1687: every mass pulls on every other, more for bigger masses, and less with the square of the distance between them.",
+      body: 'Published in 1687: every mass pulls on every other, harder for bigger masses, weaker with the square of the distance between them.',
       minDuration: 6.5,
     },
     ({ tl, cue }) => {
@@ -351,7 +351,7 @@ export function buildNewton(j: JourneyBuilder) {
     {
       id: 'ellipse',
       heading: 'Kepler, explained',
-      body: "With his laws of motion, this one law gives all three of Kepler's laws. Fire faster still and the ball swings out on an ellipse, the planet's centre at one focus, sweeping equal areas in equal times.",
+      body: "With his laws of motion, this one law gives all three of Kepler's laws. Fire faster still: the ball swings out on an ellipse, Earth's centre at a focus, sweeping equal areas in equal times.",
     },
     ({ tl, cue }) => {
       shot(
@@ -403,7 +403,7 @@ export function buildNewton(j: JourneyBuilder) {
     {
       id: 'handoff',
       heading: 'A new kind of mathematics',
-      body: 'Newton needed new mathematics for things whose speed changes every instant, like a falling apple. Under a strobe, each flash finds it farther down than the last. Spread the flashes out in time and they draw a curve.',
+      body: 'Newton needed new mathematics for speed that changes every instant. Under a strobe, each flash finds the falling apple farther down. Spread the flashes out in time: a curve.',
     },
     ({ tl, cue }) => {
       tl.to(rig, { ball: 0, mountain: 0, cannon: 0, duration: 1.2, ease: 'power2.in' }, 0);

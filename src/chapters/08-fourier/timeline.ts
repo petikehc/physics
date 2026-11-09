@@ -71,7 +71,7 @@ export function buildFourier(j: JourneyBuilder) {
     {
       id: 'title',
       kind: 'title',
-      body: 'Grenoble, 1807. Working out how heat spreads through a solid, Joseph Fourier makes a startling claim: any repeating shape, however jagged, is a sum of plain waves, circles turning at whole-number speeds.',
+      body: 'Working out how heat spreads, Fourier makes a startling claim: any repeating wave, however jagged, is a sum of circles turning at whole-number speeds.',
       minDuration: 10,
     },
     ({ tl }) => {
@@ -129,8 +129,8 @@ export function buildFourier(j: JourneyBuilder) {
   ];
   const build: BeatDef = {
     id: 'build',
-    heading: 'Circles on circles',
-    body: 'On its tip, put a circle turning three times as fast and a third as big; then one five times as fast, a fifth as big… Each adds a ripple, squaring the wave off. Listen: you can hear each one arrive.',
+    heading: 'Adding circles',
+    body: 'On its tip, a circle three times as fast and a third as big; then five times as fast, a fifth as big… Each adds a ripple, squaring the wave off.',
   };
   j.beat(SLUG, build, ({ tl, cue }) => {
     // The square the circles are aiming at, faint behind the wave.
@@ -148,7 +148,7 @@ export function buildFourier(j: JourneyBuilder) {
   const spectrum: BeatDef = {
     id: 'spectrum',
     heading: 'Front and side',
-    body: "Turn the clockwork side on, and each circle is a bar: as tall as it is big, standing at its speed. Front on, it is a wave; side on, it is the wave's recipe, its spectrum: 1, 1/3, 1/5…",
+    body: 'Turn the clockwork side on: each circle becomes a bar, as tall as it is big, at its speed. Front on, a wave; side on, its recipe, the spectrum: 1, 1/3, 1/5…',
   };
   j.beat(SLUG, spectrum, ({ tl, cue }) => {
     tl.to(rig, { trace: 0, ghost: 0, stage: 0, duration: 0.8 }, 0);
@@ -165,7 +165,7 @@ export function buildFourier(j: JourneyBuilder) {
   const shapes: BeatDef = {
     id: 'shapes',
     heading: 'Any repeating wave',
-    body: 'Change the recipe and the same clockwork plays another wave: every speed at 1/n gives a sawtooth, bright and buzzing; odd speeds at 1/n² a triangle, soft as a flute. Every repeating sound is some mix of circles.',
+    body: 'Change the recipe: every speed at 1/n gives a buzzing sawtooth; odd speeds at 1/n², a soft triangle. Every repeating sound is some mix of circles.',
   };
   j.beat(SLUG, shapes, ({ tl, cue }) => {
     tl.to(rig, { bars: 0, duration: 0.6 }, 0);
@@ -183,7 +183,7 @@ export function buildFourier(j: JourneyBuilder) {
   const formula: BeatDef = {
     id: 'formula',
     kind: 'formula',
-    body: "Fourier's series: a repeating signal f(t) is a sum of sine waves at whole-number multiples n of one frequency ω, each with its own size aₙ and starting angle φₙ.",
+    body: 'A repeating signal f(t) is a sum of sine waves at whole-number multiples n of one frequency ω, each with its own size aₙ and starting angle φₙ.',
     minDuration: 7,
   };
   j.beat(SLUG, formula, ({ tl, cue }) => {
@@ -248,7 +248,7 @@ export function buildFourier(j: JourneyBuilder) {
     {
       id: 'handoff',
       heading: 'Any closed shape',
-      body: 'Let circles turn both ways at whole-number speeds and their tip can trace a closed shape. A hundred of them draw an ambulance. Its siren sounds higher as it comes, lower as it goes. Why?',
+      body: 'Let circles turn both ways at whole-number speeds and their tip can trace a closed shape. A hundred draw an ambulance. Its siren sounds higher as it comes, lower as it goes. Why?',
     },
     ({ tl, cue }) => {
       tl.to(rig, { clockwork: 0, trace: 0, ghost: 0, stage: 0, sing: 0, duration: 1 }, 0);

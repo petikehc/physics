@@ -36,7 +36,7 @@ export function buildPythagoras(j: JourneyBuilder) {
     {
       id: 'title',
       kind: 'title',
-      body: 'Samos, about 530 BC. Draw a triangle with one square corner. Its three sides hide a rule people have used for nearly 4,000 years.',
+      body: 'Draw a triangle with one square corner. Its three sides hide a rule people have used for nearly 4,000 years.',
       minDuration: 7.5,
     },
     ({ tl, cue }) => {
@@ -223,7 +223,7 @@ export function buildPythagoras(j: JourneyBuilder) {
     {
       id: 'formula',
       kind: 'formula',
-      body: 'True for every right triangle, of any size, anywhere.',
+      body: 'Move the pieces as you like: the area stays the same. True for every right triangle.',
       minDuration: 6.5,
     },
     ({ tl, cue }) => {
@@ -302,7 +302,7 @@ export function buildPythagoras(j: JourneyBuilder) {
     {
       id: 'slices',
       heading: 'Sliced like a pie',
-      body: 'Archimedes measured circles with many-sided shapes, cut into slices like these. That is the next chapter.',
+      body: 'Archimedes measured circles with many-sided shapes, cut into slices like these.',
     },
     ({ tl, cue }) => {
       // The beach's dust gathers onto the carved circle and lies flat on it, exactly over the groove. (It rises
