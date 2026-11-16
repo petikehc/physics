@@ -1,1 +1,0 @@
-import{w as e}from"./index-DDb4Cecn.js";var t=e(e=>({hovered:null,selected:null,set:t=>e(t)}));export{t};
