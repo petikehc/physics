@@ -77,8 +77,8 @@ export function shouldSend(where: {
   url: string;
 }): boolean {
   return (
-    where.base === '/physics/' &&
-    where.hostname === 'petikehc.github.io' &&
+    where.base === '/' &&
+    where.hostname === 'sand-to-stars.idoescode.com' &&
     !where.webdriver &&
     !where.url.includes('REPLACE-ME')
   );

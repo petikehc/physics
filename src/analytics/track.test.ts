@@ -18,13 +18,13 @@ describe('createTracker', () => {
   it('counts every pageview, repeats included', () => {
     const hits: Hit[] = [];
     const t = createTracker((h) => hits.push(h));
-    t.pageview('/physics/');
-    t.pageview('/physics/transcript');
-    t.pageview('/physics/');
+    t.pageview('/');
+    t.pageview('/transcript');
+    t.pageview('/');
     expect(hits.map((h) => [h.path, h.event])).toEqual([
-      ['/physics/', false],
-      ['/physics/transcript', false],
-      ['/physics/', false],
+      ['/', false],
+      ['/transcript', false],
+      ['/', false],
     ]);
   });
 
@@ -33,7 +33,7 @@ describe('createTracker', () => {
       throw new Error('blocked');
     });
     expect(() => t.track('start')).not.toThrow();
-    expect(() => t.pageview('/physics/')).not.toThrow();
+    expect(() => t.pageview('/')).not.toThrow();
   });
 
   it('ignores an undefined event (a slug that is not a chapter)', () => {
@@ -55,8 +55,8 @@ describe('event names', () => {
 
 describe('shouldSend (the one gate)', () => {
   const live = {
-    base: '/physics/',
-    hostname: 'petikehc.github.io',
+    base: '/',
+    hostname: 'sand-to-stars.idoescode.com',
     webdriver: false,
     url: 'https://example.goatcounter.com/count',
   };
@@ -66,11 +66,15 @@ describe('shouldSend (the one gate)', () => {
   });
 
   it('sends nothing from a branch preview', () => {
-    expect(shouldSend({ ...live, base: '/physics/preview/feat-analytics/' })).toBe(false);
+    expect(shouldSend({ ...live, base: '/preview/feat-analytics/' })).toBe(false);
   });
 
   it('sends nothing from localhost', () => {
-    expect(shouldSend({ ...live, base: '/', hostname: 'localhost' })).toBe(false);
+    expect(shouldSend({ ...live, hostname: 'localhost' })).toBe(false);
+  });
+
+  it('sends nothing from the old github.io address', () => {
+    expect(shouldSend({ ...live, base: '/physics/', hostname: 'petikehc.github.io' })).toBe(false);
   });
 
   it('sends nothing from an automated browser (the e2e tests)', () => {
