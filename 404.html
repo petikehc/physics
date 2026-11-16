@@ -6,13 +6,14 @@
 <body style="background:#120f16;color:#f4efe6;font-family:system-ui,sans-serif;padding:24px">
 <script>
   (function () {
+    var repo = '/physics/';
     var path = location.pathname;
-    var home = /^\/physics\//.test(path) ? '/physics/' : '/';
-    var root = path.match(/^(\/physics)?(\/preview\/[^/]+)?\//)[0];
+    var preview = path.match(new RegExp('^' + repo + 'preview/[^/]+/'));
+    var root = preview ? preview[0] : repo;
     var rest = path.slice(root.length) + location.search + location.hash;
     // Nothing to hand over (or we already tried): the app itself is missing, so stop here.
     if (!rest || location.search.indexOf('redirect=') !== -1) {
-      document.body.innerHTML = 'Not found. <a style="color:inherit" href="' + home + '">Go to the start</a>';
+      document.body.innerHTML = 'Not found. <a style="color:inherit" href="' + repo + '">Go to the start</a>';
       return;
     }
     location.replace(root + '?redirect=' + encodeURIComponent(rest));
