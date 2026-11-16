@@ -57,8 +57,8 @@ chapter I changes. The transcript (`/transcript`) needs nothing: it reads every 
 
 Every push publishes the site to GitHub Pages (the `gh-pages` branch, built by `.github/workflows/pages.yml`):
 
-- `main` is the live site: https://petikehc.github.io/physics/
-- any other branch gets its own preview: `https://petikehc.github.io/physics/preview/<branch>/` (lower-case, with
+- `main` is the live site: https://sand-to-stars.idoescode.com/
+- any other branch gets its own preview: `https://sand-to-stars.idoescode.com/preview/<branch>/` (lower-case, with
   `/` turned into `-`), removed again when the branch is deleted.
 
 Work on a chapter or a fix in its own branch, check its preview (on a phone too), then merge it into `main` with a

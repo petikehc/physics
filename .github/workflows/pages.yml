@@ -1,8 +1,10 @@
 name: Pages
 
 # Publishes the site to the gh-pages branch (Settings → Pages → Deploy from a branch → gh-pages, / (root)):
-#   main          → https://<owner>.github.io/<repo>/
-#   other branches → https://<owner>.github.io/<repo>/preview/<branch>/   (removed when the branch is deleted)
+#   main          → https://sand-to-stars.idoescode.com/
+#   other branches → https://sand-to-stars.idoescode.com/preview/<branch>/   (removed when the branch is deleted)
+# The custom domain is set by the CNAME file written at the site root below (and its DNS record, a CNAME of
+# sand-to-stars.idoescode.com to <owner>.github.io).
 on:
   push:
     branches-ignore: [gh-pages]
@@ -25,14 +27,13 @@ jobs:
       - name: Work out where this branch is published
         id: where
         run: |
-          repo="${{ github.event.repository.name }}"
           if [ "$GITHUB_REF_NAME" = "main" ]; then
             echo "dir=." >> "$GITHUB_OUTPUT"
-            echo "base=/$repo/" >> "$GITHUB_OUTPUT"
+            echo "base=/" >> "$GITHUB_OUTPUT"
           else
             slug=$(echo "$GITHUB_REF_NAME" | tr '[:upper:]' '[:lower:]' | sed 's#[^a-z0-9._-]#-#g')
             echo "dir=preview/$slug" >> "$GITHUB_OUTPUT"
-            echo "base=/$repo/preview/$slug/" >> "$GITHUB_OUTPUT"
+            echo "base=/preview/$slug/" >> "$GITHUB_OUTPUT"
           fi
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -50,7 +51,7 @@ jobs:
       - name: Publish
         env:
           DIR: ${{ steps.where.outputs.dir }}
-          REPO: ${{ github.event.repository.name }}
+          DOMAIN: sand-to-stars.idoescode.com
         run: |
           if [ "$DIR" = "." ]; then
             # main owns the site root; keep the branch previews.
@@ -60,7 +61,10 @@ jobs:
           fi
           mkdir -p "site/$DIR"
           cp -r dist/. "site/$DIR/"
-          sh .github/pages/write-fallback.sh site "$REPO"
+          sh .github/pages/write-fallback.sh site
+          # Pages serves the site on its custom domain for as long as this file is at the root. Only main writes it,
+          # so a branch's preview deploy never moves the live site.
+          if [ "$DIR" = "." ]; then echo "$DOMAIN" > site/CNAME; fi
           cd site
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
