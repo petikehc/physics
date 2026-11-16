@@ -72,7 +72,8 @@ consent banner. Everything is in `src/analytics/`: `track.ts` is the only file t
 - **Where it counts:** only the live site, in a browser a person is driving. `shouldSend()` in `track.ts` is the one
   gate: branch previews, localhost and the Playwright tests send nothing and don't even load the script. If the
   script is blocked (an ad blocker), every call is a quiet no-op.
-- **Site code:** set `GOATCOUNTER_URL` in `track.ts`. While it says `REPLACE-ME`, nothing is sent.
+- **Site code:** `sandtostars`, set in `GOATCOUNTER_URL` in `track.ts`. The dashboard is
+  https://sandtostars.goatcounter.com.
 - **What it counts:**
   - pageviews, for every route
   - `start`

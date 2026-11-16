@@ -82,6 +82,10 @@ describe('shouldSend (the one gate)', () => {
   });
 
   it('sends nothing while the site code is still the placeholder', () => {
-    expect(shouldSend({ ...live, url: GOATCOUNTER_URL })).toBe(false);
+    expect(shouldSend({ ...live, url: 'https://REPLACE-ME.goatcounter.com/count' })).toBe(false);
+  });
+
+  it('sends from the live site with the real site code', () => {
+    expect(shouldSend({ ...live, url: GOATCOUNTER_URL })).toBe(true);
   });
 });

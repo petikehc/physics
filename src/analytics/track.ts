@@ -8,8 +8,8 @@ import { EngagedClock } from './engaged';
  * browser and the script loaded.
  */
 
-/** The site's count endpoint. Replace REPLACE-ME with the GoatCounter site code; until then nothing is sent. */
-export const GOATCOUNTER_URL = 'https://REPLACE-ME.goatcounter.com/count';
+/** The site's count endpoint (dashboard: https://sandtostars.goatcounter.com). */
+export const GOATCOUNTER_URL = 'https://sandtostars.goatcounter.com/count';
 const SCRIPT_SRC = 'https://gc.zgo.at/count.js';
 
 type Digit = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9';
