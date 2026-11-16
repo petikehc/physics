@@ -1,5 +1,10 @@
 # From Sand to Stars
 
+[![Ten stars joined by a thread, numbered I to X, over the title From Sand to Stars](public/og.jpg)](https://sand-to-stars.idoescode.com/)
+
+**▶ Play it: [sand-to-stars.idoescode.com](https://sand-to-stars.idoescode.com/)** (about 22 minutes, best with
+headphones)
+
 Ten great ideas of mathematics and physics, told as one cinematic 3D journey, from a triangle scratched in the sand to the
 stars. Built with React, TypeScript, three.js (React Three Fiber), GSAP and Tone.js.
 
@@ -57,8 +62,8 @@ chapter I changes. The transcript (`/transcript`) needs nothing: it reads every 
 
 Every push publishes the site to GitHub Pages (the `gh-pages` branch, built by `.github/workflows/pages.yml`):
 
-- `main` is the live site: https://petikehc.github.io/physics/
-- any other branch gets its own preview: `https://petikehc.github.io/physics/preview/<branch>/` (lower-case, with
+- `main` is the live site: https://sand-to-stars.idoescode.com/
+- any other branch gets its own preview: `https://sand-to-stars.idoescode.com/preview/<branch>/` (lower-case, with
   `/` turned into `-`), removed again when the branch is deleted.
 
 Work on a chapter or a fix in its own branch, check its preview (on a phone too), then merge it into `main` with a
