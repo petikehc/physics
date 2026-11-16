@@ -195,19 +195,22 @@ test('the fourier lab builds waves, turns them side on, and redraws a shape you 
   // Draw a closed loop on the stars: the circles take it over.
   await panel.getByRole('button', { name: 'Draw a shape' }).click();
   await expect(panel).toContainText('The ambulance, from 101 circles.');
-  await page.waitForTimeout(2000);
   const box = (await page.locator('canvas').boundingBox())!;
   const cx = box.x + box.width * 0.33;
   const cy = box.y + box.height * 0.45;
-  await page.mouse.move(cx + 120, cy);
-  await page.mouse.down();
-  for (let i = 1; i <= 48; i++) {
-    const a = (i / 48) * Math.PI * 2;
-    await page.mouse.move(cx + 120 * Math.cos(a), cy + 70 * Math.sin(3 * a) * 0.5 + 60 * Math.sin(a));
-    await page.waitForTimeout(16);
-  }
-  await page.mouse.up();
-  await expect(panel).toContainText('Your shape, from 101 circles.');
+  // The pad takes a stroke once the switch into drawing (a 1.2 s tween) is half done. On a slow software-rendered
+  // runner GSAP's lag smoothing can stretch that well past any fixed wait, so draw until the pad takes the stroke.
+  await expect(async () => {
+    await page.mouse.move(cx + 120, cy);
+    await page.mouse.down();
+    for (let i = 1; i <= 48; i++) {
+      const a = (i / 48) * Math.PI * 2;
+      await page.mouse.move(cx + 120 * Math.cos(a), cy + 70 * Math.sin(3 * a) * 0.5 + 60 * Math.sin(a));
+      await page.waitForTimeout(16);
+    }
+    await page.mouse.up();
+    await expect(panel).toContainText('Your shape, from 101 circles.', { timeout: 3000 });
+  }).toPass({ timeout: 60_000 });
   const fewer = panel.getByLabel('Circles');
   await fewer.focus();
   for (let i = 0; i < 5; i++) await page.keyboard.press('ArrowLeft');

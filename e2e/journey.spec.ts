@@ -418,6 +418,27 @@ test('jumping ahead loads the chapter the playhead lands in', async ({ page }) =
   expect(errors).toEqual([]);
 });
 
+test('a jump that lands right at a Your turn hands the viewer the new shot, not the old one', async ({
+  page,
+}) => {
+  const errors = collectErrors(page);
+  // Start in chapter 5, far from chapter 6's Your turn, then land a hundredth of a second before its pause: too soon
+  // for the camera to have been drawn on the new shot before the viewer gets it.
+  await page.goto(`/play/newton${Q}`);
+  await waitForJourney(page);
+  await page.waitForTimeout(2000);
+  await page.evaluate(() => {
+    const b = window.__journey!.beats.find((x) => x.key === 'calculus:yourTurn')!;
+    window.__journey!.seek(b.pauseAt! - 0.01);
+    window.__journey!.play();
+  });
+  await expect(page.getByRole('complementary', { name: 'Your turn' })).toBeVisible({ timeout: 30_000 });
+  // The scene's labels are on screen, not off behind the camera somewhere in chapter 5.
+  await expect(page.getByText('area: 2.37')).toBeInViewport();
+  await expect(page.getByText('climb: 2.37')).toBeInViewport();
+  expect(errors).toEqual([]);
+});
+
 test('the player steps between beats with the keyboard', async ({ page }) => {
   await page.goto(`/play${Q}`);
   await waitForJourney(page);
