@@ -3,9 +3,12 @@ import { Link } from 'react-router';
 import { CHAPTERS } from '../chapters/registry';
 import { FINALE } from '../chapters/finale/meta';
 import { CloseIcon } from './Icons';
+import { track } from '../analytics/track';
 
 /** The ten chapters, with Play / Lab links for the ones that are ready, and the finale. */
 export function ChaptersMenu({ onClose }: { onClose: () => void }) {
+  useEffect(() => track('chapters-menu'), []);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();

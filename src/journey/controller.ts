@@ -6,6 +6,8 @@ import { beatAt, cuesBetween, type BeatMarker, type Journey } from './builder';
 import { buildJourney } from './journey';
 import { HOOKS } from '../chapters/hooks';
 import { continuousMeter, createSoundFrame, type Levels } from '../chapters/sound';
+import { chapterEvent, chapterNumber, track } from '../analytics/track';
+import { RunTracker } from '../analytics/run';
 
 const EPS = 0.05;
 
@@ -21,6 +23,10 @@ class JourneyController {
   private lastBeat: BeatMarker | undefined;
   private wantPlay = false;
   private soundFrame = createSoundFrame();
+  /** This run through the journey, for the "watched it all in one go" event. */
+  private run: RunTracker | null = null;
+  /** The chapter last counted as reached (seek() moves lastBeat itself, so this is kept apart from it). */
+  private lastChapter: string | undefined;
 
   start(slug?: string) {
     this.dispose();
@@ -30,6 +36,8 @@ class JourneyController {
     this.lastReal = performance.now();
     this.lastBeat = undefined;
     this.soundFrame = createSoundFrame();
+    this.run = new RunTracker(journey.duration, !slug || chapterNumber(slug) === 1);
+    this.lastChapter = undefined;
     gsap.ticker.add(this.tick);
     const s = useApp.getState();
     journey.master.timeScale(s.speed);
@@ -64,6 +72,7 @@ class JourneyController {
   play() {
     const j = this.journey;
     if (!j) return;
+    track('start');
     if (useApp.getState().yourTurn) return this.continueFromYourTurn();
     if (j.master.time() >= j.duration - EPS) j.master.seek(0, false);
     this.stepTween?.kill();
@@ -140,7 +149,11 @@ class JourneyController {
   gotoChapter(slug: string) {
     const j = this.journey;
     const first = j?.beats.find((b) => b.chapter === slug);
-    if (first) this.seek(first.start);
+    if (!j || !first) return;
+    // A jump starts a new run: "in one go" only if it is back to chapter I.
+    this.run = new RunTracker(j.duration, chapterNumber(slug) === 1);
+    this.lastChapter = undefined;
+    this.seek(first.start);
   }
 
   continueFromYourTurn() {
@@ -175,6 +188,7 @@ class JourneyController {
     // One-shot cues fire only during normal forward playback, never while seeking or fast-forwarding.
     if (normal) {
       for (const c of cuesBetween(j.cues, this.lastTime, t)) audio.cue(c.id, c.params);
+      this.run?.played(dt);
     }
 
     const beat = beatAt(j.beats, t);
@@ -199,10 +213,22 @@ class JourneyController {
     // the chapter the playhead is in. Both calls are no-ops when nothing changed.
     audio.setBeat(beat?.key ?? null);
     if (beat && beat.chapter !== s.chapterSlug) s.set({ chapterSlug: beat.chapter });
+    // Reaching a chapter, by any route: playback, stepping, the scrubber or a jump.
+    if (beat && beat.chapter !== this.lastChapter) {
+      this.lastChapter = beat.chapter;
+      track(beat.chapter === 'finale' ? 'finale' : chapterEvent('chapter', beat.chapter));
+      this.run?.reach(chapterNumber(beat.chapter));
+    }
 
     const atPause =
       beat?.pauseAt !== undefined && Math.abs(t - beat.pauseAt) < EPS && j.master.paused() && !this.stepTween;
     const ended = t >= j.duration - EPS;
+    // Watched through to the end: played into it, not stepped or scrubbed there.
+    if (normal && ended && this.lastTime < j.duration - EPS) {
+      track('finished');
+      this.run?.end();
+      if (this.run?.qualifies()) track('finished-one-go');
+    }
     const isPlaying = playing || (!!this.stepTween && this.wantPlay);
     if (atPause && !s.yourTurn) {
       this.wantPlay = false;

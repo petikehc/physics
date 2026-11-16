@@ -3,6 +3,7 @@ import { Link, Route, Routes, useLocation } from 'react-router';
 import { World } from './World';
 import { useApp } from '../state/store';
 import Landing from '../landing/Landing';
+import { pageview } from '../analytics/track';
 
 const JourneyPage = lazy(() => import('../journey/JourneyPage'));
 const LabPage = lazy(() => import('../lab/LabPage'));
@@ -44,6 +45,9 @@ export function App() {
   const location = useLocation();
   const [webgl] = useState(hasWebGL);
   const set = useApp((s) => s.set);
+
+  // Every route is a pageview: the journey is a single-page app, so the script can't see route changes itself.
+  useEffect(() => pageview(location.pathname), [location.pathname]);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');

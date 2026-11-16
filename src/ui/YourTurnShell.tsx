@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
 import { useApp } from '../state/store';
 import { useLiftAbove } from './useLiftAbove';
+import { chapterEvent, track } from '../analytics/track';
 
 const AUTO_SECONDS = 14;
 
@@ -23,6 +24,11 @@ export function YourTurnShell({ body, labHref, onContinue, children }: Props) {
   const panel = useRef<HTMLElement>(null);
   const auto = autoContinue && !reduced && !touched;
   useLiftAbove(() => panel.current);
+
+  // Counts only real use of the idea: the chapter's own controls, or a drag in the scene (not Continue, the Lab link
+  // or the Auto toggle, and not orbiting the camera).
+  const used = () => track(chapterEvent('your-turn', useApp.getState().chapterSlug));
+  useEffect(() => useApp.subscribe((s, prev) => s.dragging && !prev.dragging && used()), []);
 
   // Any interaction with the scene cancels the auto-continue countdown.
   useEffect(() => {
@@ -57,7 +63,12 @@ export function YourTurnShell({ body, labHref, onContinue, children }: Props) {
     <aside ref={panel} className="your-turn" aria-label="Your turn">
       <h2 className="your-turn__title">Your turn</h2>
       <p className="your-turn__body">{body}</p>
-      {children}
+      {children ? (
+        // display: contents keeps the panel's grid exactly as it was; the wrapper only listens.
+        <div style={{ display: 'contents' }} onInputCapture={used} onClickCapture={used}>
+          {children}
+        </div>
+      ) : null}
       <button className="btn btn--primary continue-btn" onClick={onContinue}>
         Continue
         {auto ? (

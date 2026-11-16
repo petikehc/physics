@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useApp } from '../state/store';
 import { audio } from '../audio';
 import { SoundOffIcon, SoundOnIcon } from './Icons';
+import { track } from '../analytics/track';
 
 /** Sound on/off plus a popover with music and effects volumes. */
 export function SoundButton({ placement = 'down' }: { placement?: 'up' | 'down' }) {
@@ -28,6 +29,7 @@ export function SoundButton({ placement = 'down' }: { placement?: 'up' | 'down' 
     if (enabled) {
       audio.disable();
       set({ soundEnabled: false });
+      track('muted');
     } else {
       void audio.enable();
       set({ soundEnabled: true });
