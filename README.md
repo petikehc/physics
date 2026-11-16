@@ -1,5 +1,10 @@
 # From Sand to Stars
 
+[![Ten stars joined by a thread, numbered I to X, over the title From Sand to Stars](public/og.jpg)](https://sand-to-stars.idoescode.com/)
+
+**▶ Play it: [sand-to-stars.idoescode.com](https://sand-to-stars.idoescode.com/)** (about 22 minutes, best with
+headphones)
+
 Ten great ideas of mathematics and physics, told as one cinematic 3D journey, from a triangle scratched in the sand to the
 stars. Built with React, TypeScript, three.js (React Three Fiber), GSAP and Tone.js.
 
