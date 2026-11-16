@@ -1,8 +1,10 @@
 name: CI
 
+# Once per change: pull requests run through `pull_request`, and main runs after each merge. (Running on every
+# branch push as well ran each PR's CI twice.)
 on:
   push:
-    branches: ['**']
+    branches: [main]
   pull_request:
 
 jobs:
@@ -24,6 +26,19 @@ jobs:
     # Pinned: ubuntu-latest moved to 26.04, where Playwright 1.56 can't install Chromium.
     runs-on: ubuntu-24.04
     needs: check
+    # Three runners at once, about equal in length: the two "every beat" tests take minutes each in software WebGL,
+    # so each gets its own runner, and everything else (whatever its name) runs on the third.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - part: beats-desktop
+            select: --grep "every beat of the journey renders \(desktop\)"
+          - part: beats-phone
+            select: --grep "every beat of the journey renders \(phone\)"
+          - part: the-rest
+            select: --grep-invert "every beat of the journey renders"
+    name: e2e (${{ matrix.part }})
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -32,10 +47,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm run e2e
+      - run: npm run e2e -- ${{ matrix.select }}
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: e2e-screenshots
+          name: e2e-screenshots-${{ matrix.part }}
           path: test-results/
           retention-days: 7
