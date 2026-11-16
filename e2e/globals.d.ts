@@ -12,5 +12,7 @@ interface JourneyHook {
 
 interface Window {
   __journey?: JourneyHook;
+  /** With ?analytics=debug: every analytics hit, in order (see src/analytics/track.ts). */
+  __analytics?: Array<{ path: string; title: string; event: boolean }>;
   __audio?: { readonly state: string; readonly loaded: boolean };
 }

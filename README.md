@@ -64,6 +64,29 @@ Every push publishes the site to GitHub Pages (the `gh-pages` branch, built by `
 Work on a chapter or a fix in its own branch, check its preview (on a phone too), then merge it into `main` with a
 pull request.
 
+### Analytics
+
+[GoatCounter](https://www.goatcounter.com) counts visits and a few events. It sets no cookies, so the site needs no
+consent banner. Everything is in `src/analytics/`: `track.ts` is the only file that talks to GoatCounter.
+
+- **Where it counts:** only the live site, in a browser a person is driving. `shouldSend()` in `track.ts` is the one
+  gate: branch previews, localhost and the Playwright tests send nothing and don't even load the script. If the
+  script is blocked (an ad blocker), every call is a quiet no-op.
+- **Site code:** set `GOATCOUNTER_URL` in `track.ts`. While it says `REPLACE-ME`, nothing is sent.
+- **What it counts:**
+  - pageviews, for every route
+  - `start`
+  - `chapter-01` … `chapter-10`, `finale`
+  - `finished`, and `finished-one-go`: from chapter I to the end, every chapter reached, with at least 80% of the
+    runtime played
+  - `time-01` … `time-30`, a minute of engaged time each, counted while the tab is visible and the journey plays, or
+    waits in Your turn or a Lab
+  - `your-turn-NN` when a chapter's controls are used or something in its scene is dragged
+  - `lab-NN`, `chapters-menu`, `muted`, `low-quality`
+  - Each event is counted once per page load.
+- **Checking events:** add `?analytics=debug` to any URL, previews included. Events are then logged to the console
+  (`[analytics] chapter-03`) and to `window.__analytics` instead of being sent. `e2e/analytics.spec.ts` uses it.
+
 ## How it fits together
 
 - **One world, one canvas.** `src/app/World.tsx` renders a single persistent R3F `<Canvas>` behind every route. Each

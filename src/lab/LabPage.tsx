@@ -13,6 +13,7 @@ import { orbitLimits } from '../engine/camera/CameraDirector';
 import { runtime } from '../engine/runtime';
 import { createCameraRig, createWorldRig, resetRig } from '../engine/rigs';
 import { useLiftAbove } from '../ui/useLiftAbove';
+import { chapterEvent, track } from '../analytics/track';
 
 /** /lab/:slug — a theorem as a sandbox. */
 export default function LabPage() {
@@ -37,6 +38,7 @@ export default function LabPage() {
     views.enterLab();
     Object.assign(orbitLimits, { minDistance: 2, maxDistance: 22 });
     set({ mode: 'lab', chapterSlug: meta.slug, cameraMode: 'directed' });
+    track(chapterEvent('lab', meta.slug));
     audio.setScene('lab');
     audio.setBeat(`${meta.slug}:lab`);
     // Let the directed camera land on the Lab framing for a frame, then hand it to the viewer.
