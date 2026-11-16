@@ -58,15 +58,67 @@ export function CameraDirector() {
   const pos = useRef(new THREE.Vector3());
   const target = useRef(new THREE.Vector3());
   const prevMode = useRef(cameraMode);
+  /** Set when the viewer is about to get the camera: the next frame hands it over from the script's current shot. */
+  const handover = useRef(false);
+
+  /** Puts the camera on the rig's shot: framing, handheld breathing, the blend back from the viewer's camera. */
+  const aim = (width: number, height: number, time: number) => {
+    const rig = runtime.camera;
+    directedPose(rig, pos.current, target.current);
+    // On a wide screen, slide the shot sideways (leaving room beside the subject); fade that out on a tall one.
+    const aspect = width / Math.max(height, 1);
+    const wide = Math.min(Math.max((aspect - 0.8) / 0.4, 0), 1);
+    if (rig.side !== 0 && wide > 0) {
+      _side
+        .subVectors(target.current, pos.current)
+        .cross(UP)
+        .setY(0)
+        .normalize()
+        .multiplyScalar(rig.side * wide);
+      pos.current.add(_side);
+      target.current.add(_side);
+    }
+    // A portrait screen steps back and widens the lens, as much as the shot allows.
+    const full = portraitFit(aspect);
+    const k = Math.min(Math.max(rig.portrait, 0), 1);
+    // Beside the text column, a little further back, as far as the picture has moved over.
+    const aside = 1 + (SIDE_ROOM.dolly - 1) * (room.current / SIDE_ROOM.shift);
+    const fit = { dolly: (1 + (full.dolly - 1) * k) * aside, fov: 1 + (full.fov - 1) * k };
+    if (fit.dolly !== 1) pos.current.sub(target.current).multiplyScalar(fit.dolly).add(target.current);
+
+    const amp = reduced ? 0 : rig.shake;
+    if (amp > 0) {
+      pos.current.x += handheld(time, 1) * 0.05 * amp;
+      pos.current.y += handheld(time, 2) * 0.035 * amp;
+      pos.current.z += handheld(time, 3) * 0.05 * amp;
+      target.current.x += handheld(time, 4) * 0.025 * amp;
+      target.current.y += handheld(time, 5) * 0.02 * amp;
+    }
+
+    const b = blend.current;
+    if (b.t > 0) {
+      pos.current.lerp(b.pos, b.t);
+      target.current.lerp(b.target, b.t);
+    }
+
+    camera.position.copy(pos.current);
+    camera.up.set(0, 1, 0);
+    camera.lookAt(target.current);
+    if (rig.roll !== 0) camera.rotateZ(rig.roll);
+    lastTarget.current.copy(target.current);
+
+    const fov = rig.fov * fit.fov;
+    if (Math.abs(camera.fov - fov) > 0.01) {
+      camera.fov = fov;
+      camera.updateProjectionMatrix();
+    }
+  };
 
   useEffect(() => {
     const wasInteractive = prevMode.current === 'interactive';
     prevMode.current = cameraMode;
     if (cameraMode === 'interactive') {
-      const c = controls.current;
-      if (!c) return;
-      const t = lastTarget.current;
-      void c.setLookAt(camera.position.x, camera.position.y, camera.position.z, t.x, t.y, t.z, false);
+      handover.current = true;
       return;
     }
     // Back to the script: start from wherever the viewer left the camera.
@@ -102,59 +154,19 @@ export function CameraDirector() {
     }
 
     if (cameraMode === 'interactive') {
-      controls.current?.getTarget(lastTarget.current);
+      const c = controls.current;
+      if (handover.current && c) {
+        // Hand over the shot the script is on now, not wherever the camera was last drawn: a jump (or a slow device
+        // that skipped frames) can reach the pause before the camera has followed, leaving the viewer elsewhere.
+        handover.current = false;
+        aim(width, height, state.clock.elapsedTime);
+        const t = lastTarget.current;
+        void c.setLookAt(camera.position.x, camera.position.y, camera.position.z, t.x, t.y, t.z, false);
+      }
+      c?.getTarget(lastTarget.current);
       return;
     }
-    const rig = runtime.camera;
-    directedPose(rig, pos.current, target.current);
-    // On a wide screen, slide the shot sideways (leaving room beside the subject); fade that out on a tall one.
-    const aspect = state.size.width / Math.max(state.size.height, 1);
-    const wide = Math.min(Math.max((aspect - 0.8) / 0.4, 0), 1);
-    if (rig.side !== 0 && wide > 0) {
-      _side
-        .subVectors(target.current, pos.current)
-        .cross(UP)
-        .setY(0)
-        .normalize()
-        .multiplyScalar(rig.side * wide);
-      pos.current.add(_side);
-      target.current.add(_side);
-    }
-    // A portrait screen steps back and widens the lens, as much as the shot allows.
-    const full = portraitFit(state.size.width / Math.max(state.size.height, 1));
-    const k = Math.min(Math.max(rig.portrait, 0), 1);
-    // Beside the text column, a little further back, as far as the picture has moved over.
-    const aside = 1 + (SIDE_ROOM.dolly - 1) * (room.current / SIDE_ROOM.shift);
-    const fit = { dolly: (1 + (full.dolly - 1) * k) * aside, fov: 1 + (full.fov - 1) * k };
-    if (fit.dolly !== 1) pos.current.sub(target.current).multiplyScalar(fit.dolly).add(target.current);
-
-    const amp = reduced ? 0 : rig.shake;
-    if (amp > 0) {
-      const t = state.clock.elapsedTime;
-      pos.current.x += handheld(t, 1) * 0.05 * amp;
-      pos.current.y += handheld(t, 2) * 0.035 * amp;
-      pos.current.z += handheld(t, 3) * 0.05 * amp;
-      target.current.x += handheld(t, 4) * 0.025 * amp;
-      target.current.y += handheld(t, 5) * 0.02 * amp;
-    }
-
-    const b = blend.current;
-    if (b.t > 0) {
-      pos.current.lerp(b.pos, b.t);
-      target.current.lerp(b.target, b.t);
-    }
-
-    camera.position.copy(pos.current);
-    camera.up.set(0, 1, 0);
-    camera.lookAt(target.current);
-    if (rig.roll !== 0) camera.rotateZ(rig.roll);
-    lastTarget.current.copy(target.current);
-
-    const fov = rig.fov * fit.fov;
-    if (Math.abs(camera.fov - fov) > 0.01) {
-      camera.fov = fov;
-      camera.updateProjectionMatrix();
-    }
+    aim(width, height, state.clock.elapsedTime);
   }, -2);
 
   if (cameraMode !== 'interactive') return null;
