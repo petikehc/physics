@@ -380,7 +380,7 @@ function sand(n: number) {
     const t = rng() * TAU;
     const r = Math.pow(rng(), 0.75) * 16;
     out[i * 3] = Math.cos(t) * r;
-    out[i * 3 + 1] = 0.03 + rng() * 0.02;
+    out[i * 3 + 1] = 0.01 + rng() * 0.015;
     out[i * 3 + 2] = Math.sin(t) * r;
   }
   return out;
