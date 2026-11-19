@@ -20,18 +20,24 @@ import { launchBrowser, openJourney } from './lib/journey.mjs';
 
 /** The cut: beat key, seconds into the beat to start at, and length in seconds. Change the cut here. */
 const SHOTS = [
+  // Screen-recorded from the site in real time: the frame-stepped render of the scratching looked shaky.
+  {
+    beat: 'pythagoras:draw',
+    at: 0,
+    length: 6,
+    footage: { file: 'previews/footage/pythagoras-draw.mov', from: 10.74, crop: '1962:1104:0:152' },
+  },
   { beat: 'doppler:mach', at: 5, length: 5 },
-  { beat: 'pythagoras:pour', at: 1, length: 6 },
   { beat: 'newton:cannon', at: 2, length: 5 },
   { beat: 'fourier:build', at: 1, length: 6 },
-  { beat: 'circle-area:deal', at: 1, length: 5 },
-  { beat: 'energy:ride', at: 1, length: 5 },
+  { beat: 'kepler:areas', at: 1, length: 5 },
+  { beat: 'energy:ride', at: 9.5, length: 4 },
 ];
 /** The last shot: the constellation, full frame, under the title and the address. */
-const END = { beat: 'finale:end', at: 2, length: 6 };
+const END = { beat: 'finale:end', at: 0, length: 6 };
 /** Other candidates, rendered as stills only (--stills). */
 const ALTERNATES = [
-  { beat: 'kepler:areas', at: 1 },
+  { beat: 'circle-area:deal', at: 1 },
   { beat: 'euler:helix', at: 4 },
   { beat: 'archimedes:eureka', at: 2 },
   { beat: 'fourier:shapes', at: 2 },
@@ -204,7 +210,17 @@ for (const [n, shot] of cut.entries()) {
     rmSync(dir, { recursive: true, force: true });
     mkdirSync(dir, { recursive: true });
     const t0 = Date.now();
-    const words = await renderShot(shot, dir, { frames: Math.round(seconds * FPS), end });
+    const frames = Math.round(seconds * FPS);
+    // Recorded footage still opens the journey for the shot's words; only the picture comes from the recording.
+    const words = await renderShot(shot, dir, { frames: shot.footage ? 0 : frames, end });
+    if (shot.footage) {
+      const { file, from, crop } = shot.footage;
+      ffmpeg([
+        ...['-ss', String(from), '-i', resolve(file), '-frames:v', String(frames)],
+        ...['-vf', `crop=${crop},fps=${FPS},scale=${VIEW.w}:${VIEW.h}:flags=lanczos`],
+        ...['-start_number', '0', join(dir, 'f%05d.png')],
+      ]);
+    }
     await band(join(dir, 'band.png'), { ...words, end });
     // The shot's sound, from the score rendered offline, with a little run-up so pads and reverb are already sounding.
     const runUp = 4;
