@@ -10,10 +10,10 @@
  *     [--width 1280] [--height 720] [--quality medium] [--from 0] [--seconds <all>] [--no-video] [--no-audio]
  *     [--resume]   keep frames already rendered (useful for long renders)
  */
-import { chromium } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { launchBrowser, openJourney } from './lib/journey.mjs';
 
 const args = process.argv.slice(2);
 const opt = (name, fallback) => {
@@ -31,18 +31,8 @@ const quality = opt('quality', 'medium');
 const from = Number(opt('from', '0'));
 
 mkdirSync(out, { recursive: true });
-const browser = await chromium.launch({
-  args: [
-    '--use-angle=swiftshader',
-    '--enable-unsafe-swiftshader',
-    '--ignore-gpu-blocklist',
-    '--autoplay-policy=no-user-gesture-required',
-  ],
-});
-const page = await browser.newPage({ viewport: { width, height } });
-page.on('pageerror', (e) => console.error('pageerror:', e.message));
-await page.goto(`${url}/play?quality=${quality}`);
-await page.waitForFunction(() => !!window.__journey, null, { timeout: 60_000 });
+const browser = await launchBrowser();
+const page = await openJourney(browser, { url, width, height, quality });
 const { duration, pauses } = await page.evaluate(() => ({
   duration: window.__journey.duration,
   pauses: window.__journey.beats.filter((b) => b.pauseAt !== undefined).map((b) => b.pauseAt),
