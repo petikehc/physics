@@ -13,7 +13,7 @@
  *     --resume  keep shots already rendered completely (an unfinished shot is rendered again from its start)
  *     --plain   plain ink behind the picture instead of a blurred, darkened copy of it
  */
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { launchBrowser, openJourney } from './lib/journey.mjs';
@@ -182,6 +182,12 @@ if (flag('stills')) {
 }
 
 // The cut: each shot rendered and set in its card, then dissolved one into the next, with its own sound.
+/** How long a rendered clip runs, in seconds. */
+function clipSeconds(file) {
+  const r = spawnSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', file]);
+  return Number(String(r.stdout).trim());
+}
+
 const work = join(out, 'demo');
 mkdirSync(work, { recursive: true });
 const cut = [...SHOTS, END].filter((s) => !opt('only') || s.beat === opt('only'));
@@ -193,7 +199,8 @@ for (const [n, shot] of cut.entries()) {
   const clip = join(work, `${name}.mkv`);
   // Fades overlap the shots: each one runs a fade longer, except the last.
   const seconds = shot.length + (n < cut.length - 1 ? FADE : 0);
-  if (!(flag('resume') && existsSync(clip))) {
+  // --resume keeps a clip only if it has the length this cut needs (a shot rendered alone with --only is shorter).
+  if (!(flag('resume') && existsSync(clip) && Math.abs(clipSeconds(clip) - seconds) < 0.05)) {
     rmSync(dir, { recursive: true, force: true });
     mkdirSync(dir, { recursive: true });
     const t0 = Date.now();
@@ -235,9 +242,13 @@ for (const [n, shot] of cut.entries()) {
       '12',
       '-preset',
       'medium',
+      // The score can end before the picture does (the end card): pad the sound with silence to the shot's length.
+      '-af',
+      'apad',
       '-c:a',
       'pcm_s16le',
-      '-shortest',
+      '-t',
+      String(seconds),
       clip,
     ]);
     rmSync(dir, { recursive: true, force: true });
