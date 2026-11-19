@@ -3,16 +3,17 @@
  */
 import { chromium } from '@playwright/test';
 
-/** Chromium with software WebGL (SwiftShader). CHROMIUM_PATH points it at another build of Chromium if needed. */
+/**
+ * Chromium with software WebGL (SwiftShader), so it draws on a machine without a GPU. GPU=1 uses the machine's own GPU
+ * instead (much faster, e.g. on a Mac). CHROMIUM_PATH points it at another build of Chromium if needed.
+ */
 export function launchBrowser() {
+  const graphics = process.env.GPU
+    ? ['--ignore-gpu-blocklist']
+    : ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'];
   return chromium.launch({
     executablePath: process.env.CHROMIUM_PATH || undefined,
-    args: [
-      '--use-angle=swiftshader',
-      '--enable-unsafe-swiftshader',
-      '--ignore-gpu-blocklist',
-      '--autoplay-policy=no-user-gesture-required',
-    ],
+    args: [...graphics, '--autoplay-policy=no-user-gesture-required'],
   });
 }
 
