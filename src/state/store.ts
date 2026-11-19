@@ -33,10 +33,17 @@ function savePrefs(p: Prefs) {
   }
 }
 
+/** A quality set in the URL (?quality=low|medium|high), for tests and recordings: kept as given. */
+function qualityParam(): QualityTier | null {
+  if (typeof window === 'undefined') return null;
+  const param = new URLSearchParams(window.location.search).get('quality');
+  return param === 'low' || param === 'medium' || param === 'high' ? param : null;
+}
+
 function detectQuality(): QualityTier {
   if (typeof window === 'undefined') return 'high';
-  const param = new URLSearchParams(window.location.search).get('quality');
-  if (param === 'low' || param === 'medium' || param === 'high') return param;
+  const param = qualityParam();
+  if (param) return param;
   const coarse = window.matchMedia?.('(pointer: coarse)').matches;
   const small = Math.min(window.innerWidth, window.innerHeight) < 600;
   if (coarse && small) return 'low';
@@ -55,10 +62,16 @@ export interface AppState extends Prefs {
   /** Chapter slug shown in the Lab, or the chapter the journey is in. */
   chapterSlug: string;
   quality: QualityTier;
+  /** The quality was set in the URL: keep it, instead of stepping down when frames come slowly. */
+  qualityFixed: boolean;
   reducedMotion: boolean;
   soundEnabled: boolean;
   cameraMode: CameraMode;
   dragging: boolean;
+  /** The world does not draw on its own: a recording is stepping it frame by frame (window.__film). */
+  worldPaused: boolean;
+  /** A film is being recorded (window.__film): the world draws no film grain of its own. */
+  recording: boolean;
 
   // Journey (discrete state only; per-frame time is read from the timeline directly).
   /** Increments each time a journey timeline is built (0 = none). */
@@ -78,10 +91,13 @@ export const useApp = create<AppState>((set, get) => ({
   mode: 'teaser',
   chapterSlug: 'pythagoras',
   quality: detectQuality(),
+  qualityFixed: qualityParam() !== null,
   reducedMotion: detectReducedMotion(),
   soundEnabled: false,
   cameraMode: 'directed',
   dragging: false,
+  worldPaused: false,
+  recording: false,
   journeyId: 0,
   playing: false,
   beatKey: null,
