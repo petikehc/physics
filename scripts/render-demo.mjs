@@ -20,19 +20,19 @@ import { launchBrowser, openJourney } from './lib/journey.mjs';
 
 /** The cut: beat key, seconds into the beat to start at, and length in seconds. Change the cut here. */
 const SHOTS = [
+  { beat: 'doppler:mach', at: 5, length: 5 },
   { beat: 'pythagoras:pour', at: 1, length: 6 },
-  { beat: 'kepler:areas', at: 1, length: 5 },
-  { beat: 'euler:helix', at: 1, length: 5 },
+  { beat: 'newton:cannon', at: 2, length: 5 },
   { beat: 'fourier:build', at: 1, length: 6 },
-  { beat: 'doppler:mach', at: 2, length: 5 },
+  { beat: 'circle-area:deal', at: 1, length: 5 },
   { beat: 'energy:ride', at: 1, length: 5 },
 ];
 /** The last shot: the constellation, full frame, under the title and the address. */
 const END = { beat: 'finale:end', at: 2, length: 6 };
 /** Other candidates, rendered as stills only (--stills). */
 const ALTERNATES = [
-  { beat: 'newton:cannon', at: 2 },
-  { beat: 'circle-area:deal', at: 2 },
+  { beat: 'kepler:areas', at: 1 },
+  { beat: 'euler:helix', at: 4 },
   { beat: 'archimedes:eureka', at: 2 },
   { beat: 'fourier:shapes', at: 2 },
   { beat: 'finale:sweep', at: 4 },
