@@ -130,7 +130,9 @@ export function Beach() {
       <hemisphereLight ref={hemi} args={['#6a78a8', '#3a2418', HEMI_LIGHT]} />
       <ambientLight intensity={0.08} />
       <mesh ref={ground} rotation-x={-Math.PI / 2} receiveShadow material={sand.material}>
-        <planeGeometry args={[4000, 4000, 1, 1]} />
+        {/* In tiles of 20 m, not two triangles 4 km across: depth across a triangle that size comes out centimetres
+            off near the camera, and the dust lying on the sand flickered in and out as the camera moved. */}
+        <planeGeometry args={[4000, 4000, 200, 200]} />
       </mesh>
       <Environment resolution={128} frames={1}>
         <color attach="background" args={['#120f16']} />
