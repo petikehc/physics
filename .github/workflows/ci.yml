@@ -28,18 +28,19 @@ jobs:
     # (4-6 minutes). Its version must match @playwright/test in package.json.
     container: mcr.microsoft.com/playwright:v1.56.1-noble
     needs: check
-    # Three runners at once, about equal in length: the two "every beat" tests take minutes each in software WebGL,
-    # so each gets its own runner, and everything else (whatever its name) runs on the third.
+    # Three runners at once, about equal in length: the two "every beat" tests on one, and everything else (whatever
+    # its name) split test by test across the other two (--fully-parallel lets a shard split a file; one worker
+    # still runs one test at a time).
     strategy:
       fail-fast: false
       matrix:
         include:
-          - part: beats-desktop
-            select: --grep "every beat of the journey renders \(desktop\)"
-          - part: beats-phone
-            select: --grep "every beat of the journey renders \(phone\)"
-          - part: the-rest
-            select: --grep-invert "every beat of the journey renders"
+          - part: beats
+            select: --grep "every beat of the journey renders"
+          - part: rest-1
+            select: --grep-invert "every beat of the journey renders" --fully-parallel --shard 1/2
+          - part: rest-2
+            select: --grep-invert "every beat of the journey renders" --fully-parallel --shard 2/2
     name: e2e (${{ matrix.part }})
     steps:
       - uses: actions/checkout@v4
