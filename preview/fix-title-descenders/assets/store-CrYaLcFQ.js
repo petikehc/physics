@@ -1,0 +1,1 @@
+import{w as e}from"./index-Cf2PQA3S.js";var t=e(e=>({hovered:null,selected:null,set:t=>e(t)}));export{t};
