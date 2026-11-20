@@ -1,1 +1,0 @@
-import{w as e}from"./index-DBTcdMp5.js";var t=e(e=>({hovered:null,selected:null,set:t=>e(t)}));export{t};
