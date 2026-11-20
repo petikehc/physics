@@ -20,13 +20,7 @@ import { launchBrowser, openJourney } from './lib/journey.mjs';
 
 /** The cut: beat key, seconds into the beat to start at, and length in seconds. Change the cut here. */
 const SHOTS = [
-  // Screen-recorded from the site in real time: the frame-stepped render of the scratching looked shaky.
-  {
-    beat: 'pythagoras:draw',
-    at: 0,
-    length: 6,
-    footage: { file: 'previews/footage/pythagoras-draw.mov', from: 10.74, crop: '1962:1104:0:152' },
-  },
+  { beat: 'pythagoras:draw', at: 0, length: 6 },
   { beat: 'doppler:mach', at: 5, length: 5 },
   { beat: 'newton:cannon', at: 2, length: 5 },
   { beat: 'fourier:build', at: 1, length: 6 },
@@ -210,17 +204,7 @@ for (const [n, shot] of cut.entries()) {
     rmSync(dir, { recursive: true, force: true });
     mkdirSync(dir, { recursive: true });
     const t0 = Date.now();
-    const frames = Math.round(seconds * FPS);
-    // Recorded footage still opens the journey for the shot's words; only the picture comes from the recording.
-    const words = await renderShot(shot, dir, { frames: shot.footage ? 0 : frames, end });
-    if (shot.footage) {
-      const { file, from, crop } = shot.footage;
-      ffmpeg([
-        ...['-ss', String(from), '-i', resolve(file), '-frames:v', String(frames)],
-        ...['-vf', `crop=${crop},fps=${FPS},scale=${VIEW.w}:${VIEW.h}:flags=lanczos`],
-        ...['-start_number', '0', join(dir, 'f%05d.png')],
-      ]);
-    }
+    const words = await renderShot(shot, dir, { frames: Math.round(seconds * FPS), end });
     await band(join(dir, 'band.png'), { ...words, end });
     // The shot's sound, from the score rendered offline, with a little run-up so pads and reverb are already sounding.
     const runUp = 4;
