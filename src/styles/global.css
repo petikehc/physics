@@ -1390,6 +1390,11 @@ a {
     display: none;
   }
 
+  /* At this width the beat ticks run together into a smear between the chapter rings. */
+  .scrubber__marker--beat {
+    display: none;
+  }
+
   .captions {
     bottom: calc(96px + env(safe-area-inset-bottom));
   }

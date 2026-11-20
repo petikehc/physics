@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useApp } from '../state/store';
 import { controller } from './controller';
-import { CHAPTERS, chapterBySlug } from '../chapters/registry';
+import { chapterBySlug } from '../chapters/registry';
 import { segmentBySlug } from '../chapters/finale/meta';
 import { CaptionsIcon, NextIcon, PauseIcon, PlayIcon, PrevIcon } from '../ui/Icons';
 import { audio } from '../audio';
@@ -108,7 +108,7 @@ export function PlayerBar() {
         {journey?.beats.map((b) => (
           <span
             key={b.key}
-            className="scrubber__marker"
+            className="scrubber__marker scrubber__marker--beat"
             style={{ left: `${(b.start / duration) * 100}%`, opacity: 0.5 }}
           />
         ))}
@@ -131,21 +131,6 @@ export function PlayerBar() {
             {hover.label}
           </span>
         ) : null}
-      </div>
-      <div className="player__group" aria-label="Chapters" title="Ten chapters">
-        {CHAPTERS.map((c) => (
-          <span
-            key={c.slug}
-            title={`${c.numeral} · ${c.title}${c.status === 'soon' ? ' (in production)' : ''}`}
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: 6,
-              background: c.status === 'ready' ? c.accent : 'rgba(244,239,230,0.18)',
-              display: 'inline-block',
-            }}
-          />
-        ))}
       </div>
       <div className="player__group">
         <button
