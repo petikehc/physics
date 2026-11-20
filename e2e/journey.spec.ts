@@ -32,14 +32,26 @@ for (const viewport of [
     await waitForJourney(page);
     const beats = await page.evaluate(() => window.__journey!.beats);
     expect(beats.length).toBeGreaterThan(20);
-    // Time for every beat, however long the journey grows: a software-rendered seek and screenshot take a few seconds.
-    test.setTimeout(120_000 + beats.length * 8_000);
+    // Time for every beat, however long the journey grows: software-rendered frames are slow.
+    test.setTimeout(120_000 + beats.length * 3_000);
+    let chapter = '';
     for (const b of beats) {
       await seek(page, b.start + Math.min((b.end - b.start) * 0.7, 6));
-      await page.waitForTimeout(1500);
-      await page.screenshot({
-        path: test.info().outputPath(`${viewport.name}-${b.key.replace(':', '_')}.png`),
-      });
+      // A chapter's station loads with its neighbour's, so it is usually there already; a moment on the way in
+      // covers the rest.
+      const slug = b.key.split(':')[0]!;
+      if (slug !== chapter) await page.waitForTimeout(1000);
+      chapter = slug;
+      // Two frames drawn on the beat run its parts' per-frame code and compile anything new for it.
+      await page.evaluate(
+        () => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))),
+      );
+      if (errors.length) {
+        await page.screenshot({
+          path: test.info().outputPath(`${viewport.name}-${b.key.replace(':', '_')}.png`),
+        });
+      }
+      expect(errors, `on beat ${b.key}`).toEqual([]);
     }
     await expectCanvasRendered(page);
     expect(errors).toEqual([]);

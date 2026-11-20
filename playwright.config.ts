@@ -12,6 +12,8 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${PORT}`,
     viewport: { width: 1440, height: 900 },
+    // A failed test leaves a picture of the page in test-results/, which CI uploads.
+    screenshot: 'only-on-failure',
     launchOptions: {
       // Software WebGL so the 3D world renders in headless CI.
       args: [

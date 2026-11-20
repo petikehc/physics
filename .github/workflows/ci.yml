@@ -23,8 +23,10 @@ jobs:
       - run: npm run build
 
   e2e:
-    # Pinned: ubuntu-latest moved to 26.04, where Playwright 1.56 can't install Chromium.
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
+    # Playwright's own image comes with Chromium and the libraries it needs, instead of installing them on every run
+    # (4-6 minutes). Its version must match @playwright/test in package.json.
+    container: mcr.microsoft.com/playwright:v1.56.1-noble
     needs: check
     # Three runners at once, about equal in length: the two "every beat" tests take minutes each in software WebGL,
     # so each gets its own runner, and everything else (whatever its name) runs on the third.
@@ -46,7 +48,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
       - run: npm run e2e -- ${{ matrix.select }}
       - uses: actions/upload-artifact@v4
         if: always()
