@@ -1,0 +1,1 @@
+import{w as e}from"./index-_b5RKO_t.js";var t=e(e=>({hovered:null,selected:null,set:t=>e(t)}));export{t};
