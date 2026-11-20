@@ -90,7 +90,12 @@ export function TitleCard() {
       if (reduced || !title) {
         tl.fromTo(el, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.6 });
       } else {
-        const split = SplitText.create(title, { type: 'chars,words', mask: 'chars' });
+        const split = SplitText.create(title, {
+          type: 'chars,words',
+          mask: 'chars',
+          // The masks get this class too, as `title-card__char-mask`: the stylesheet gives them room for descenders.
+          charsClass: 'title-card__char',
+        });
         tl.fromTo(
           '.title-card__numeral',
           { autoAlpha: 0, y: 12 },
@@ -99,7 +104,8 @@ export function TitleCard() {
         );
         tl.fromTo(
           split.chars,
-          { yPercent: 110 },
+          // Far enough down to hide below the masks' room for descenders.
+          { yPercent: 130 },
           { yPercent: 0, duration: 1.1, stagger: 0.025, ease: 'expo.out', onComplete: () => split.revert() },
           1.6,
         );
