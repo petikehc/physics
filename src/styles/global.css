@@ -675,6 +675,13 @@ a {
   text-shadow: 0 2px 40px rgba(14, 15, 19, 0.65);
 }
 
+/* Each letter rises inside a clipping mask one line tall, and the tight line height would cut off the tails of
+   p, y and g until the reveal ends. Room below, taken back by the margin, so the line doesn't move. */
+.title-card__char-mask {
+  padding-bottom: 0.2em;
+  margin-bottom: -0.2em;
+}
+
 .title-card__meta {
   margin-top: 16px;
 }
