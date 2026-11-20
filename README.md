@@ -42,6 +42,7 @@ npm run dev        # http://localhost:5173
 | `npm run e2e`                        | End-to-end tests (Playwright, software WebGL)                 |
 | `npm run typecheck` / `npm run lint` | TypeScript and ESLint                                         |
 | `npm run render:preview`             | Render the journey to `previews/` (WAV soundtrack + MP4 film) |
+| `npm run render:demo`                | Render the ~40 s demo video for social feeds (4:5, MP4)       |
 
 Useful URL parameters: `?quality=low|medium|high` (otherwise detected) and `?motion=reduced`.
 
@@ -51,6 +52,24 @@ With the production build served (`npm run build && npm run preview`), `npm run 
 renders the soundtrack offline and the picture frame by frame (by seeking the timeline), then muxes both with ffmpeg
 into `previews/journey.mp4`. It needs no GPU. Add `--resume` to continue an interrupted render and `--from`/`--seconds`
 to render a slice.
+
+The render scripts draw with software WebGL (SwiftShader) by default. On a machine with a GPU, such as a Mac, put
+`GPU=1` in front of the command to draw on it instead: much faster.
+
+### Rendering the demo video
+
+`npm run render:demo` renders a ~40 s demo for social feeds into `previews/demo.mp4`: 4:5 (1080×1350), 30 fps,
+with the score. Each shot is the desktop journey in the middle of the frame, the chapter above it and the beat's
+heading below it; the last is the constellation with the title and the address. The world is stepped exactly 1/30 s
+per frame, so nothing jitters however slowly it draws. The shot list is `SHOTS` at the top of
+`scripts/render-demo.mjs`.
+
+With the build served, as for the preview film:
+
+- `--stills` renders one composed still per shot (and alternate) into `previews/demo-stills/`, in seconds: a quick
+  way to check the cut before rendering it.
+- `--only <beat key>` renders one shot, into `previews/demo-shot.mp4`.
+- `--resume` keeps shots already rendered at the right length.
 
 ### Stills for sharing
 
@@ -119,7 +138,6 @@ consent banner. Everything is in `src/analytics/`: `track.ts` is the only file t
   with. The same engine renders offline previews.
 - **The world** (`runtime.world`) fades from the dusk beach of the first chapters into deep space (`space` 0 → 1)
   as the journey rises to the planets, and to a night street and fairground (`night`) for the last two chapters.
-
 - **The finale** (`src/chapters/finale`) is a station like the chapters' but not one of them: the night's stars
   gather into a constellation of ten, one per chapter, and one sweep along them shows what each kept the same,
   before Noether's theorem says why. At the end of the journey, and at `/map`, the constellation is the index.
