@@ -1,0 +1,1 @@
+import{w as e}from"./index-0U9R9gUu.js";var t=e(e=>({hovered:null,selected:null,set:t=>e(t)}));export{t};
